@@ -2,10 +2,12 @@
 <html>
 <head>
     <meta charset="UTF-8">
+    <script>if (typeof module === 'object') {window.module = module; module = undefined;}</script>
     <script src="/js/bootstrap/jquery-3.2.1.slim.min.js"></script>
     <script src="/js/bootstrap/popper.min.js"></script>
     <script src="/js/bootstrap/bootstrap.min.js"></script>
     <link rel="stylesheet" href="/css/bootstrap/bootstrap.min.css">
+    <script>if (window.module) module = window.module;</script>
     <title><%=servername%> - 디버그</title>
 </head>
 
@@ -23,5 +25,6 @@
 <p>홍보 이메일 수신 동의 : <%=req.user.allow_email_ad%></p>
 <p>계정 생성일 : <%=req.user.createdAt%></p>
 <p>가입 완료 : <%=req.user.join_finish%></p>
+<p>전용 클라이언트 : <%=session.isClient || false%></p>
 </body>
 </html>

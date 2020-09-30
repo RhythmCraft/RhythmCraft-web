@@ -2,10 +2,12 @@
 <html>
 <head>
     <meta charset="UTF-8">
+    <script>if (typeof module === 'object') {window.module = module; module = undefined;}</script>
     <script src="/js/bootstrap/jquery-3.2.1.slim.min.js"></script>
     <script src="/js/bootstrap/popper.min.js"></script>
     <script src="/js/bootstrap/bootstrap.min.js"></script>
     <link rel="stylesheet" href="/css/bootstrap/bootstrap.min.css">
+    <script>if (window.module) module = window.module;</script>
     <script src="/js/login.js"></script>
     <title><%=servername%> - 로그인</title>
     <script>
@@ -15,7 +17,9 @@
 
 <body>
 <h1>로그인</h1>
+<%if(!session.isClient) {%>
 <%-include('./layout/menu')%>
+<%}%>
 <%-include('./layout/info')%>
 
 <form action="/login" method="post" id="LoginForm">
@@ -28,18 +32,27 @@
         <input type="password" class="form-control" id="InputPassword" placeholder="비밀번호" name="password" required>
     </div>
     <button type="submit" class="btn btn-primary">로그인</button>
-    <a class="btn btn-primary" href="/join">회원가입</a>
+    <%if(session.isClient) {%>
+        <button class="btn btn-primary" onclick="require('child_process').execSync('explorer https://rhythmcraft.hyonsu.com/join')">회원가입</button>
+    <%} else {%>
+        <a class="btn btn-primary" href="/join">회원가입</a>
+    <%}%>
     <br><br>
     <a class="btn btn-primary" href="/find_my_password">비밀번호 찾기</a>
 </form>
 <hr>
 <h2>QR코드 스캔해서 로그인</h2>
 <img id="qrlogin" width="245" height="245" src="/img/loading.gif">
-<br><a href='https://play.google.com/store/apps/details?id=com.hyonsu.hyonsulogin&pcampaignid=pcampaignidMKT-Other-global-all-co-prtnr-py-PartBadge-Mar2515-1'><img width="250" height="100" alt='다운로드하기 Google Play' src='https://play.google.com/intl/ko/badges/static/images/badges/ko_badge_web_generic.png'/></a>
+<br>
+<%if(!session.isClient) {%>
+<a href='https://play.google.com/store/apps/details?id=com.hyonsu.hyonsulogin&pcampaignid=pcampaignidMKT-Other-global-all-co-prtnr-py-PartBadge-Mar2515-1'><img width="250" height="100" alt='다운로드하기 Google Play' src='https://play.google.com/intl/ko/badges/static/images/badges/ko_badge_web_generic.png'/></a>
+<%}%>
 <hr>
+<%if(!session.isClient) {%>
 <h2>SNS 로그인</h2>
 <%login_list.forEach((name) => {%>
 <h2><a class="btn btn-primary" href="/login/<%=name.replace('.js', '')%>"><%=login[`${name.replace('.js', '').toUpperCase()}_TRANSLATE_NAME`]%></a></h2>
 <%});%>
+<%}%>
 </body>
 </html>

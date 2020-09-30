@@ -138,7 +138,8 @@ module.exports = (io, app) => {
                     if(checkroom.ready_player == checkroom.now_player) {
                         io.to(`room_${url_query.room}`).emit('msg', {
                             'action': 'gamestartreal',
-                            'note_speed': checkroom.note_speed
+                            'note_speed': checkroom.note_speed,
+                            'musicname': checkroom.music_name
                         });
                         await Room.updateOne( { roomcode: url_query.room }, { ready_player : 0 } );
 
@@ -168,7 +169,7 @@ module.exports = (io, app) => {
                                             note: Number(i.replace('note', '')),
                                             note_speed: checkroom.note_speed
                                         });
-                                    }, time));
+                                    }, time + 3000));
                                 });
                             }
                         }

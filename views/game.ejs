@@ -2,6 +2,7 @@
 <html>
 <head>
     <meta charset="UTF-8">
+    <script>if (typeof module === 'object') {window.module = module; module = undefined;}</script>
     <script src="/js/bootstrap/jquery-3.2.1.slim.min.js"></script>
     <script src="/js/bootstrap/popper.min.js"></script>
     <script src="/js/bootstrap/bootstrap.min.js"></script>
@@ -13,12 +14,14 @@
     <script>
         room_have_password = <%=room_have_password%>;
         socket_address = "<%=socket%>";
+        isClient = <%=session.isClient || false%>;
     </script>
 </head>
 
 <body>
 <div id="lobby">
-    <button id="room_setting_toggle" class="for-master btn btn-primary">방 설정 변경</button>
+    <a href="/" class="btn btn-primary">나가기</a>
+    <br><button id="room_setting_toggle" class="for-master btn btn-primary">방 설정 변경</button>
     <br>
     <div id="room_setting" hidden>
         <label for="InputName">방 이름</label>

@@ -9,7 +9,18 @@ let accurary = 0;
 let possible_max_score = 0;
 let playing = false;
 
-window.onload = () => {
+window.onload = async () => {
+    if(isClient) {
+        require('electron').remote.getGlobal('globalVars').RichPresence = {
+            details: '게임 준비 중',
+            state: '게임 준비 중 입니다.',
+            startTimestamp: Date.now(),
+            largeImageKey: 'main',
+            smallImageKey: 'main',
+            instance: true
+        }
+    }
+
     let sound;
     let master;
     let musictimeout;
@@ -114,7 +125,15 @@ window.onload = () => {
 
     let password;
     if(room_have_password && location.hash != '#master') {
-        password = prompt('방 비밀번호를 입력해 주세요.');
+        if(isClient) password = await require('electron-prompt')({
+            title: '비밀번호 입력',
+            label: '아래에 비밀번호를 입력하세요.',
+            inputAttrs: {
+                type: 'string'
+            },
+            type: 'input'
+        });
+        else password = prompt('방 비밀번호를 입력해 주세요.');
     }
     location.hash = '';
     socket = io.connect(`${socket_address}/game?password=${password}`, {
@@ -186,12 +205,16 @@ window.onload = () => {
                     scores[player.fullID]['max_combo'] = 0;
                 });
                 showScore(scores);
+                ChatBox.scrollTo(0, ChatBox.scrollHeight);
+                ChatBox2.scrollTo(0, ChatBox2.scrollHeight);
                 break;
             case 'gamestartreal':
-                if(master && create_mode) sound.play();
+                if(master && create_mode) setTimeout(() => {
+                    sound.play();
+                }, 3000);
                 else musictimeout = setTimeout(() => {
                     sound.play();
-                }, data.note_speed);
+                }, data.note_speed + 3000);
 
                 note_speed = data.note_speed;
                 note_interval = setInterval(note_interval_func, 1);
@@ -203,8 +226,31 @@ window.onload = () => {
                 accurary = 0;
 
                 document.getElementById('user_leaderboard').innerHTML = '';
+
+                if(isClient) {
+                    require('electron').remote.getGlobal('globalVars').RichPresence = {
+                        details: create_mode ? '자유 모드' : '채보 플레이 중',
+                        state: data.musicname,
+                        startTimestamp: Date.now(),
+                        endTimestamp: Date.now() + sound.duration() * 1000 + 3000,
+                        largeImageKey: 'main',
+                        smallImageKey: 'main',
+                        instance: true
+                    }
+                }
                 break;
             case 'gameend':
+                if(isClient) {
+                    require('electron').remote.getGlobal('globalVars').RichPresence = {
+                        details: '게임 준비 중',
+                        state: '게임 준비 중 입니다.',
+                        startTimestamp: Date.now(),
+                        largeImageKey: 'main',
+                        smallImageKey: 'main',
+                        instance: true
+                    }
+                }
+
                 clearInterval(note_interval);
                 playing = false;
                 document.getElementById('lobby').hidden = false;
@@ -219,6 +265,8 @@ window.onload = () => {
                 rtnote = data.rtnote;
                 document.getElementById('Save_rtnote').hidden = false;
                 document.getElementById('Save_rtnote_to_library').hidden = false;
+                ChatBox.scrollTo(0, ChatBox.scrollHeight);
+                ChatBox2.scrollTo(0, ChatBox2.scrollHeight);
                 break;
             case 'keymapinfo':
                 keymap[data.key1] = 1;

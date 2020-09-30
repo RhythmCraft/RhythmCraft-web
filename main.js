@@ -132,12 +132,21 @@ app.use((req, res, next) => {
     res.locals.Error = req.flash('Error');
     res.locals.Info = req.flash('Info');
     res.locals.Warn = req.flash('Warn');
+    res.locals.session = req.session;
     next();
 });
 
 // 헤더 설정
 app.use((req, res, next) => {
     res.set('Referrer-Policy', 'no-referrer-when-downgrade');
+    next();
+});
+
+// 클라이언트 인식
+app.use((req, res, next) => {
+    if(req.query.isClient == 'true') req.session.isClient = true;
+    if(req.query.isClient == 'false') req.session.isClient = false;
+    if(req.session.isClient && !req.isAuthenticated() && !req.url.startsWith('/login') && !req.url.startsWith('/getqrcode')) return res.redirect('/login');
     next();
 });
 

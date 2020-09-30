@@ -2,6 +2,7 @@
 <html>
 <head>
     <meta charset="UTF-8">
+    <script>if (typeof module === 'object') {window.module = module; module = undefined;}</script>
     <script src="/js/bootstrap/jquery-3.2.1.slim.min.js"></script>
     <script src="/js/bootstrap/popper.min.js"></script>
     <script src="/js/bootstrap/bootstrap.min.js"></script>
@@ -9,14 +10,24 @@
     <script src="/js/main.js"></script>
     <link rel="stylesheet" href="/css/main.css">
     <title><%=servername%></title>
+    <script>
+        isClient = <%=session.isClient || false%>;
+    </script>
 </head>
 
 <body>
-<h1>RhythmCraft</h1>
+<img src="/img/title.png" width="28%" height="28%"><br>
 <%-include('./layout/menu')%>
 <%-include('./layout/info')%>
 
 <a href="/newroom" class="btn btn-primary">새 방 만들기</a>
+<%if(session.isClient) {%>
+    <button class="btn btn-primary" onclick="require('electron').remote.app.exit();">게임 종료</button>
+<%} else {%>
+    <a class="btn btn-primary" href="/client-setup.exe">전용 클라이언트 다운로드(인스톨러)</a>
+    <a class="btn btn-primary" href="/client.zip">전용 클라이언트 다운로드(ZIP)</a>
+<%}%>
+<br><br>
 <hr>
 <div id="room"></div>
 </body>

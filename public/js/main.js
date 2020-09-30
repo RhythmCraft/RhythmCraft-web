@@ -1,4 +1,15 @@
 window.onload = () => {
+    if(isClient) {
+        require('electron').remote.getGlobal('globalVars').RichPresence = {
+            details: '로비',
+            state: '로비에서 대기하고 있습니다.',
+            startTimestamp: Date.now(),
+            largeImageKey: 'main',
+            smallImageKey: 'main',
+            instance: true
+        }
+    }
+
     const socket = io.connect('/main', {
         path: '/socket'
     });
