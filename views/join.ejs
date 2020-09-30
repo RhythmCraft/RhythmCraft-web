@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <script src="/js/bootstrap/jquery-3.2.1.slim.min.js"></script>
+    <script src="/js/bootstrap/popper.min.js"></script>
+    <script src="/js/bootstrap/bootstrap.min.js"></script>
+    <link rel="stylesheet" href="/css/bootstrap/bootstrap.min.css">
+    <script src="/js/join.js"></script>
+    <title><%=servername%> - 회원가입</title>
+</head>
+
+<body>
+<h1>회원가입</h1>
+<%-include('./layout/menu')%>
+<%-include('./layout/info')%>
+<h4>가입 후 메일함에서 이메일 인증을 마쳐야 계정이 생성됩니다.</h4>
+
+<form action="/join" method="post">
+    <div class="form-group">
+        <label for="InputEmail">이메일 주소</label>
+        <input type="email" class="form-control" id="InputEmail" placeholder="이메일 주소" name="email" required>
+    </div>
+    <div class="form-group">
+        <label for="InputPassword">비밀번호</label>
+        <input type="password" class="form-control" id="InputPassword" placeholder="비밀번호" name="password" required>
+    </div>
+    <div class="form-group">
+        <label for="InputNickname">닉네임</label>
+        <input type="text" class="form-control" id="InputNickname" placeholder="닉네임" name="nickname" required>
+    </div>
+    <div class="form-check">
+        <input class="form-check-input" type="checkbox" value="true" id="allow_email_ad" name="allow_email_ad">
+        <label class="form-check-label" for="allow_email_ad">
+            홍보 이메일 수신 동의
+        </label>
+    </div>
+    <button type="submit" class="btn btn-primary">회원가입</button>
+</form>
+</body>
+</html>

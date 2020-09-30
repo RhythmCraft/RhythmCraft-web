@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <script src="/js/bootstrap/jquery-3.2.1.slim.min.js"></script>
+    <script src="/js/bootstrap/popper.min.js"></script>
+    <script src="/js/bootstrap/bootstrap.min.js"></script>
+    <link rel="stylesheet" href="/css/bootstrap/bootstrap.min.css">
+    <title><%=servername%> - 이메일 변경</title>
+</head>
+
+<body>
+<h1>이메일 주소 변경</h1>
+<%-include('./layout/menu')%>
+<%-include('./layout/info')%>
+
+<h4>이메일 변경을 하면 변경할 이메일에 이메일이 도착하며, 해당 이메일에 있는 링크를 눌러야 최종 변경됩니다.</h4>
+<form action="change_email" method="post">
+    <div class="form-group">
+        <label for="InputEmail">새 이메일 주소</label>
+        <input type="email" class="form-control" id="InputEmail" name="email" placeholder="새 이메일 주소" required>
+    </div>
+
+    <button type="submit" class="btn btn-primary">변경</button>
+</form>
+</body>
+</html>

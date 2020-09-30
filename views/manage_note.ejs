@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <script src="/js/bootstrap/jquery-3.2.1.slim.min.js"></script>
+    <script src="/js/bootstrap/popper.min.js"></script>
+    <script src="/js/bootstrap/bootstrap.min.js"></script>
+    <link rel="stylesheet" href="/css/bootstrap/bootstrap.min.css">
+    <title><%=servername%> - 채보 관리</title>
+</head>
+
+<body>
+<h1>채보 관리</h1>
+<%-include('./layout/menu')%>
+<%-include('./layout/info')%>
+
+<h4>.rhythmcraft 확장자의 파일을 업로드하세요.</h4>
+
+<form action="/uploadnote" method="post" enctype="multipart/form-data">
+    <div class="form-group">
+        <label for="InputFile">채보 업로드</label>
+        <input type="file" name="file" class="form-control-file" id="InputFile" required>
+    </div>
+    <button type="submit" class="btn btn-primary">업로드</button>
+</form>
+
+<hr>
+
+<%files.forEach(file => {%>
+    <h4>
+        <%=file.originalname%>
+        <a href="/downloadnote?name=<%=encodeURI(file.name)%>">파일 다운로드</a>
+        <a href="/removenote?name=<%=encodeURI(file.name)%>">파일 삭제</a>
+    </h4>
+<%});%>
+</body>
+</html>

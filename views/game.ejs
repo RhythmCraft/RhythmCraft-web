@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <script src="/js/bootstrap/jquery-3.2.1.slim.min.js"></script>
+    <script src="/js/bootstrap/popper.min.js"></script>
+    <script src="/js/bootstrap/bootstrap.min.js"></script>
+    <link rel="stylesheet" href="/css/bootstrap/bootstrap.min.css">
+    <script src="/js/game.js"></script>
+    <script src="/js/howler.js"></script>
+    <link rel="stylesheet" href="/css/game.css">
+    <title><%=servername%> - 게임</title>
+    <script>
+        room_have_password = <%=room_have_password%>;
+        socket_address = "<%=socket%>";
+    </script>
+</head>
+
+<body>
+<div id="lobby">
+    <button id="room_setting_toggle" class="for-master btn btn-primary">방 설정 변경</button>
+    <br>
+    <div id="room_setting" hidden>
+        <label for="InputName">방 이름</label>
+        <input id="InputName" type="text" placeholder="방 이름을 입력하세요." class="form-control">
+        <label for="InputPassword">방 비밀번호</label>
+        <input id="InputPassword" type="password" placeholder="방 비밀번호를 입력하세요. 비워두면 비밀번호 없이 들어올 수 있습니다." class="form-control">
+        <label for="InputNoteSpeed">노트 속도(노트가 판정선에 닿기까지 걸리는 시간, 단위 ms)</label>
+        <input id="InputNoteSpeed" type="text" placeholder="노트 속도를 입력하세요.(단위 : ms)" class="form-control">
+        <label for="InputMusic">음악 선택</label>
+        <select name="music" class="form-control" id="InputMusic" required></select>
+        <label for="InputNote">채보 선택</label>
+        <select name="note" class="form-control" id="InputNote" required></select>
+
+        <br>
+        <button id="change_room_setting" class="btn btn-primary">적용</button>
+    </div>
+    <br><br>
+    <button id="StartGame" class="for-master btn btn-primary">게임 시작</button>
+    <br><br>
+    <div id="user-list" class="list-group"></div>
+
+    <br><button id="Save_rtnote_to_library" class="btn btn-primary" hidden>이전 게임 채보 저장</button>
+    <br><br><button id="Save_rtnote" class="btn btn-primary" hidden>이전 게임 채보 다운로드</button>
+
+    <div id="ChatBox"></div>
+    <input id="InputChat" placeholder="채팅을 입력하세요.">
+    <button id="SendChat" class="btn btn-primary">전송</button>
+
+    <h1>유저 통계</h1>
+    <div id="user_leaderboard"></div>
+</div>
+
+<div id="game" hidden>
+    <button id="StopGame" class="for-master btn btn-primary">게임 종료</button>
+    <div id="score">0점</div>
+    <div id="multiplier">1.00X</div>
+    <div id="accurary">0%</div>
+    <div id="combo">0콤보</div>
+    <div id="max_combo">최대 0콤보</div>
+    <div id="note_check_line"></div>
+    <div id="game_line"></div>
+    <div id="note_1_area" class="note_area"><div id="note_area_background_1" class="note_area_background"></div></div>
+    <div id="note_2_area" class="note_area"><div id="note_area_background_2" class="note_area_background"></div></div>
+    <div id="note_3_area" class="note_area"><div id="note_area_background_3" class="note_area_background"></div></div>
+    <div id="note_4_area" class="note_area"><div id="note_area_background_4" class="note_area_background"></div></div>
+    <div id="note_5_area" class="note_area"><div id="note_area_background_5" class="note_area_background"></div></div>
+    <div id="note_6_area" class="note_area"><div id="note_area_background_6" class="note_area_background"></div></div>
+    <div id="note_7_area" class="note_area"><div id="note_area_background_7" class="note_area_background"></div></div>
+    <div id="note_8_area" class="note_area"><div id="note_area_background_8" class="note_area_background"></div></div>
+
+
+    <div id="ChatBoxForGame"></div>
+    <input id="InputChatForGame" placeholder="채팅을 입력하세요.">
+    <button id="SendChatForGame" class="btn btn-primary">전송</button>
+    <div id="Live_LeaderBoard"></div>
+</div>
+</body>
+</html>

@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <script src="/js/bootstrap/jquery-3.2.1.slim.min.js"></script>
+    <script src="/js/bootstrap/popper.min.js"></script>
+    <script src="/js/bootstrap/bootstrap.min.js"></script>
+    <link rel="stylesheet" href="/css/bootstrap/bootstrap.min.css">
+    <title><%=servername%></title>
+
+<!--    테스트용 코드-->
+<!--    <script>window.onload = () => document.getElementById('form').submit();</script>-->
+</head>
+
+<body>
+<h1>방 생성</h1>
+<%-include('./layout/menu')%>
+<%-include('./layout/info')%>
+
+<form action="/newroom" method="post" id="form">
+    <div class="form-group">
+        <label for="InputName">방 이름</label>
+        <input type="text" class="form-control" id="InputName" placeholder="방 이름을 입력하세요." value="<%=user.nickname%>의 방" name="name" required>
+    </div>
+    <div class="form-group">
+        <label for="InputPassword">방 비밀번호</label>
+        <input type="password" class="form-control" id="InputPassword" placeholder="방 비밀번호를 입력하세요. 비워두면 비밀번호 없이 들어올 수 있습니다." value="" name="password">
+    </div>
+    <div class="form-group">
+        <label for="InputNoteSpeed">노트 속도(노트가 판정선에 닿기까지 걸리는 시간, 단위 ms)</label>
+        <input type="number" class="form-control" id="InputNoteSpeed" placeholder="노트 속도를 입력하세요.(단위 : ms)" value="1000" name="note_speed" required>
+    </div>
+    <div class="form-group">
+        <label for="InputMaxPlayer">최대 플레이어(최소 2명, 최대 8명)</label>
+        <input type="number" class="form-control" id="InputMaxPlayer" palceholder="최대 플레이어를 입력하세요." min="2" max="8" value="8" name="max_player" required>
+    </div>
+    <div class="form-group">
+        <label for="InputMusic">음악 선택</label>
+        <select name="music" class="form-control" id="InputMusic" required>
+            <%files.forEach(file => {%>
+                <option value="<%=file.name%>"><%=file.originalname%></option>
+            <%});%>
+        </select>
+    </div>
+    <div class="form-group">
+        <label for="InputNote">채보 선택</label>
+        <select name="note" class="form-control" id="InputNote" required>
+            <option value="rhythmcraft_mode">창작 모드!</option>
+            <%notes.forEach(note => {%>
+            <option value="<%=note.name%>"><%=note.originalname%></option>
+            <%});%>
+        </select>
+    </div>
+
+    <button type="submit" class="btn btn-primary">생성</button>
+</form>
+</body>
+</html>

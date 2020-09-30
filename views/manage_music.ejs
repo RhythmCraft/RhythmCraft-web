@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <script src="/js/bootstrap/jquery-3.2.1.slim.min.js"></script>
+    <script src="/js/bootstrap/popper.min.js"></script>
+    <script src="/js/bootstrap/bootstrap.min.js"></script>
+    <link rel="stylesheet" href="/css/bootstrap/bootstrap.min.css">
+    <title><%=servername%> - 음악 관리</title>
+</head>
+
+<body>
+<h1>음악 관리</h1>
+<%-include('./layout/menu')%>
+<%-include('./layout/info')%>
+
+<h4>음악 업로드 시 해당 음악에 대한 사용 권한을 가진 것으로 간주합니다.</h4>
+<h4>음악 사용 권한을 가지고 있지 않을 시 음악을 업로드하지 마세요.</h4>
+
+<form action="/uploadmusic" method="post" enctype="multipart/form-data">
+    <div class="form-group">
+        <label for="InputFile">음악 업로드</label>
+        <input type="file" name="file" class="form-control-file" id="InputFile" accept="audio/*" required>
+    </div>
+    <button type="submit" class="btn btn-primary">업로드</button>
+</form>
+
+<hr>
+
+<%files.forEach(file => {%>
+    <h4>
+        <a href="/listenmusic?name=<%=encodeURI(file.name)%>"><%=file.originalname%></a>
+        <%if(file.public) {%>
+            <a href="/musicstatus?name=<%=encodeURI(file.name)%>&public=false" style="color: red;">음악 비공개</a>
+        <%} else {%>
+            <a href="/musicstatus?name=<%=encodeURI(file.name)%>&public=true">음악 공개</a>
+        <%}%>
+        <a href="/removemusic?name=<%=encodeURI(file.name)%>">파일 삭제</a>
+    </h4>
+<%});%>
+</body>
+</html>

@@ -1,0 +1,26 @@
+<%rooms.forEach(room => {%>
+    <div class="card room_list" style="width: 18rem;" onclick="location.href = '/game?room=<%=room.roomcode%>';">
+        <div class="card-body">
+            <h5 class="card-title"><%=room.name%></h5>
+            <h6 class="card-subtitle mb-2 text-muted">
+                <%if(room.playing) {%>
+                     플레이 중, 입장 불가능
+                <%} else {%>
+                    클릭하여 입장
+                <%}%>
+            </h6>
+            <p class="card-text">
+                정원 : <%=room.now_player%> / <%=room.max_player%>,
+                노트 속도 : <%=room.note_speed%>ms,
+                <%if(!room.password) {%>
+                    공개방
+                <%} else {%>
+                    비밀방
+                <%}%>
+                <br>
+                음악 : <%=room.music_name%>
+                <br>채보 : <%=room.note != null ? `${room.note.musicname}(Note By ${room.note.author_name})` : '채보 없음'%>
+            </p>
+        </div>
+    </div>
+<%});%>

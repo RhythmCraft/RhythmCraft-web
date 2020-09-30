@@ -1,0 +1,177 @@
+.note_image {
+    width: 5.5vw;
+    height: 49px;
+}
+#StopGame {
+    position: absolute;
+    top: 210px;
+    right: 0px;
+    float: right;
+}
+#user-list {
+    width: 300px;
+}
+#note_check_line {
+    width: 50%;
+    height: 70%;
+    border: black solid 1px;
+    position: absolute;
+    float: left;
+}
+#game_line {
+    top: 70%;
+    width: 50%;
+    height: 30%;
+    border: black solid 1px;
+    position: absolute;
+    float: left;
+}
+#score, #multiplier, #accurary, #combo, #max_combo {
+    position: absolute;
+    float: left;
+    right: 6px;
+    top: 0px;
+    font-size: 30px;
+}
+#multiplier {
+    top: 40px;
+}
+#accurary {
+    top: 80px;
+}
+#combo {
+    top: 120px;
+}
+#max_combo {
+    top: 160px;
+}
+.note {
+    position: absolute;
+    z-index: 1;
+}
+.note_1 {
+    left: 0.25%;
+}
+.note_2 {
+    left: 6.5%;
+}
+.note_3 {
+    left: 12.75%;
+}
+.note_4 {
+    left: 19%;
+}
+.note_5 {
+    left: 25.25%;
+}
+.note_6 {
+    left: 31.5%;
+}
+.note_7 {
+    left: 37.75%;
+}
+.note_8 {
+    left: 44%;
+}
+.note_area {
+    position: absolute;
+    width: 6.25%;
+    height: 70%;
+    top: 0px;
+    border: solid 1px black;
+    z-index: 0;
+}
+.note_area_background {
+    width: 100%;
+    height: 100%;
+    background-color: gray;
+    opacity: 0;
+}
+#note_1_area {
+    left: 0px;
+}
+#note_2_area {
+    left: 6.25%;
+}
+#note_3_area {
+    left: 12.5%;
+}
+#note_4_area {
+    left: 18.75%;
+}
+#note_5_area {
+    left: 25%;
+}
+#note_6_area {
+    left: 31.25%;
+}
+#note_7_area {
+    left: 37.5%;
+ }
+#note_8_area {
+    left: 43.75%;
+}
+#user_leaderboard {
+    border: solid black 1px;
+}
+#ChatBox, #ChatBoxForGame {
+    width: 28.25%;
+    height: 400px;
+    margin-bottom: 10px;
+    overflow: scroll;
+    border: gray solid 3px;
+}
+#InputChat, #InputChatForGame {
+    width: 25%;
+}
+#ChatBoxForGame {
+    position: absolute;
+    bottom: 34px;
+    right: 0px;
+    float: right;
+    float: bottom;
+}
+#InputChatForGame {
+    position: absolute;
+    bottom: 8px;
+    right: 60px;
+    float: right;
+    float: bottom;
+    z-index: 0;
+}
+#SendChatForGame {
+    position: absolute;
+    bottom: 5px;
+    right: 0px;
+    float: right;
+    float: bottom;
+}
+#chat {
+    position: absolute;
+    float: right;
+    top: 70%;
+    right: 0px;
+    width: 25%;
+    height: 400px;
+}
+.chat-nickname, .chat-text {
+    margin-left: 10px;
+}
+.roomowner-chat {
+    background-color: LightGreen;
+}
+.admin-chat {
+    background-color: LightCyan;
+}
+.system-chat {
+    background-color: lightgray;
+}
+#StopGame {
+    z-index: 1;
+}
+#Live_LeaderBoard {
+    position: absolute;
+    float: right;
+    top: 10px;
+    right: 30%;
+}

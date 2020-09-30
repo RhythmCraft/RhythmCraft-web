@@ -1,0 +1,37 @@
+{
+  "SERVER_NAME": "RhythmCraft",
+
+  "PORT": 80,
+  "USE_SSL": false,
+  "SSL_CERT": "SSL_CERT",
+  "SSL_KEY": "SSL_KEY",
+  "SESSION_SECRET": "SECRET",
+
+  "INDEX": [ "index.htm" , "index.html" ],
+
+  "SAVE_FILE_PATH": "FILE_PATH",
+
+  "USE_REDIS": false,
+  "REDIS_HOST": "localhost",
+  "REDIS_PORT": 6379,
+  "REDIS_PASSWORD": "",
+
+  "MONGODB_HOST": "localhost",
+  "MONGODB_PORT": 27017,
+  "MONGODB_USER": "USER",
+  "MONGODB_PASSWORD": "PASS",
+  "DBNAME": "rhythmcraft",
+
+  "TOKEN_SECRET": "SECRET",
+
+  "SMTP_MAIL_ADDRESS": "example@example.com",
+  "SMTP_INFO" : {
+    "host": "example.com",
+    "port": 465,
+    "secure": true,
+    "auth": {
+      "user": "example@example.com",
+      "pass": "SECRET"
+    }
+  }
+}

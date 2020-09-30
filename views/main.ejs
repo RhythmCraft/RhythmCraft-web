@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <script src="/js/bootstrap/jquery-3.2.1.slim.min.js"></script>
+    <script src="/js/bootstrap/popper.min.js"></script>
+    <script src="/js/bootstrap/bootstrap.min.js"></script>
+    <link rel="stylesheet" href="/css/bootstrap/bootstrap.min.css">
+    <script src="/js/main.js"></script>
+    <link rel="stylesheet" href="/css/main.css">
+    <title><%=servername%></title>
+</head>
+
+<body>
+<h1>RhythmCraft</h1>
+<%-include('./layout/menu')%>
+<%-include('./layout/info')%>
+
+<a href="/newroom" class="btn btn-primary">새 방 만들기</a>
+<hr>
+<div id="room"></div>
+</body>
+</html>

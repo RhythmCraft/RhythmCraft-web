@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <script src="/js/bootstrap/jquery-3.2.1.slim.min.js"></script>
+    <script src="/js/bootstrap/popper.min.js"></script>
+    <script src="/js/bootstrap/bootstrap.min.js"></script>
+    <link rel="stylesheet" href="/css/bootstrap/bootstrap.min.css">
+    <title><%=servername%> - 디버그</title>
+</head>
+
+<body>
+<h1>디버그 정보</h1>
+<%-include('./layout/menu')%>
+<%-include('./layout/info')%>
+
+<p>나의 닉네임 : <%=req.user.nickname%></p>
+<p>이메일 : <%=req.user.email%></p>
+<p>식별ID : <%=req.user.snsID%></p>
+<p>fullID : <%=req.user.fullID%></p>
+<p>provider : <%=req.user.provider%></p>
+<p>nick_set : <%=req.user.nick_set%></p>
+<p>홍보 이메일 수신 동의 : <%=req.user.allow_email_ad%></p>
+<p>계정 생성일 : <%=req.user.createdAt%></p>
+<p>가입 완료 : <%=req.user.join_finish%></p>
+</body>
+</html>

@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="/css/admin-user-menu.css">
+    <script src="/js/bootstrap/jquery-3.2.1.slim.min.js"></script>
+    <script src="/js/bootstrap/popper.min.js"></script>
+    <script src="/js/bootstrap/bootstrap.min.js"></script>
+    <link rel="stylesheet" href="/css/bootstrap/bootstrap.min.css">
+    <title>유저 관리 - 유저 ID 입력</title>
+</head>
+
+<body>
+<h1>유저 관리 - 유저 ID 입력</h1>
+<%-include('./layout/menu')%>
+<%-include('./layout/info')%>
+
+<form action="/admin/user">
+    <input type="text" name="id" id="input" placeholder="관리 대상 유저 ID를 입력해 주세요." required>
+    <input type="submit" value="확인">
+</form>
+</body>
+</html>

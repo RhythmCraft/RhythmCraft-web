@@ -1,0 +1,27 @@
+<link rel="stylesheet" href="/css/menu.css">
+
+<div id="dropdown_menu" class="btn-group float-right">
+    <button type="button" class="btn btn-secondary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+        메뉴
+    </button>
+    <div class="dropdown-menu dropdown-menu-right">
+        <%if(logined) {%>
+            <a class="dropdown-item" href="/logout">로그아웃</a>
+            <a class="dropdown-item" href="/mypage">마이페이지</a>
+            <a class="dropdown-item" href="/music">음악 업로드 관리</a>
+            <a class="dropdown-item" href="/note">채보 업로드 관리</a>
+        <%} else {%>
+            <a class="dropdown-item" href="/login">로그인</a>
+        <%}%>
+        <div class="dropdown-divider"></div>
+            <a class="dropdown-item" href="/">메인 메뉴</a>
+            <div class="dropdown-divider"></div>
+        <%if(logined && user.create_judge) {%>
+            <a class="dropdown-item" href="/create">문제 만들기</a>
+        <%}%>
+        <a class="dropdown-item" href="/debug">디버그 정보</a>
+        <%if(isAdmin) {%>
+            <a class="dropdown-item" href="/admin">관리자 메뉴</a>
+        <%}%>
+    </div>
+</div>
