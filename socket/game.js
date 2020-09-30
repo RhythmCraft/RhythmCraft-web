@@ -296,7 +296,7 @@ module.exports = (io, app) => {
         });
 
         socket.on('SaveToLibrary', async data => {
-            const name = `${uniqueString()}.adofai`;
+            const name = `${uniqueString()}.rhythmcraft`;
             fs.writeFileSync(path.join(setting.SAVE_FILE_PATH, name), data.rtnote);
 
             await File.create({
