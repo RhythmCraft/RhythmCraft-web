@@ -1,3 +1,9 @@
+#title {
+    margin: 10px;
+}
+#menu-button {
+    bottom: 17px;
+}
 .room_list {
     text-align: center;
     min-width: 20%;
