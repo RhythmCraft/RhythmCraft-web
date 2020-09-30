@@ -61,7 +61,10 @@ if(setting.USE_REDIS) {
         secret: setting.SESSION_SECRET,
         resave: false,
         saveUninitialized: false,
-        store: new RedisStore({ client: client })
+        store: new RedisStore({ client: client }),
+        cookie: {
+            maxAge: 1000 * 60 * 60 * 24 * 7
+        }
     })
     app.use(sessionMiddleware);
 }
@@ -69,7 +72,10 @@ else {
     sessionMiddleware = session({
         secret: setting.SESSION_SECRET,
         resave: false,
-        saveUninitialized: false
+        saveUninitialized: false,
+        cookie: {
+            maxAge: 1000 * 60 * 60 * 24 * 7
+        }
     });
     app.use(sessionMiddleware);
 }
