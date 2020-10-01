@@ -143,7 +143,7 @@ module.exports = (io, app) => {
                         });
                         await Room.updateOne( { roomcode: url_query.room }, { ready_player : 0 } );
 
-                        starttimestamp = new Date().getTime();
+                        starttimestamp = new Date().getTime() + 3000;
 
                         rtnote = {};
                         rtnote.music = checkroom.music;
