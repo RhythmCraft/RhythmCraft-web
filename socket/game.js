@@ -22,6 +22,7 @@ module.exports = (io, app) => {
         let rtnote = {};
         let starttimestamp;
         let rtnote_timeout = [];
+        let notepersecond;
 
         io.to(`user_${user.fullID}`).emit('msg', { 'action' : 'exit' , 'message' : '다중접속' });
 
@@ -283,11 +284,88 @@ module.exports = (io, app) => {
             });
         });
 
-        socket.on('Chat', data => {
+        socket.on('Chat', async data => {
+            const checkroom = await Room.findOne({ roomcode : url_query.room });
+
             let chattype;
             if(user.admin) chattype = 'admin';
             else if(master) chattype = 'roomowner';
             else chattype = 'user';
+
+            const params = data.chat.replace('/', '').split(' ');
+            params.splice(0, 1);
+            if(data.chat.startsWith('/') && user.admin) switch(data.chat.replace('/', '').split(' ')[0]) {
+                case 'debug':
+                    switch(params[0]) {
+                        case 'autoplay':
+                            socket.emit('msg', {
+                                'action': 'toggleautoplay'
+                            });
+                            socket.emit('Chat', {
+                                nickname: '시스템',
+                                chattype: 'system',
+                                chat: '자동플레이 명령이 실행되었습니다.'
+                            });
+                            break;
+                        case 'notepersecond':
+                            if(!params[1] || !params[2]) {
+                                socket.emit('Chat', {
+                                    nickname: '시스템',
+                                    chattype: 'system',
+                                    chat: '옵션이 잘못되었습니다.<br>사용법 : /debug notepersecond <노트번호> <간격 ms>'
+                                });
+                                break;
+                            }
+
+                            notepersecond = setInterval(() => {
+                                io.to(`room_${url_query.room}`).emit('GiveNote', {
+                                    note: Number(params[1]),
+                                    note_speed: checkroom.note_speed
+                                });
+                            }, Number(params[2]));
+                            socket.emit('Chat', {
+                                nickname: '시스템',
+                                chattype: 'system',
+                                chat: `${params[1]}번 노트가 ${params[2]}ms마다 생성됩니다.`
+                            });
+                            break;
+                        case 'stopnote':
+                            clearTimeout(notepersecond);
+                            rtnote_timeout.forEach(timeout => {
+                                clearTimeout(timeout);
+                            });
+                            rtnote_timeout = [];
+                            socket.emit('Chat', {
+                                nickname: '시스템',
+                                chattype: 'system',
+                                chat: '모든 노트 대기열을 정지했습니다.'
+                            });
+                            break;
+                        default:
+                            socket.emit('Chat', {
+                                nickname: '시스템',
+                                chattype: 'system',
+                                chat: '존재하지 않는 디버그 옵션입니다.'
+                            });
+                            break;
+                    }
+                    break;
+                case 'closeroom':
+                    await RoomUser.deleteMany({ roomcode : url_query.room });
+                    await Room.deleteOne({ roomcode : url_query.room });
+                    app.get('socket_main').emit('msg', { 'action': 'reload_room' });
+                    io.to(`room_${url_query.room}`).emit('msg', { 'action' : 'exit' , 'message' : '관리자에 의해 방이 삭제됩니다.' });
+                    break;
+                default:
+                    socket.emit('Chat', {
+                        nickname: '시스템',
+                        chattype: 'system',
+                        chat: '존재하지 않는 명령어입니다.'
+                    });
+            }
+
+            if(data.chat.startsWith('/') && user.admin) return;
+
             io.to(`room_${url_query.room}`).emit('Chat', {
                 nickname: user.nickname,
                 chattype,

@@ -28,6 +28,7 @@ window.onload = async () => {
     let rtnote;
     let create_mode;
     let scores;
+    let autoplay;
 
     document.getElementById('InputMusic').innerHTML = Request('get', '/select_music');
     document.getElementById('InputNote').innerHTML = Request('get', '/select_note');
@@ -305,6 +306,8 @@ window.onload = async () => {
             case 'updatenote':
                 if(master) updateNote();
                 break;
+            case 'toggleautoplay':
+                autoplay = !autoplay;
         }
     });
 
@@ -351,6 +354,12 @@ window.onload = async () => {
         document.getElementById('game').appendChild(note);
 
         possible_max_score += 5;
+
+        if(autoplay) setTimeout(() => {
+            for(let key in keymap) {
+                if(keymap[key] == data.note) fakeKey(key);
+            }
+        }, data.note_speed);
     });
 
     socket.on('MyScore', data => {
