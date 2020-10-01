@@ -205,16 +205,37 @@ window.onload = async () => {
                     scores[player.fullID]['max_combo'] = 0;
                 });
                 showScore(scores);
-                ChatBox.scrollTo(0, ChatBox.scrollHeight);
-                ChatBox2.scrollTo(0, ChatBox2.scrollHeight);
+                document.getElementById('ChatBox').scrollTo(0, ChatBox.scrollHeight);
+                document.getElementById('ChatBoxForGame').scrollTo(0, ChatBox2.scrollHeight);
                 break;
             case 'gamestartreal':
+                const CountDown = document.getElementById('CountDown');
+                CountDown.hidden = false;
+
                 if(master && create_mode) setTimeout(() => {
                     sound.play();
                 }, 3000);
                 else musictimeout = setTimeout(() => {
                     sound.play();
                 }, data.note_speed + 3000);
+
+                CountDown.innerText = '3';
+                hitsound.play();
+                setTimeout(() => {
+                    CountDown.innerText = '2';
+                    hitsound.play();
+                }, 1000);
+                setTimeout(() => {
+                    CountDown.innerText = '1';
+                    hitsound.play();
+                }, 2000);
+                setTimeout(() => {
+                    CountDown.innerText = '시작!';
+                    hitsound.play();
+                }, 3000);
+                setTimeout(() => {
+                    CountDown.hidden = true;
+                }, 3500);
 
                 note_speed = data.note_speed;
                 note_interval = setInterval(note_interval_func, 1);

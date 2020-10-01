@@ -175,3 +175,13 @@
     top: 10px;
     right: 30%;
 }
+#CountDown {
+    position: absolute;
+    z-index: 3;
+    text-align: center;
+    width: 100%;
+    height: 40%;
+    top: 40%;
+    margin: 0px;
+    font-size: 100px;
+}
