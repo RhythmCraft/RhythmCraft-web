@@ -4,6 +4,16 @@ window.onload = () => {
     note = JSON.parse(note_file);
     let note_time = startpos;
 
+    if(isClient) {
+        require('electron').remote.getGlobal('globalVars').RichPresence = {
+            details: '수정 중',
+            state: note.musicname,
+            startTimestamp: Date.now(),
+            largeImageKey: 'main',
+            instance: true
+        }
+    }
+
     renderNote(note, note_time);
 
     document.getElementById('Play').onclick = function() {
