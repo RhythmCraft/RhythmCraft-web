@@ -23,6 +23,13 @@
 <a href="/newroom" class="btn btn-primary">새 방 만들기</a>
 <%if(session.isClient) {%>
     <button class="btn btn-primary" onclick="require('electron').remote.app.exit();">게임 종료</button>
+    <form method="get" action="/game">
+        <div class="form-group">
+            <label for="InputRoom">방 코드 입력</label>
+            <input id="InputRoom" class="form-control" name="room" type="text" placeholder="방 코드 입력">
+        </div>
+        <button type="submit" class="btn btn-primary">접속</button>
+    </form>
 <%} else {%>
     <a class="btn btn-primary" href="/client-setup.exe">전용 클라이언트 다운로드(인스톨러)</a>
     <a class="btn btn-primary" href="/client.zip">전용 클라이언트 다운로드(ZIP)</a>
