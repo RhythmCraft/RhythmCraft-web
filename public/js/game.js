@@ -16,7 +16,6 @@ window.onload = async () => {
             state: '게임 준비 중 입니다.',
             startTimestamp: Date.now(),
             largeImageKey: 'main',
-            smallImageKey: 'main',
             instance: true
         }
     }
@@ -29,6 +28,7 @@ window.onload = async () => {
     let create_mode;
     let scores;
     let autoplay;
+    let hitsound_collection = [];
 
     document.getElementById('InputMusic').innerHTML = Request('get', '/select_music');
     document.getElementById('InputNote').innerHTML = Request('get', '/select_note');
@@ -43,7 +43,7 @@ window.onload = async () => {
     document.getElementById('InputChat').focus();
 
     document.getElementById('room_setting_toggle').onclick = function() {
-        if(master) document.getElementById('room_setting').hidden = !document.getElementById('room_setting').hidden;
+        document.getElementById('room_setting').hidden = !document.getElementById('room_setting').hidden;
     }
     document.getElementById('change_room_setting').onclick = function() {
         if(master) {
@@ -53,14 +53,7 @@ window.onload = async () => {
 
             if (!InputName.value || !Number(InputNoteSpeed.value)) return;
 
-            socket.emit('ChangeRoomSetting', {
-                name: InputName.value,
-                password: InputPassword.value,
-                note_speed: InputNoteSpeed.value,
-                music: document.getElementById('InputMusic').value,
-                note: document.getElementById('InputNote').value,
-                show_alert: true
-            });
+            ChangeRoomSetting(true);
         }
     }
 
@@ -124,6 +117,10 @@ window.onload = async () => {
         ele.hidden = true;
     });
 
+    Array.from(document.getElementsByClassName('for-master-other-disable')).forEach(ele => {
+        ele.disabled = true;
+    });
+
     let password;
     if(room_have_password && location.hash != '#master') {
         if(isClient) password = await require('electron-prompt')({
@@ -135,13 +132,17 @@ window.onload = async () => {
             type: 'input'
         });
         else password = prompt('방 비밀번호를 입력해 주세요.');
+        location.hash = '';
     }
-    location.hash = '';
+
     socket = io.connect(`${socket_address}/game?password=${password}`, {
         path: '/socket'
     });
 
     socket.on('msg', data => {
+        const ChatBox = document.getElementById('ChatBox');
+        const ChatBox2 = document.getElementById('ChatBoxForGame');
+
         switch(data.action) {
             case 'exit':
                 alert(data.message);
@@ -151,7 +152,17 @@ window.onload = async () => {
                 Array.from(document.getElementsByClassName('for-master')).forEach(ele => {
                     ele.hidden = false;
                 });
+                Array.from(document.getElementsByClassName('for-master-other-disable')).forEach(ele => {
+                    ele.disabled = false;
+                });
                 master = true;
+
+                if(location.hash == '#start') {
+                    socket.emit('msg', {
+                        "action": "gamestart"
+                    });
+                }
+                location.hash = '';
 
                 // 테스트용 코드
                 // socket.emit('msg', {
@@ -161,11 +172,16 @@ window.onload = async () => {
             case 'alert':
                 alert(data.message);
                 break;
+            case 'redirect':
+                location.href = data.url;
+                break;
             case 'roomInfo':
                 document.getElementById('InputName').value = data.name;
                 document.getElementById('InputPassword').value = data.password;
                 document.getElementById('InputNoteSpeed').value = data.note_speed;
                 document.getElementById('InputMusic').value = data.music;
+                document.getElementById('InputStartpos').value = data.startpos;
+                document.getElementById('public').checked = data.public;
                 break;
             case 'gamestart':
                 playing = true;
@@ -188,6 +204,7 @@ window.onload = async () => {
                     html5: true,
                     onload: () => {
                         socket.emit('msg', { 'action' : 'gameready' });
+                        document.getElementById('CountDown').innerText = '다른 유저를 기다리는 중...';
                     },
                     onend: () => {
                         if(master) socket.emit('msg', { 'action' : 'gameend' });
@@ -208,35 +225,41 @@ window.onload = async () => {
                 showScore(scores);
                 document.getElementById('ChatBox').scrollTo(0, ChatBox.scrollHeight);
                 document.getElementById('ChatBoxForGame').scrollTo(0, ChatBox2.scrollHeight);
+
+                document.getElementById('CountDown').innerText = '음악 다운로드 중...';
                 break;
             case 'gamestartreal':
+                hitsound_collection = [];
+
                 const CountDown = document.getElementById('CountDown');
                 CountDown.hidden = false;
 
-                if(master && create_mode) setTimeout(() => {
+                if(master && create_mode) hitsound_collection.push(setTimeout(() => {
+                    sound.seek(data.startpos / 1000);
                     sound.play();
-                }, 3000);
-                else musictimeout = setTimeout(() => {
+                }, 3000));
+                else musictimeout = hitsound_collection.push(setTimeout(() => {
+                    sound.seek(data.startpos / 1000);
                     sound.play();
-                }, data.note_speed + 3000);
+                }, data.note_speed + 3000));
 
                 CountDown.innerText = '3';
                 hitsound.play();
-                setTimeout(() => {
+                hitsound_collection.push(setTimeout(() => {
                     CountDown.innerText = '2';
                     hitsound.play();
-                }, 1000);
-                setTimeout(() => {
+                }, 1000));
+                hitsound_collection.push(setTimeout(() => {
                     CountDown.innerText = '1';
                     hitsound.play();
-                }, 2000);
-                setTimeout(() => {
+                }, 2000));
+                hitsound_collection.push(setTimeout(() => {
                     CountDown.innerText = '시작!';
                     hitsound.play();
-                }, 3000);
-                setTimeout(() => {
+                }, 3000));
+                hitsound_collection.push(setTimeout(() => {
                     CountDown.hidden = true;
-                }, 3500);
+                }, 3500));
 
                 note_speed = data.note_speed;
                 note_interval = setInterval(note_interval_func, 1);
@@ -256,7 +279,6 @@ window.onload = async () => {
                         startTimestamp: Date.now(),
                         endTimestamp: Date.now() + sound.duration() * 1000 + 3000,
                         largeImageKey: 'main',
-                        smallImageKey: 'main',
                         instance: true
                     }
                 }
@@ -268,10 +290,18 @@ window.onload = async () => {
                         state: '게임 준비 중 입니다.',
                         startTimestamp: Date.now(),
                         largeImageKey: 'main',
-                        smallImageKey: 'main',
                         instance: true
                     }
                 }
+
+                Array.from(document.getElementsByClassName('note')).forEach(ele => {
+                    ele.remove();
+                });
+
+                hitsound_collection.forEach(timeout => {
+                    clearTimeout(timeout);
+                });
+                hitsound_collection = [];
 
                 clearInterval(note_interval);
                 playing = false;
@@ -331,9 +361,9 @@ window.onload = async () => {
 
     socket.on('GiveNote', data => {
         if(master && create_mode) hitsound.play();
-        else setTimeout(() => {
+        else hitsound_collection.push(setTimeout(() => {
             hitsound.play();
-        }, data.note_speed);
+        }, data.note_speed));
 
         const note = document.createElement('div');
         note.classList.add(`note`);
@@ -623,26 +653,12 @@ function Request(method, url) {
 
 function updateMusic() {
     document.getElementById('InputMusic').innerHTML = Request('get', '/select_music');
-    socket.emit('ChangeRoomSetting', {
-        name: InputName.value,
-        password: InputPassword.value,
-        note_speed: InputNoteSpeed.value,
-        music: document.getElementById('InputMusic').value,
-        note: document.getElementById('InputNote').value,
-        show_alert: false
-    });
+    ChangeRoomSetting(false);
 }
 
 function updateNote() {
     document.getElementById('InputNote').innerHTML = Request('get', '/select_note');
-    socket.emit('ChangeRoomSetting', {
-        name: InputName.value,
-        password: InputPassword.value,
-        note_speed: InputNoteSpeed.value,
-        music: document.getElementById('InputMusic').value,
-        note: document.getElementById('InputNote').value,
-        show_alert: false
-    });
+    ChangeRoomSetting(false);
 }
 
 function showScore(scores) {
@@ -683,4 +699,17 @@ function showScore(scores) {
 
         leaderboard.appendChild(player);
     }
+}
+
+function ChangeRoomSetting(show) {
+    socket.emit('ChangeRoomSetting', {
+        name: document.getElementById('InputName').value,
+        password: document.getElementById('InputPassword').value,
+        note_speed: document.getElementById('InputNoteSpeed').value,
+        music: document.getElementById('InputMusic').value,
+        note: document.getElementById('InputNote').value,
+        show_alert: show,
+        startpos: document.getElementById('InputStartpos').value,
+        public: document.getElementById('public').checked
+    });
 }

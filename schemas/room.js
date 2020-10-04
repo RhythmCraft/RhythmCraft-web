@@ -53,6 +53,30 @@ const newSchema = new Schema({
     },
     note: {
         type: JSON
+    },
+    startpos: {
+        type: Number,
+        required: true,
+        default: 0,
+        min: 0
+    },
+    public: {
+        type: Boolean,
+        required: true,
+        default: true
+    },
+    room_for_note_test: {
+        type: Boolean,
+        required: true,
+        default: false
+    },
+    note_name_for_note_test: {
+        type: String
+    },
+    room_for_single_play: {
+        type: Boolean,
+        required: true,
+        default: false
     }
 });
 

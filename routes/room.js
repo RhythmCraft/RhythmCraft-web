@@ -58,7 +58,7 @@ app.post('/newroom', utils.isLogin, async (req, res, next) => {
 
     const roomcode = uniqueString();
     await Room.deleteMany({ master : req.user.fullID });
-    const result = await Room.create({
+    await Room.create({
         name: req.body.name,
         master: req.user.fullID,
         password: req.body.password,
@@ -67,7 +67,9 @@ app.post('/newroom', utils.isLogin, async (req, res, next) => {
         roomcode,
         music: music.name,
         music_name: music.originalname,
-        note: note_file
+        note: note_file,
+        startpos: req.body.startpos,
+        public: req.body.public == 'true'
     });
 
     res.redirect(`/game?room=${roomcode}#master`);

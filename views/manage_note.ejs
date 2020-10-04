@@ -7,6 +7,11 @@
     <script src="/js/bootstrap/popper.min.js"></script>
     <script src="/js/bootstrap/bootstrap.min.js"></script>
     <link rel="stylesheet" href="/css/bootstrap/bootstrap.min.css">
+    <style>
+        * {
+            margin-left: 1px;
+        }
+    </style>
     <script>if (window.module) module = window.module;</script>
     <title><%=servername%> - 채보 관리</title>
 </head>
@@ -31,9 +36,12 @@
 <%files.forEach(file => {%>
     <h4>
         <%=file.originalname%>
-        <a href="/downloadnote?name=<%=encodeURI(file.name)%>">파일 다운로드</a>
-        <a href="/removenote?name=<%=encodeURI(file.name)%>">파일 삭제</a>
+        <br><a href="/testnote?note=<%=encodeURI(file.name)%>&startpos=0&singleplay=true">채보 플레이</a>
+        <br><a href="/editor?name=<%=encodeURI(file.name)%>">채보 에디터</a>
+        <br><a href="/downloadnote?name=<%=encodeURI(file.name)%>">파일 다운로드</a>
+        <br><a href="/removenote?name=<%=encodeURI(file.name)%>">파일 삭제</a>
     </h4>
+<hr>
 <%});%>
 </body>
 </html>

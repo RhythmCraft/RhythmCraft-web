@@ -68,8 +68,7 @@ login_dir_list.forEach((file) => {
 app.get('/login', utils.isNotLogin, (req, res, next) => {
     res.render('login', {
         login: login,
-        login_list: login_dir_list,
-        socket: `${req.protocol}://${req.hostname}:${setting.PORT}`
+        login_list: login_dir_list
     });
     return;
 });

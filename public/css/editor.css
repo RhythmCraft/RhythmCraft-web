@@ -1,0 +1,19 @@
+#tools {
+    position: absolute;
+    float: right;
+    top: 0px;
+    right: 0px;
+    width: 50%;
+    height: 100%;
+}
+.tool {
+    position: absolute;
+    float: right;
+    right: 0px;
+}
+#buttons {
+    top: 40px;
+}
+#controller {
+    top: 90px;
+}

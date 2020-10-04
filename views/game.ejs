@@ -22,22 +22,25 @@
 <body>
 <div id="lobby">
     <a href="/" class="btn btn-primary">나가기</a>
-    <br><button id="room_setting_toggle" class="for-master btn btn-primary">방 설정 변경</button>
+    <br><button id="room_setting_toggle" class="btn btn-primary">방 설정 열기 / 닫기</button>
     <br>
     <div id="room_setting" hidden>
         <label for="InputName">방 이름</label>
-        <input id="InputName" type="text" placeholder="방 이름을 입력하세요." class="form-control">
+        <input id="InputName" type="text" placeholder="방 이름을 입력하세요." class="form-control for-master-other-disable">
         <label for="InputPassword">방 비밀번호</label>
-        <input id="InputPassword" type="password" placeholder="방 비밀번호를 입력하세요. 비워두면 비밀번호 없이 들어올 수 있습니다." class="form-control">
+        <input id="InputPassword" type="password" placeholder="방 비밀번호를 입력하세요. 비워두면 비밀번호 없이 들어올 수 있습니다." class="form-control for-master-other-disable">
         <label for="InputNoteSpeed">노트 속도(노트가 판정선에 닿기까지 걸리는 시간, 단위 ms)</label>
-        <input id="InputNoteSpeed" type="text" placeholder="노트 속도를 입력하세요.(단위 : ms)" class="form-control">
+        <input id="InputNoteSpeed" type="text" placeholder="노트 속도를 입력하세요.(단위 : ms)" class="form-control for-master-other-disable">
         <label for="InputMusic">음악 선택</label>
-        <select name="music" class="form-control" id="InputMusic" required></select>
+        <select name="music" class="form-control for-master-other-disable" id="InputMusic" required></select>
         <label for="InputNote">채보 선택</label>
-        <select name="note" class="form-control" id="InputNote" required></select>
+        <select name="note" class="form-control for-master-other-disable" id="InputNote" required></select>
+        <label for="InputNoteSpeed">StartPos(ms)</label>
+        <input type="number" class="form-control for-master-other-disable" id="InputStartpos" placeholder="StartPos를 입력하세요." required>
+        <p><label for="public"><input type="checkbox" name="public" id="public" value="true" class="for-master-other-disable"> 방 공개(해제시 URL로만 접속 가능)</label></p>
 
         <br>
-        <button id="change_room_setting" class="btn btn-primary">적용</button>
+        <button id="change_room_setting" class="for-master-other-disable btn btn-primary">적용</button>
     </div>
     <br><br>
     <button id="StartGame" class="for-master btn btn-primary">게임 시작</button>

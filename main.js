@@ -139,6 +139,8 @@ app.use((req, res, next) => {
     res.locals.Info = req.flash('Info');
     res.locals.Warn = req.flash('Warn');
     res.locals.session = req.session;
+    res.locals.isClient = req.session.isClient || false;
+    res.locals.socket = `${req.protocol}://${req.hostname}:${setting.PORT}`;
     next();
 });
 

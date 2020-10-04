@@ -88,7 +88,9 @@ module.exports = (io, app) => {
             'name': room.name,
             'password': room.password,
             'note_speed': room.note_speed,
-            'music': room.music
+            'music': room.music,
+            'startpos': room.startpos,
+            'public': room.public
         });
 
         socket.emit('msg', {
@@ -114,7 +116,7 @@ module.exports = (io, app) => {
                         'action': 'gamestart',
                         'music': checkroom.music,
                         'create_mode': !checkroom.note,
-                        players: players
+                        'players': players
                     });
 
                     rtnote = {};
@@ -140,11 +142,12 @@ module.exports = (io, app) => {
                         io.to(`room_${url_query.room}`).emit('msg', {
                             'action': 'gamestartreal',
                             'note_speed': checkroom.note_speed,
-                            'musicname': checkroom.music_name
+                            'musicname': checkroom.music_name,
+                            'startpos': checkroom.startpos
                         });
                         await Room.updateOne( { roomcode: url_query.room }, { ready_player : 0 } );
 
-                        starttimestamp = new Date().getTime() + 3000;
+                        starttimestamp = new Date().getTime() + 3000 - checkroom.startpos;
 
                         rtnote = {};
                         rtnote.music = checkroom.music;
@@ -165,12 +168,12 @@ module.exports = (io, app) => {
                             rtnote_timeout = [];
                             for(let i in checkroom.note.note) {
                                 checkroom['note']['note'][i].forEach(time => {
-                                    rtnote_timeout.push(setTimeout(() => {
+                                    if(time > checkroom.startpos) rtnote_timeout.push(setTimeout(() => {
                                         io.to(`room_${url_query.room}`).emit('GiveNote', {
                                             note: Number(i.replace('note', '')),
                                             note_speed: checkroom.note_speed
                                         });
-                                    }, time + 3000));
+                                    }, time + 3000 - checkroom.startpos));
                                 });
                             }
                         }
@@ -206,6 +209,19 @@ module.exports = (io, app) => {
                             clearTimeout(timeout);
                         });
                         rtnote_timeout = [];
+
+                        if(checkroom.room_for_note_test) {
+                            socket.emit('msg', {
+                                "action": "redirect",
+                                "url": `/editor?name=${checkroom.note_name_for_note_test}&startpos=${checkroom.startpos}`
+                            });
+                        }
+                        if(checkroom.room_for_single_play) {
+                            socket.emit('msg', {
+                                "action": "redirect",
+                                "url": `/note`
+                            });
+                        }
                     }
                     break;
             }
@@ -223,7 +239,7 @@ module.exports = (io, app) => {
 
         socket.on('ChangeRoomSetting', async data => {
             if(!master) return socket.emit('msg', { 'action' : 'alert' , 'message' : '권한이 없습니다.' });
-            if(!data.name || !data.note_speed || !data.music) return socket.emit('msg', { 'action' : 'alert' , 'message' : '설정 구성이 잘못되었습니다.' });
+            if(!data.name || !data.note_speed || !data.music || data.startpos < 0) return socket.emit('msg', { 'action' : 'alert' , 'message' : '설정 구성이 잘못되었습니다.' });
 
             let note;
             let note_file;
@@ -243,10 +259,22 @@ module.exports = (io, app) => {
                 note_speed : data.note_speed,
                 music : music.name,
                 music_name : music.originalname,
-                note: note_file
+                note: note_file,
+                startpos: data.startpos,
+                public: data.public
             });
             app.get('socket_main').emit('msg', { 'action' : 'reload_room' });
             if(data.show_alert) socket.emit('msg', { 'action' : 'alert' , 'message' : '방 설정이 적용되었습니다.' });
+
+            io.to(`room_${url_query.room}`).emit('msg', {
+                action : 'roomInfo',
+                name : data.name,
+                password : data.password,
+                note_speed : data.note_speed,
+                music : music.name,
+                startpos : data.startpos,
+                public : data.public
+            });
             return;
         });
 

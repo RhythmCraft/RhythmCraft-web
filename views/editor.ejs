@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="user-scalable=no">
+    <script>if (typeof module === 'object') {window.module = module; module = undefined;}</script>
+    <script src="/js/bootstrap/jquery-3.2.1.slim.min.js"></script>
+    <script src="/js/bootstrap/popper.min.js"></script>
+    <script src="/js/bootstrap/bootstrap.min.js"></script>
+    <link rel="stylesheet" href="/css/bootstrap/bootstrap.min.css">
+    <script src="/js/editor.js"></script>
+    <link rel="stylesheet" href="/css/game.css">
+    <link rel="stylesheet" href="/css/editor.css">
+    <title><%=servername%> - 에디터</title>
+    <script>
+        isClient = <%=session.isClient || false%>;
+        note_file = `<%-note_file%>`;
+        note_name = `<%=note_name%>`;
+        startpos = <%=startpos || 0%>;
+    </script>
+    <script src="/js/nerdamer.core.js"></script>
+    <script src="/js/Algebra.js"></script>
+    <script src="/js/Calculus.js"></script>
+    <script src="/js/Solve.js"></script>
+</head>
+
+<body>
+<div id="note_check_line"></div>
+<div id="game_line"></div>
+<div id="note_1_area" class="note_area"><div id="note_area_background_1" class="note_area_background"></div></div>
+<div id="note_2_area" class="note_area"><div id="note_area_background_2" class="note_area_background"></div></div>
+<div id="note_3_area" class="note_area"><div id="note_area_background_3" class="note_area_background"></div></div>
+<div id="note_4_area" class="note_area"><div id="note_area_background_4" class="note_area_background"></div></div>
+<div id="note_5_area" class="note_area"><div id="note_area_background_5" class="note_area_background"></div></div>
+<div id="note_6_area" class="note_area"><div id="note_area_background_6" class="note_area_background"></div></div>
+<div id="note_7_area" class="note_area"><div id="note_area_background_7" class="note_area_background"></div></div>
+<div id="note_8_area" class="note_area"><div id="note_area_background_8" class="note_area_background"></div></div>
+
+<div id="tools">
+    <h4 class="tool">기본적으로 자동 저장을 지원합니다. <s>불안하면 저장 누르세요</s></h4>
+    <div id="buttons" class="tool">
+        <button id="Play" class="btn btn-primary">플레이하기</button>
+        <button id="Save" class="btn btn-primary">저장</button>
+    </div>
+
+    <div id="controller" class="tool">
+        <h4>시간 설정</h4>
+        <button id="DecreaseTime">-</button>
+        <input id="InputTime" type="number" value="<%=startpos || 0%>">
+        <button id="IncreaseTime">+</button>
+    </div>
+</div>
+</body>
+</html>

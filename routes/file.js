@@ -5,6 +5,7 @@ const uniqueString = require('unique-string');
 const streamifier = require('streamifier');
 const fs = require('fs');
 const fileType = require('file-type');
+const bodyParser = require('body-parser');
 
 const utils = require('../utils');
 const setting = require('../setting.json');
@@ -13,6 +14,10 @@ const File = require('../schemas/file');
 
 // app 정의
 const app = express.Router();
+
+// bodyParser
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended : false }));
 
 const upload = multer({
     storage: multer.memoryStorage()
@@ -172,6 +177,18 @@ app.get('/select_note', utils.isLogin, async (req, res, next) => {
     return res.render('select_note', {
         notes
     });
+});
+
+app.post('/savenote', utils.isLogin, async (req, res, next) => {
+    const file = await File.findOne({ owner : req.user.fullID , name : req.body.name , file_type : 'note' });
+    if(!file) {
+        req.flash('Error', '해당 채보가 존재하지 않습니다.');
+        return res.redirect('/note');
+    }
+
+    fs.writeFileSync(path.join(setting.SAVE_FILE_PATH, file.name), JSON.stringify(req.body.note));
+    req.app.get('socket_game').to(`user_${req.user.fullID}`).emit('msg', { 'action' : 'updatenote' });
+    return res.send('ok');
 });
 
 module.exports = app;
