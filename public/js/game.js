@@ -494,6 +494,7 @@ window.onload = async () => {
         if(!playing) return;
         if(lockkey[e.code]) return;
         if(!keymap[e.code]) return;
+        if(autoplay) return;
         lockkey[e.code] = true;
 
         if(master && create_mode) {
