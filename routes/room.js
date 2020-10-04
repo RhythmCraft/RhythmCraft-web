@@ -69,7 +69,8 @@ app.post('/newroom', utils.isLogin, async (req, res, next) => {
         music_name: music.originalname,
         note: note_file,
         startpos: req.body.startpos,
-        public: req.body.public == 'true'
+        public: req.body.public == 'true',
+        pitch: req.body.pitch
     });
 
     res.redirect(`/game?room=${roomcode}#master`);

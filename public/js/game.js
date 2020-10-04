@@ -184,6 +184,7 @@ window.onload = async () => {
                 document.getElementById('InputMusic').value = data.music;
                 document.getElementById('InputStartpos').value = data.startpos;
                 document.getElementById('public').checked = data.public;
+                document.getElementById('InputPitch').value = data.pitch;
                 break;
             case 'gamestart':
                 playing = true;
@@ -204,6 +205,7 @@ window.onload = async () => {
                     loop: false,
                     volume: 0.5,
                     html5: true,
+                    rate: data.pitch / 100,
                     onload: () => {
                         socket.emit('msg', { 'action' : 'gameready' });
                         document.getElementById('CountDown').innerText = '다른 유저를 기다리는 중...';
@@ -729,6 +731,7 @@ function ChangeRoomSetting(show) {
         note: document.getElementById('InputNote').value,
         show_alert: show,
         startpos: document.getElementById('InputStartpos').value,
-        public: document.getElementById('public').checked
+        public: document.getElementById('public').checked,
+        pitch: document.getElementById('InputPitch').value
     });
 }

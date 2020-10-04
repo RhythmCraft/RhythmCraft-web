@@ -1,4 +1,5 @@
 let note;
+const note_speed = 1000;
 
 window.onload = () => {
     note = JSON.parse(note_file);
@@ -17,9 +18,13 @@ window.onload = () => {
 
     renderNote(note, note_time);
 
+    document.getElementById('autoplay').checked = autoplay;
+
     document.getElementById('Play').onclick = function() {
         const result = save();
-        if(result == 'ok') location.href = `/testnote?note=${note_name}&startpos=${note_time}&fromeditor=true`;
+        const pitch = document.getElementById('InputPitch').value;
+        const autoplay = document.getElementById('autoplay').checked;
+        if(result == 'ok') location.href = `/testnote?note=${note_name}&startpos=${note_time}&fromeditor=true&pitch=${pitch}&autoplay=${autoplay}`;
         else alert('노트 저장에 실패했습니다.');
     }
 
@@ -51,7 +56,7 @@ window.onload = () => {
             let notenum = this.id.replace('note_', '');
             notenum = Number(notenum.replace('_area', ''));
 
-            note['note'][`note${notenum}`].push(Math.round(getms(innerHeight - e.clientY - 24.5)));
+            note['note'][`note${notenum}`].push(Math.round(getms(innerHeight - e.clientY - 24.5)) + note_time);
             renderNote(note, note_time);
 
             setTimeout(() => {
@@ -88,7 +93,6 @@ window.onload = () => {
 }
 
 function renderNote(note, look_time) {
-    const note_speed = 1000;
     if(typeof note == 'string') note = JSON.parse(note);
 
     Array.from(document.getElementsByClassName('note')).forEach(ele => {
@@ -134,7 +138,7 @@ function RequestData(method, url, data) {
 }
 
 function getms(px) {
-    let temp = nerdamer.solve(`(((${innerHeight}*0.65/1000)*(x-0))+${innerHeight}*0.65/1000)+${innerHeight}*0.3=${px}`, 'x').toString().replace('[', '').replace(']', '').split('/');
+    let temp = nerdamer.solve(`(((${innerHeight}*0.65/${note_speed})*(x-0))+${innerHeight}*0.65/${note_speed})+${innerHeight}*0.3=${px}`, 'x').toString().replace('[', '').replace(']', '').split('/');
     return temp[0] / temp[1];
 }
 

@@ -45,8 +45,7 @@ app.get('/editor', utils.isLogin, async (req, res, next) => {
 
     res.render('editor', {
         note_file,
-        note_name: req.query.name,
-        startpos: req.query.startpos
+        query: req.query
     });
 });
 
@@ -80,7 +79,9 @@ app.get('/testnote', utils.isLogin, async (req, res, next) => {
         public: false,
         room_for_note_test: req.query.fromeditor == 'true',
         note_name_for_note_test: note.name,
-        room_for_single_play: req.query.singleplay == 'true'
+        room_for_single_play: req.query.singleplay == 'true',
+        pitch: req.query.pitch,
+        autoplay: req.query.autoplay == 'true'
     });
 
     return res.redirect(`/game?room=${roomcode}#start`);

@@ -15,8 +15,10 @@
     <script>
         isClient = <%=session.isClient || false%>;
         note_file = `<%-note_file%>`;
-        note_name = `<%=note_name%>`;
-        startpos = <%=startpos || 0%>;
+        note_name = `<%=query.name%>`;
+        startpos = <%=query.startpos || 0%>;
+        pitch = <%=query.pitch || 100%>;
+        autoplay = <%=query.autoplay || true%>;
     </script>
     <script src="/js/nerdamer.core.js"></script>
     <script src="/js/Algebra.js"></script>
@@ -46,8 +48,13 @@
     <div id="controller" class="tool">
         <h4>시간 설정</h4>
         <button id="DecreaseTime">-</button>
-        <input id="InputTime" type="number" value="<%=startpos || 0%>">
+        <input id="InputTime" type="number" value="<%=query.startpos || 0%>" placeholder="시간">
         <button id="IncreaseTime">+</button>
+
+        <h4>플레이시 피치 설정</h4>
+        <input id="InputPitch" type="number" value="<%=query.pitch || 100%>" placeholder="피치">
+
+        <p><label for="autoplay"><input type="checkbox" id="autoplay"> 자동 플레이</label></p>
     </div>
 </div>
 </body>

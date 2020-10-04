@@ -77,6 +77,18 @@ const newSchema = new Schema({
         type: Boolean,
         required: true,
         default: false
+    },
+    pitch: {
+        type: Number,
+        required: true,
+        default: 100,
+        min: 50,
+        max: 400
+    },
+    autoplay: {
+        type: Boolean,
+        required: true,
+        default: false
     }
 });
 

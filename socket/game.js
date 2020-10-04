@@ -23,6 +23,7 @@ module.exports = (io, app) => {
         let starttimestamp;
         let rtnote_timeout = [];
         let notepersecond;
+        let pitch;
 
         io.to(`user_${user.fullID}`).emit('msg', { 'action' : 'exit' , 'message' : '다중접속' });
 
@@ -90,7 +91,8 @@ module.exports = (io, app) => {
             'note_speed': room.note_speed,
             'music': room.music,
             'startpos': room.startpos,
-            'public': room.public
+            'public': room.public,
+            'pitch': room.pitch
         });
 
         socket.emit('msg', {
@@ -116,7 +118,8 @@ module.exports = (io, app) => {
                         'action': 'gamestart',
                         'music': checkroom.music,
                         'create_mode': !checkroom.note,
-                        'players': players
+                        'players': players,
+                        'pitch': checkroom.pitch
                     });
 
                     rtnote = {};
@@ -133,6 +136,8 @@ module.exports = (io, app) => {
                     rtnote.note.note6 = [];
                     rtnote.note.note7 = [];
                     rtnote.note.note8 = [];
+
+                    pitch = checkroom.pitch;
                     break;
                 case 'gameready':
                     await Room.updateOne( { roomcode : url_query.room }, { $inc: { ready_player : 1 } } );
@@ -178,9 +183,20 @@ module.exports = (io, app) => {
                                             note: Number(i.replace('note', '')),
                                             note_speed: checkroom.note_speed
                                         });
-                                    }, time + countdown - checkroom.startpos));
+                                    }, ((time / (checkroom.pitch / 100)) + countdown - (checkroom.startpos / (checkroom.pitch / 100)))));
                                 });
                             }
+                        }
+
+                        if(checkroom.autoplay) {
+                            socket.emit('msg', {
+                                'action': 'toggleautoplay'
+                            });
+                            socket.emit('Chat', {
+                                nickname: '시스템',
+                                chattype: 'system',
+                                chat: '자동플레이가 활성화되었습니다.'
+                            });
                         }
                     }
                     break;
@@ -218,7 +234,7 @@ module.exports = (io, app) => {
                         if(checkroom.room_for_note_test) {
                             socket.emit('msg', {
                                 "action": "redirect",
-                                "url": `/editor?name=${checkroom.note_name_for_note_test}&startpos=${(new Date().getTime() - starttimestamp) - 1000}`
+                                "url": `/editor?name=${checkroom.note_name_for_note_test}&startpos=${(new Date().getTime() - starttimestamp) - (1000 / (checkroom.pitch / 100))}&pitch=${checkroom.pitch}&autoplay=${checkroom.autoplay}`
                             });
                         }
                         if(checkroom.room_for_single_play) {
@@ -266,7 +282,8 @@ module.exports = (io, app) => {
                 music_name : music.originalname,
                 note: note_file,
                 startpos: data.startpos,
-                public: data.public
+                public: data.public,
+                pitch: data.pitch
             });
             app.get('socket_main').emit('msg', { 'action' : 'reload_room' });
             if(data.show_alert) socket.emit('msg', { 'action' : 'alert' , 'message' : '방 설정이 적용되었습니다.' });
@@ -278,7 +295,8 @@ module.exports = (io, app) => {
                 note_speed : data.note_speed,
                 music : music.name,
                 startpos : data.startpos,
-                public : data.public
+                public : data.public,
+                pitch: data.pitch
             });
             return;
         });
@@ -303,7 +321,7 @@ module.exports = (io, app) => {
                         note_speed: room.note_speed
                     });
 
-                    rtnote['note'][`note${key}`].push(new Date().getTime() - starttimestamp);
+                    rtnote['note'][`note${key}`].push((new Date().getTime() - starttimestamp) * (pitch / 100));
                 }
             }
         });
