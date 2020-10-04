@@ -68,6 +68,7 @@ window.onload = () => {
 
         ele.oncontextmenu = function(e) {
             e.preventDefault();
+            if(!note['jscode']) note['jscode'] = {};
             note['jscode'][Math.round(getms(innerHeight - e.clientY - 24.5)) + note_time + 30] = '';
             renderNote(note, note_time);
 
