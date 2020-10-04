@@ -29,6 +29,8 @@ window.onload = async () => {
     let scores;
     let autoplay;
     let hitsound_collection = [];
+    let pressedkey = [];
+    let countdown;
 
     document.getElementById('InputMusic').innerHTML = Request('get', '/select_music');
     document.getElementById('InputNote').innerHTML = Request('get', '/select_note');
@@ -229,7 +231,6 @@ window.onload = async () => {
                 document.getElementById('CountDown').innerText = '음악 다운로드 중...';
                 break;
             case 'gamestartreal':
-                let countdown;
                 if(data.countdown) countdown = 3000;
                 else countdown = 0;
 
@@ -482,6 +483,12 @@ window.onload = async () => {
 
     let lockkey = {};
     document.onkeydown = e => {
+        pressedkey[e.keyCode] = true;
+
+        if(pressedkey[27]) {
+            if(countdown == 0) document.getElementById('StopGame').click();
+        }
+
         if(!playing) return;
         if(lockkey[e.code]) return;
         if(!keymap[e.code]) return;
@@ -544,6 +551,7 @@ window.onload = async () => {
         }
     }
     document.onkeyup = e => {
+        pressedkey[e.keyCode] = false;
         if(!playing) return;
         lockkey[e.code] = false;
     }

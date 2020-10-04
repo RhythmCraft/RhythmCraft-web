@@ -3,6 +3,7 @@ let note;
 window.onload = () => {
     note = JSON.parse(note_file);
     let note_time = startpos;
+    let pressedkey = [];
 
     if(isClient) {
         require('electron').remote.getGlobal('globalVars').RichPresence = {
@@ -58,6 +59,32 @@ window.onload = () => {
             }, 0);
         }
     });
+
+    document.onkeydown = e => {
+        pressedkey[e.keyCode] = true;
+
+        if(pressedkey[80]) {
+            document.getElementById('Play').click();
+        }
+        if(pressedkey[17] && pressedkey[83]) {
+            e.preventDefault();
+            document.getElementById('Save').click();
+        }
+        if(pressedkey[219]) {
+            document.getElementById('DecreaseTime').click();
+        }
+        if(pressedkey[221]) {
+            document.getElementById('IncreaseTime').click();
+        }
+        if(pressedkey[220]) {
+            document.getElementById('InputTime').value = 0;
+            note_time = 0;
+            renderNote(note, note_time);
+        }
+    }
+    document.onkeyup = e => {
+        pressedkey[e.keyCode] = false;
+    }
 }
 
 function renderNote(note, look_time) {
