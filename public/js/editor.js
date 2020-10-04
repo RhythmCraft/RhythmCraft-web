@@ -1,23 +1,19 @@
+let note;
+
 window.onload = () => {
-    const note = JSON.parse(note_file);
+    note = JSON.parse(note_file);
     let note_time = startpos;
 
     renderNote(note, note_time);
 
     document.getElementById('Play').onclick = function() {
-        const result = RequestData('post', '/savenote', {
-            name: note_name,
-            note
-        });
+        const result = save();
         if(result == 'ok') location.href = `/testnote?note=${note_name}&startpos=${note_time}&fromeditor=true`;
         else alert('노트 저장에 실패했습니다.');
     }
 
     document.getElementById('Save').onclick = function() {
-        const result = RequestData('post', '/savenote', {
-            name: note_name,
-            note
-        });
+        const result = save();
         if(result != 'ok') alert('노트 저장에 실패했습니다.');
     }
 
@@ -47,10 +43,9 @@ window.onload = () => {
             note['note'][`note${notenum}`].push(Math.round(getms(innerHeight - e.clientY - 24.5)));
             renderNote(note, note_time);
 
-            const result = RequestData('post', '/savenote', {
-                name: note_name,
-                note
-            });
+            setTimeout(() => {
+                save();
+            }, 0);
         }
     });
 }
@@ -81,10 +76,9 @@ function renderNote(note, look_time) {
                     newnote.remove();
                     note['note'][i].splice(note['note'][i].indexOf(time), 1);
 
-                    const result = RequestData('post', '/savenote', {
-                        name: note_name,
-                        note
-                    });
+                    setTimeout(() => {
+                        save();
+                    }, 0);
                 }
                 newnote.appendChild(image);
 
@@ -105,4 +99,11 @@ function RequestData(method, url, data) {
 function getms(px) {
     let temp = nerdamer.solve(`(((${innerHeight}*0.65/1000)*(x-0))+${innerHeight}*0.65/1000)+${innerHeight}*0.3=${px}`, 'x').toString().replace('[', '').replace(']', '').split('/');
     return temp[0] / temp[1];
+}
+
+function save() {
+    return RequestData('post', '/savenote', {
+        name: note_name,
+        note
+    });
 }
