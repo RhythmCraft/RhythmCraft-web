@@ -119,7 +119,7 @@ app.get('/note', utils.isLogin, async (req, res, next) => {
 });
 
 app.post('/uploadnote', utils.isLogin, upload.single('file'), async (req, res, next) => {
-    if(req.file.mimetype != 'application/octet-stream' || path.extname(req.file.originalname) != '.rhythmcraft') {
+    if(req.file.mimetype != 'application/octet-stream' || (path.extname(req.file.originalname) != '.rhythmcraft' && path.extname(req.file.originalname) != '.signedrhythmcraft')) {
         req.flash('Error', '채보 파일이 아닙니다.');
         return res.redirect('/note');
     }
