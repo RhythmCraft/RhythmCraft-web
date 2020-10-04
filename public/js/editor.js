@@ -96,6 +96,11 @@ window.onload = () => {
         document.getElementById('help_area').hidden = !document.getElementById('help_area').hidden;
     }
 
+    document.getElementById('Exit').onclick = function() {
+        save();
+        location.href = '/note';
+    }
+
     document.onkeydown = e => {
         pressedkey[e.keyCode] = true;
 
