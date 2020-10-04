@@ -7,6 +7,11 @@ window.onload = () => {
             largeImageKey: 'main',
             instance: true
         }
+
+        document.getElementById('InputRoom').oninput = function() {
+            const url = new URL('this.value');
+            this.value = url.search.replace('?room=', '');
+        }
     }
 
     const socket = io.connect('/main', {
