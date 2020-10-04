@@ -9,7 +9,7 @@ window.onload = () => {
         }
 
         document.getElementById('InputRoom').oninput = function() {
-            const url = new URL('this.value');
+            const url = new URL(this.value);
             this.value = url.search.replace('?room=', '');
         }
     }
