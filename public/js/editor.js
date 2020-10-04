@@ -103,6 +103,6 @@ function RequestData(method, url, data) {
 }
 
 function getms(px) {
-    let temp = nerdamer.solve(`(((969*0.65/1000)*(x-0))+969*0.65/1000)+969*0.3=${px}`, 'x').toString().replace('[', '').replace(']', '').split('/');
+    let temp = nerdamer.solve(`(((${innerHeight}*0.65/1000)*(x-0))+${innerHeight}*0.65/1000)+${innerHeight}*0.3=${px}`, 'x').toString().replace('[', '').replace(']', '').split('/');
     return temp[0] / temp[1];
 }
