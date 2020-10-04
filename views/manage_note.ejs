@@ -37,9 +37,14 @@
     <h4>
         <%=file.originalname%>
         <br><a href="/testnote?note=<%=encodeURI(file.name)%>&startpos=0&singleplay=true">채보 플레이</a>
+        <%if(!file.name.includes('.signedrhythmcraft')) {%>
         <br><a href="/editor?name=<%=encodeURI(file.name)%>">채보 에디터</a>
-        <br><a href="/downloadnote?name=<%=encodeURI(file.name)%>">파일 다운로드</a>
-        <br><a href="/removenote?name=<%=encodeURI(file.name)%>">파일 삭제</a>
+        <%}%>
+        <br><a href="/downloadnote?name=<%=encodeURI(file.name)%>">채보 다운로드</a>
+        <br><a href="/removenote?name=<%=encodeURI(file.name)%>">채보 삭제</a>
+        <%if(user.admin && !file.name.includes('.signedrhythmcraft')) {%>
+        <br><a href="/signnotetext?name=<%=encodeURI(file.name)%>&originalname=<%=encodeURI(file.originalname)%>">채보 서명</a>
+        <%}%>
     </h4>
 <hr>
 <%});%>

@@ -6,9 +6,10 @@ const streamifier = require('streamifier');
 const fs = require('fs');
 const fileType = require('file-type');
 const bodyParser = require('body-parser');
+const jwt = require('jsonwebtoken');
 
-const utils = require('../utils');
 const setting = require('../setting.json');
+const utils = require('../utils');
 
 const File = require('../schemas/file');
 
@@ -189,6 +190,63 @@ app.post('/savenote', utils.isLogin, async (req, res, next) => {
     fs.writeFileSync(path.join(setting.SAVE_FILE_PATH, file.name), JSON.stringify(req.body.note));
     req.app.get('socket_game').to(`user_${req.user.fullID}`).emit('msg', { 'action' : 'updatenote' });
     return res.send('ok');
+});
+
+app.post('/signnote', utils.isAdmin, upload.single('file'), async (req, res, next) => {
+    if(req.file.mimetype != 'application/octet-stream' || path.extname(req.file.originalname) != '.rhythmcraft') {
+        req.flash('Error', '채보 파일이 아닙니다.');
+        return res.redirect('/note');
+    }
+    if(req.file.size > 1024 * 1024 * 100) {
+        req.flash('Error', '파일이 100MB를 초과합니다.');
+        return res.redirect('/');
+    }
+
+    const name = `${uniqueString()}.signedrhythmcraft`;
+
+    const note = JSON.parse(req.file.buffer.toString('utf-8'));
+    const token = jwt.sign(note, setting.TOKEN_SECRET, {
+        issuer: setting.SERVER_NAME
+    });
+    fs.writeFileSync(path.join(setting.SAVE_FILE_PATH, name), token);
+
+    await File.create({
+        name,
+        originalname: req.file.originalname.replace('.rhythmcraft', '.signedrhythmcraft'),
+        owner: req.user.fullID,
+        file_type: 'note'
+    });
+
+    req.flash('Info', `서명된 채보 ${req.file.originalname}이(가) 성공적으로 업로드되었습니다. 채보 관리 페이지에서 확인하세요.`);
+    req.app.get('socket_game').to(`user_${req.user.fullID}`).emit('msg', { 'action' : 'updatenote' });
+    return res.redirect('/admin/sign');
+});
+
+app.get('/signnotetext', utils.isAdmin, async (req, res, next) => {
+    const testnote = await File.findOne({ owner : req.user.fullID , file_type : 'note' , name : req.query.name });
+    if(!testnote) {
+        req.flash('Error', '해당 채보가 존재하지 않습니다.');
+        return res.redirect('/note');
+    }
+
+    const name = `${uniqueString()}.signedrhythmcraft`;
+
+    const note = JSON.parse(fs.readFileSync(path.join(setting.SAVE_FILE_PATH, req.query.name)));
+    const token = jwt.sign(note, setting.TOKEN_SECRET, {
+        issuer: setting.SERVER_NAME
+    });
+    fs.writeFileSync(path.join(setting.SAVE_FILE_PATH, name), token);
+
+    await File.create({
+        name,
+        originalname: req.query.originalname.replace('.rhythmcraft', '.signedrhythmcraft'),
+        owner: req.user.fullID,
+        file_type: 'note'
+    });
+
+    req.flash('Info', `채보 ${req.query.originalname}를 성공적으로 서명하였습니다.`);
+    req.app.get('socket_game').to(`user_${req.user.fullID}`).emit('msg', { 'action' : 'updatenote' });
+    return res.redirect('/note');
 });
 
 module.exports = app;

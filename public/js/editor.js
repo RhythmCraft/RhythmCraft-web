@@ -19,12 +19,14 @@ window.onload = () => {
     renderNote(note, note_time);
 
     document.getElementById('autoplay').checked = autoplay;
+    document.getElementById('unsafe_mode').checked = unsafe_mode;
 
     document.getElementById('Play').onclick = function() {
         const result = save();
         const pitch = document.getElementById('InputPitch').value;
         const autoplay = document.getElementById('autoplay').checked;
-        if(result == 'ok') location.href = `/testnote?note=${note_name}&startpos=${note_time}&fromeditor=true&pitch=${pitch}&autoplay=${autoplay}`;
+        const unsafe = document.getElementById('unsafe_mode').checked;
+        if(result == 'ok') location.href = `/testnote?note=${note_name}&startpos=${note_time}&fromeditor=true&pitch=${pitch}&autoplay=${autoplay}&unsafe=${unsafe}`;
         else alert('노트 저장에 실패했습니다.');
     }
 
@@ -63,10 +65,38 @@ window.onload = () => {
                 save();
             }, 0);
         }
+
+        ele.oncontextmenu = function(e) {
+            e.preventDefault();
+            note['jscode'][Math.round(getms(innerHeight - e.clientY - 24.5)) + note_time + 30] = '';
+            renderNote(note, note_time);
+
+            setTimeout(() => {
+                save();
+            }, 0);
+        }
     });
 
+    document.getElementById('SaveScript').onclick = function() {
+        const inputscript = document.getElementById('InputScript');
+        note['jscode'][inputscript.dataset.effect] = inputscript.value;
+
+        setTimeout(() => {
+            save();
+        }, 0);
+    }
+
+    document.getElementById('HideScriptSetting').onclick = function() {
+        Array.from(document.getElementsByClassName('editscript')).forEach(ele => {
+            ele.hidden = true;
+        });
+    }
+
+    document.getElementById('help_button').onclick = function() {
+        document.getElementById('help_area').hidden = !document.getElementById('help_area').hidden;
+    }
+
     document.onkeydown = e => {
-        console.log(e.keyCode)
         pressedkey[e.keyCode] = true;
 
         if(pressedkey[80]) {
@@ -99,6 +129,9 @@ function renderNote(note, look_time) {
     Array.from(document.getElementsByClassName('note')).forEach(ele => {
         ele.remove();
     });
+    Array.from(document.getElementsByClassName('script')).forEach(ele => {
+        ele.remove();
+    });
 
     for(let i in note.note) {
         note['note'][i].forEach(time => {
@@ -127,6 +160,39 @@ function renderNote(note, look_time) {
                 document.body.appendChild(newnote);
             }
         });
+    }
+
+    for(let i in note.jscode) {
+        const position = (((innerHeight * 0.65 / note_speed) * (Number(i) - look_time)) + innerHeight * 0.65 / note_speed) + innerHeight * 0.3;
+        if(position < innerHeight && position > 0) {
+            const newscript = document.createElement('div');
+            newscript.classList.add('script');
+            newscript.dataset.note_position = i;
+            newscript.style.bottom = `${position}px`;
+            newscript.dataset.script = note['jscode'][i];
+
+            newscript.onclick = function() {
+                newscript.remove();
+                delete note['jscode'][i];
+                renderNote(note, look_time);
+
+                setTimeout(() => {
+                    save();
+                }, 0);
+            }
+
+            newscript.oncontextmenu = function(e) {
+                e.preventDefault();
+                Array.from(document.getElementsByClassName('editscript')).forEach(ele => {
+                    ele.hidden = false;
+                });
+                const inputscript = document.getElementById('InputScript');
+                inputscript.dataset.effect = i;
+                inputscript.value = note['jscode'][i];
+            }
+
+            document.body.appendChild(newscript);
+        }
     }
 }
 

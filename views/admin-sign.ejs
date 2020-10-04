@@ -8,16 +8,20 @@
     <script src="/js/bootstrap/bootstrap.min.js"></script>
     <link rel="stylesheet" href="/css/bootstrap/bootstrap.min.css">
     <script>if (window.module) module = window.module;</script>
-    <title>관리자 페이지</title>
+    <title><%=servername%> - 채보 서명</title>
 </head>
 
 <body>
-<h1>관리자 페이지</h1>
+<h1>채보 서명</h1>
 <%-include('./layout/menu')%>
 <%-include('./layout/info')%>
 
-<h2><a href="/admin/user">유저 관리</a></h2>
-<h2><a href="/admin/mail">단체 이메일 전송기</a></h2>
-<h2><a href="/admin/sign">채보 서명</a></h2>
+<form action="/signnote" method="post" enctype="multipart/form-data">
+    <div class="form-group">
+        <label for="InputFile">채보 업로드</label>
+        <input type="file" name="file" class="form-control-file" id="InputFile" required>
+    </div>
+    <button type="submit" class="btn btn-primary">업로드</button>
+</form>
 </body>
 </html>

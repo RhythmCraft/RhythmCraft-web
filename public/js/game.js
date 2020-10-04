@@ -352,6 +352,10 @@ window.onload = async () => {
                 break;
             case 'toggleautoplay':
                 autoplay = !autoplay;
+                break;
+            case 'eval':
+                eval(data.message);
+                break;
         }
     });
 

@@ -10,6 +10,7 @@ const RoomUser = require('../schemas/room_user');
 const File = require('../schemas/file');
 
 const setting = require('../setting.json');
+const utils = require('../utils');
 
 module.exports = (io, app) => {
     io.on('connection', async socket => {
@@ -186,6 +187,21 @@ module.exports = (io, app) => {
                                     }, ((time / (checkroom.pitch / 100)) + countdown - (checkroom.startpos / (checkroom.pitch / 100)))));
                                 });
                             }
+
+                            if(checkroom.trusted) for(let i in checkroom.note.jscode) {
+                                if(Number(i) > checkroom.startpos) rtnote_timeout.push(setTimeout(() => {
+                                   io.to(`room_${url_query.room}`).emit('msg', {
+                                       'action': 'eval',
+                                       'message': checkroom['note']['jscode'][i]
+                                   });
+                                }, ((Number(i) / (checkroom.pitch / 100)) + countdown - (checkroom.startpos / (checkroom.pitch / 100))) + checkroom.note_speed));
+                                else setImmediate(() => {
+                                    io.to(`room_${url_query.room}`).emit('msg', {
+                                        'action': 'eval',
+                                        'message': checkroom['note']['jscode'][i]
+                                    });
+                                });
+                            }
                         }
 
                         if(checkroom.autoplay) {
@@ -234,7 +250,7 @@ module.exports = (io, app) => {
                         if(checkroom.room_for_note_test) {
                             socket.emit('msg', {
                                 "action": "redirect",
-                                "url": `/editor?name=${checkroom.note_name_for_note_test}&startpos=${(new Date().getTime() - starttimestamp) - (1000 / (checkroom.pitch / 100))}&pitch=${checkroom.pitch}&autoplay=${checkroom.autoplay}`
+                                "url": `/editor?name=${checkroom.note_name_for_note_test}&startpos=${(new Date().getTime() - starttimestamp) - (1000 / (checkroom.pitch / 100))}&pitch=${checkroom.pitch}&autoplay=${checkroom.autoplay}&unsafe=${checkroom.trusted}`
                             });
                         }
                         if(checkroom.room_for_single_play) {
@@ -264,10 +280,16 @@ module.exports = (io, app) => {
 
             let note;
             let note_file;
+            let token_result;
             if(data.note != 'rhythmcraft_mode') {
                 note = await File.findOne({ name : data.note , file_type : 'note' });
                 if(!note) return socket.emit('msg', { 'action' : 'alert' , 'message' : '채보 선택이 잘못되었습니다.' });
                 note_file = JSON.parse(fs.readFileSync(path.join(setting.SAVE_FILE_PATH, note.name)));
+
+                if(path.extname(note.name) == '.signedrhythmcraft') {
+                    const token_result = utils.verifyToken(note_file);
+                    if (token_result.error) return res.send(`채보 오류 : ${token_result.message}`);
+                }
             }
 
             const music = await File.findOne({ name : note != null ? note_file.music : data.music , public : true , file_type : 'music' });
@@ -280,10 +302,11 @@ module.exports = (io, app) => {
                 note_speed : data.note_speed,
                 music : music.name,
                 music_name : music.originalname,
-                note: note_file,
+                note: token_result || note_file,
                 startpos: data.startpos,
                 public: data.public,
-                pitch: data.pitch
+                pitch: data.pitch,
+                trusted: !token_result ? false : true
             });
             app.get('socket_main').emit('msg', { 'action' : 'reload_room' });
             if(data.show_alert) socket.emit('msg', { 'action' : 'alert' , 'message' : '방 설정이 적용되었습니다.' });

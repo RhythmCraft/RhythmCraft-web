@@ -17,3 +17,19 @@
 #controller {
     top: 90px;
 }
+.script {
+    position: absolute;
+    left: 0px;
+    width: 50%;
+    height: 8px;
+    background-color: black;
+}
+#InputScript {
+    width: 600px;
+    height: 400px;
+}
+#help {
+    float: bottom;
+    bottom: 2px;
+    right: 2px;
+}

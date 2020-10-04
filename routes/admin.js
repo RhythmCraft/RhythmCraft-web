@@ -30,6 +30,9 @@ app.get('/admin/:page', utils.isAdmin, async (req, res, next) => {
         case 'mail':
             res.render('admin-mail');
             return;
+        case 'sign':
+            res.render('admin-sign');
+            return;
         default:
             res.redirect('/admin');
             return;

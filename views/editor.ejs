@@ -19,6 +19,7 @@
         startpos = <%=query.startpos || 0%>;
         pitch = <%=query.pitch || 100%>;
         autoplay = <%=query.autoplay || true%>;
+        unsafe_mode = <%=query.unsafe || false%>;
     </script>
     <script src="/js/nerdamer.core.js"></script>
     <script src="/js/Algebra.js"></script>
@@ -55,6 +56,30 @@
         <input id="InputPitch" type="number" value="<%=query.pitch || 100%>" placeholder="피치">
 
         <p><label for="autoplay"><input type="checkbox" id="autoplay"> 자동 플레이</label></p>
+        <p><label for="unsafe_mode" title="서명되지 않은 효과 스크립트를 실행합니다. 문장의 뜻을 이해할 수 없다면 체크하지 마세요."><input type="checkbox" id="unsafe_mode"> 비보호 모드</label></p>
+
+        <textarea id="InputScript" class="editscript" placeholder="스크립트를 입력하세요." hidden></textarea>
+        <br><button id="SaveScript" class="btn btn-primary editscript" hidden>스크립트 적용</button>
+        <button id="HideScriptSetting" class="btn btn-primary editscript" hidden>닫기(저장하지 않음)</button>
+    </div>
+
+    <div id="help" class="tool">
+        <button id="help_button" class="btn btn-primary">도움말 보이기/숨기기</button>
+        <div id="help_area" hidden>
+            <h4>단축키</h4>
+            <h6>P : 플레이하기(저장 포함)</h6>
+            <h6>ESC : (플레이 중) 에디터로 돌아오기</h6>
+            <h6>Ctrl + S : 저장</h6>
+            <h6>- : 시간 설정 -100ms</h6>
+            <h6>+ : 시간 설정 +100ms</h6>
+
+            <h4>제작 방법</h4>
+            <h6>채보 영역 빈공간 좌클릭 : 새 노트 설치</h6>
+            <h6>노트 좌클릭 : 해당 노트 삭제</h6>
+            <h6>채보 영역 빈공간 우클릭 : 새 이펙트(멀티플레이에서 작동하려면 관리자 승인 필요)</h6>
+            <h6>채보 영역 이펙트 선 좌클릭 : 이펙트 삭제</h6>
+            <h6>채보 영역 이펙트 선 우클릭 : 이펙트 JS 명령 수정</h6>
+        </div>
     </div>
 </div>
 </body>

@@ -35,6 +35,11 @@ app.get('/game', utils.isLogin, async (req, res, next) => {
 });
 
 app.get('/editor', utils.isLogin, async (req, res, next) => {
+    if(req.query.name.includes('.signedrhythmcraft')) {
+        req.flash('Error', '서명된 채보는 수정할 수 없습니다.');
+        return res.redirect('/');
+    }
+
     const note = await File.findOne({ name : req.query.name , file_type: 'note' , owner : req.user.fullID });
     if(!note) {
         req.flash('Error', '해당 채보 파일이 존재하지 않습니다.');
@@ -55,9 +60,19 @@ app.get('/testnote', utils.isLogin, async (req, res, next) => {
         req.flash('Error', '해당 채보가 존재하지 않습니다.');
         return res.redirect('/');
     }
-    const note_file = JSON.parse(fs.readFileSync(path.join(setting.SAVE_FILE_PATH, note.name)));
 
-    const music = await File.findOne({ name : note_file.music , public : true , file_type : 'music' });
+    let token_result;
+    let note_file = String(fs.readFileSync(path.join(setting.SAVE_FILE_PATH, note.name)));
+
+    if(path.extname(note.name) == '.signedrhythmcraft') {
+        token_result = utils.verifyToken(note_file);
+        if (token_result.error) return res.send(`채보 오류 : ${token_result.message}`);
+    }
+    else {
+        note_file = JSON.parse(note_file);
+    }
+
+    const music = await File.findOne({ name : !token_result ? note_file.music : token_result.music , public : true , file_type : 'music' });
     if(!music) {
         req.flash('Error', '음악이 잘못되었습니다.');
         return res.redirect('/');
@@ -74,14 +89,15 @@ app.get('/testnote', utils.isLogin, async (req, res, next) => {
         roomcode,
         music: music.name,
         music_name: music.originalname,
-        note: note_file,
+        note: token_result || note_file,
         startpos: req.query.startpos,
         public: false,
         room_for_note_test: req.query.fromeditor == 'true',
         note_name_for_note_test: note.name,
         room_for_single_play: req.query.singleplay == 'true',
         pitch: req.query.pitch,
-        autoplay: req.query.autoplay == 'true'
+        autoplay: req.query.autoplay == 'true',
+        trusted: !token_result ? req.query.unsafe == 'true' : true
     });
 
     return res.redirect(`/game?room=${roomcode}#start`);

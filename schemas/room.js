@@ -89,6 +89,11 @@ const newSchema = new Schema({
         type: Boolean,
         required: true,
         default: false
+    },
+    trusted: {
+        type: Boolean,
+        required: true,
+        default: false
     }
 });
 

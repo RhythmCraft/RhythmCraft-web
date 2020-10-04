@@ -40,16 +40,25 @@ app.post('/newroom', utils.isLogin, async (req, res, next) => {
     }
     let note;
     let note_file;
+    let token_result;
     if(req.body.note != 'rhythmcraft_mode') {
         note = await File.findOne({ name : req.body.note , file_type : 'note' });
         if(!note) {
             req.flash('Error', '채보 선택이 잘못되었습니다.');
             return res.redirect('/');
         }
-        note_file = JSON.parse(fs.readFileSync(path.join(setting.SAVE_FILE_PATH, note.name)));
+        note_file = String(fs.readFileSync(path.join(setting.SAVE_FILE_PATH, note.name)));
+
+        if(path.extname(note.name) == '.signedrhythmcraft') {
+            token_result = utils.verifyToken(note_file);
+            if (token_result.error) return res.send(`채보 오류 : ${token_result.message}`);
+        }
+        else {
+            note_file = JSON.parse(note_file);
+        }
     }
 
-    const music = await File.findOne({ name : note != null ? note_file.music : req.body.music , public : true , file_type : 'music' });
+    const music = await File.findOne({ name : note != null ? !token_result ? note_file.music : token_result.music : req.body.music , public : true , file_type : 'music' });
 
     if(!music) {
         req.flash('Error', '음악이 잘못되었습니다.');
@@ -67,10 +76,11 @@ app.post('/newroom', utils.isLogin, async (req, res, next) => {
         roomcode,
         music: music.name,
         music_name: music.originalname,
-        note: note_file,
+        note: token_result || note_file,
         startpos: req.body.startpos,
         public: req.body.public == 'true',
-        pitch: req.body.pitch
+        pitch: req.body.pitch,
+        trusted: !token_result ? false : true
     });
 
     res.redirect(`/game?room=${roomcode}#master`);
