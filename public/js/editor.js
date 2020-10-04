@@ -66,6 +66,7 @@ window.onload = () => {
     });
 
     document.onkeydown = e => {
+        console.log(e.keyCode)
         pressedkey[e.keyCode] = true;
 
         if(pressedkey[80]) {
@@ -75,10 +76,10 @@ window.onload = () => {
             e.preventDefault();
             document.getElementById('Save').click();
         }
-        if(pressedkey[219]) {
+        if(pressedkey[189]) {
             document.getElementById('DecreaseTime').click();
         }
-        if(pressedkey[221]) {
+        if(pressedkey[187]) {
             document.getElementById('IncreaseTime').click();
         }
         if(pressedkey[220]) {
