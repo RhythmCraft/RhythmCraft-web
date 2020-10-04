@@ -101,6 +101,10 @@ window.onload = () => {
         location.href = '/note';
     }
 
+    document.getElementById('InputScript').onkeydown = function(e) {
+        e.stopPropagation();
+    }
+
     document.onkeydown = e => {
         pressedkey[e.keyCode] = true;
 
