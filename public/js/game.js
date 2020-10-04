@@ -291,7 +291,7 @@ window.onload = async () => {
                         details: create_mode ? '자유 모드' : '채보 플레이 중',
                         state: data.musicname,
                         startTimestamp: Date.now(),
-                        endTimestamp: Date.now() + sound.duration() * 1000 + countdown,
+                        endTimestamp: Date.now() + sound.duration() * 1000 + countdown - data.startpos,
                         largeImageKey: 'main',
                         instance: true
                     }
