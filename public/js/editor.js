@@ -79,7 +79,7 @@ window.onload = () => {
 
     document.getElementById('SaveScript').onclick = function() {
         const inputscript = document.getElementById('InputScript');
-        note['jscode'][inputscript.dataset.effect] = inputscript.value.replace('\n', '/*nextline*/');
+        note['jscode'][inputscript.dataset.effect] = inputscript.value.split('\n').join('/*nextline*/');
 
         setTimeout(() => {
             save();
@@ -197,7 +197,7 @@ function renderNote(note, look_time) {
                 });
                 const inputscript = document.getElementById('InputScript');
                 inputscript.dataset.effect = i;
-                inputscript.value = note['jscode'][i].replace('/*nextline*/', '\n');
+                inputscript.value = note['jscode'][i].split('/*nextline*/').join('\n');
             }
 
             document.body.appendChild(newscript);
