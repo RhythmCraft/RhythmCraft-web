@@ -35,11 +35,6 @@ app.get('/game', utils.isLogin, async (req, res, next) => {
 });
 
 app.get('/editor', utils.isLogin, async (req, res, next) => {
-    if(!req.user.admin) {
-        req.flash('Error', '시험중인 기능입니다.');
-        return res.redirect('/');
-    }
-
     const note = await File.findOne({ name : req.query.name , file_type: 'note' , owner : req.user.fullID });
     if(!note) {
         req.flash('Error', '해당 채보 파일이 존재하지 않습니다.');
