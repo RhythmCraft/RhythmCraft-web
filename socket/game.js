@@ -143,11 +143,13 @@ module.exports = (io, app) => {
                             'action': 'gamestartreal',
                             'note_speed': checkroom.note_speed,
                             'musicname': checkroom.music_name,
-                            'startpos': checkroom.startpos
+                            'startpos': checkroom.startpos,
+                            'countdown': !checkroom.room_for_note_test
                         });
                         await Room.updateOne( { roomcode: url_query.room }, { ready_player : 0 } );
 
-                        starttimestamp = new Date().getTime() + 3000 - checkroom.startpos;
+                        if(checkroom.room_for_note_test) starttimestamp = new Date().getTime() - checkroom.startpos;
+                        else  starttimestamp = new Date().getTime() + 3000 - checkroom.startpos;
 
                         rtnote = {};
                         rtnote.music = checkroom.music;
@@ -164,6 +166,9 @@ module.exports = (io, app) => {
                         rtnote.note.note7 = [];
                         rtnote.note.note8 = [];
 
+                        let countdown;
+                        if(checkroom.room_for_note_test) countdown = 0;
+                        else countdown = 3000;
                         if(checkroom.note != null) {
                             rtnote_timeout = [];
                             for(let i in checkroom.note.note) {
@@ -173,7 +178,7 @@ module.exports = (io, app) => {
                                             note: Number(i.replace('note', '')),
                                             note_speed: checkroom.note_speed
                                         });
-                                    }, time + 3000 - checkroom.startpos));
+                                    }, time + countdown - checkroom.startpos));
                                 });
                             }
                         }
@@ -213,7 +218,7 @@ module.exports = (io, app) => {
                         if(checkroom.room_for_note_test) {
                             socket.emit('msg', {
                                 "action": "redirect",
-                                "url": `/editor?name=${checkroom.note_name_for_note_test}&startpos=${checkroom.startpos}`
+                                "url": `/editor?name=${checkroom.note_name_for_note_test}&startpos=${(new Date().getTime() - starttimestamp) - 1000}`
                             });
                         }
                         if(checkroom.room_for_single_play) {

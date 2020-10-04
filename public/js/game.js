@@ -229,6 +229,10 @@ window.onload = async () => {
                 document.getElementById('CountDown').innerText = '음악 다운로드 중...';
                 break;
             case 'gamestartreal':
+                let countdown;
+                if(data.countdown) countdown = 3000;
+                else countdown = 0;
+
                 hitsound_collection = [];
 
                 const CountDown = document.getElementById('CountDown');
@@ -237,29 +241,36 @@ window.onload = async () => {
                 if(master && create_mode) hitsound_collection.push(setTimeout(() => {
                     sound.seek(data.startpos / 1000);
                     sound.play();
-                }, 3000));
-                else musictimeout = hitsound_collection.push(setTimeout(() => {
-                    sound.seek(data.startpos / 1000);
-                    sound.play();
-                }, data.note_speed + 3000));
+                }, countdown));
+                else {
+                    musictimeout = hitsound_collection.push(setTimeout(() => {
+                        sound.seek(data.startpos / 1000);
+                        sound.play();
+                    }, data.note_speed + countdown));
+                }
 
-                CountDown.innerText = '3';
-                hitsound.play();
-                hitsound_collection.push(setTimeout(() => {
-                    CountDown.innerText = '2';
+                if(data.countdown) {
+                    CountDown.innerText = '3';
                     hitsound.play();
-                }, 1000));
-                hitsound_collection.push(setTimeout(() => {
-                    CountDown.innerText = '1';
-                    hitsound.play();
-                }, 2000));
-                hitsound_collection.push(setTimeout(() => {
-                    CountDown.innerText = '시작!';
-                    hitsound.play();
-                }, 3000));
-                hitsound_collection.push(setTimeout(() => {
+                    hitsound_collection.push(setTimeout(() => {
+                        CountDown.innerText = '2';
+                        hitsound.play();
+                    }, 1000));
+                    hitsound_collection.push(setTimeout(() => {
+                        CountDown.innerText = '1';
+                        hitsound.play();
+                    }, 2000));
+                    hitsound_collection.push(setTimeout(() => {
+                        CountDown.innerText = '시작!';
+                        hitsound.play();
+                    }, 3000));
+                    hitsound_collection.push(setTimeout(() => {
+                        CountDown.hidden = true;
+                    }, 3500));
+                }
+                else {
                     CountDown.hidden = true;
-                }, 3500));
+                }
 
                 note_speed = data.note_speed;
                 note_interval = setInterval(note_interval_func, 1);
@@ -277,7 +288,7 @@ window.onload = async () => {
                         details: create_mode ? '자유 모드' : '채보 플레이 중',
                         state: data.musicname,
                         startTimestamp: Date.now(),
-                        endTimestamp: Date.now() + sound.duration() * 1000 + 3000,
+                        endTimestamp: Date.now() + sound.duration() * 1000 + countdown,
                         largeImageKey: 'main',
                         instance: true
                     }
