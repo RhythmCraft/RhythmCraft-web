@@ -259,6 +259,12 @@ module.exports = (io, app) => {
                                 "url": `/note`
                             });
                         }
+                        if(checkroom.room_from_workshop) {
+                            socket.emit('msg', {
+                                "action": "redirect",
+                                "url": `/workshop/note?name=${checkroom.note_name}`
+                            });
+                        }
                     }
                     break;
             }
@@ -455,7 +461,8 @@ module.exports = (io, app) => {
                 name,
                 originalname: data.filename,
                 owner: user.fullID,
-                file_type: 'note'
+                file_type: 'note',
+                description: '레벨에 대해 말해보세요!'
             });
 
             socket.emit('msg', { 'action' : 'updatenote' });

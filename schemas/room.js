@@ -78,6 +78,11 @@ const newSchema = new Schema({
         required: true,
         default: false
     },
+    room_from_workshop: {
+        type: Boolean,
+        required: true,
+        default: false
+    },
     pitch: {
         type: Number,
         required: true,
@@ -94,6 +99,9 @@ const newSchema = new Schema({
         type: Boolean,
         required: true,
         default: false
+    },
+    note_name: {
+        type: String
     }
 });
 

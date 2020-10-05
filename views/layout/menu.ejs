@@ -10,11 +10,13 @@
             <a class="dropdown-item" href="/mypage">마이페이지</a>
             <a class="dropdown-item" href="/music">음악 업로드 관리</a>
             <a class="dropdown-item" href="/note">채보 관리</a>
+            <a class="dropdown-item" href="/profile">프로필</a>
         <%} else {%>
             <a class="dropdown-item" href="/login">로그인</a>
         <%}%>
         <div class="dropdown-divider"></div>
             <a class="dropdown-item" href="/">메인 메뉴</a>
+            <a class="dropdown-item" href="/workshop">창작마당</a>
             <div class="dropdown-divider"></div>
         <%if(logined && user.create_judge) {%>
             <a class="dropdown-item" href="/create">문제 만들기</a>

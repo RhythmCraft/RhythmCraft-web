@@ -96,6 +96,11 @@ const userSchema = new Schema({
         type: String,
         required: true,
         default: "Semicolon"
+    },
+    verified: {
+        type: Boolean,
+        required: true,
+        default: false
     }
 });
 

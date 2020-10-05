@@ -50,11 +50,30 @@
         <%if(!file.name.includes('.signedrhythmcraft')) {%>
         <br><a href="/editor?name=<%=encodeURI(file.name)%>">채보 에디터</a>
         <%}%>
+        <br>
+        <%if(file.public) {%>
+        <a href="/notestatus?name=<%=encodeURI(file.name)%>&public=false" style="color: red;">채보 비공개</a>
+        <%} else {%>
+        <a href="/notestatus?name=<%=encodeURI(file.name)%>&public=true">채보 공개</a>
+        <%}%>
         <br><a href="/downloadnote?name=<%=encodeURI(file.name)%>">채보 다운로드</a>
         <br><a href="/removenote?name=<%=encodeURI(file.name)%>">채보 삭제</a>
         <%if(user.admin && !file.name.includes('.signedrhythmcraft')) {%>
         <br><a href="/signnotetext?name=<%=encodeURI(file.name)%>&originalname=<%=encodeURI(file.originalname)%>">채보 서명</a>
         <%}%>
+        <%if(file.name.includes('.signedrhythmcraft')) {%>
+            <br><a href="/unsignnote?name=<%=encodeURI(file.name)%>&originalname=<%=encodeURI(file.originalname)%>">채보 서명 해제</a>
+        <%}%>
+
+        <form action="/editnotedescription" method="post">
+            <input type="hidden" name="name" value="<%=file.name%>">
+            <div class="form-group">
+                <br><label for="InputDescription">채보 설명 수정</label>
+                <br><textarea name="description" id="InputDescription" class="form-control"><%=file.description%></textarea>
+            </div>
+
+            <button type="submit" class="btn btn-primary">채보 설명 적용</button>
+        </form>
     </h4>
 <hr>
 <%});%>

@@ -49,15 +49,14 @@ app.get('/editor', utils.isLogin, async (req, res, next) => {
     const note_file = fs.readFileSync(path.join(setting.SAVE_FILE_PATH, note.name)).toString();
 
     res.render('editor', {
-        note_file,
-        query: req.query
+        note_file
     });
 });
 
 app.get('/testnote', utils.isLogin, async (req, res, next) => {
-    const note = await File.findOne({ owner : req.user.fullID , name : req.query.note , file_type : 'note' });
-    if(!note) {
-        req.flash('Error', '해당 채보가 존재하지 않습니다.');
+    const note = await File.findOne({ name : req.query.note , file_type : 'note' });
+    if(!note || (!note.public && note.owner != req.user.fullID)) {
+        req.flash('Error', '해당 채보가 존재하지 않거나 접근 권한이 없습니다.');
         return res.redirect('/');
     }
 
@@ -94,10 +93,12 @@ app.get('/testnote', utils.isLogin, async (req, res, next) => {
         public: false,
         room_for_note_test: req.query.fromeditor == 'true',
         note_name_for_note_test: note.name,
+        room_from_workshop: req.query.from_workshop == 'true',
         room_for_single_play: req.query.singleplay == 'true',
         pitch: req.query.pitch,
         autoplay: req.query.autoplay == 'true',
-        trusted: !token_result ? req.query.unsafe == 'true' : true
+        trusted: !token_result ? req.query.unsafe == 'true' : true,
+        note_name: req.query.note
     });
 
     return res.redirect(`/game?room=${roomcode}#start`);

@@ -45,6 +45,11 @@
     <%} else {%>
         <p><label for="admin">관리자 : <input type="checkbox" name="admin" id="admin" value="true"></label></p>
     <%}%>
+    <%if(edituser.verified) {%>
+        <p><label for="admin">인증됨 : <input type="checkbox" name="verified" id="verified" value="true" checked></label></p>
+    <%} else {%>
+        <p><label for="admin">인증됨 : <input type="checkbox" name="verified" id="verified" value="true"></label></p>
+    <%}%>
 
     <input type="submit" value="저장">
 </form>

@@ -21,6 +21,9 @@ const newSchema = new Schema({
     file_type: {
         type: String,
         required: true
+    },
+    description: {
+        type: String
     }
 });
 

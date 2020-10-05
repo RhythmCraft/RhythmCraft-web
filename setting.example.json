@@ -10,6 +10,7 @@
   "INDEX": [ "index.htm" , "index.html" ],
 
   "SAVE_FILE_PATH": "FILE_PATH",
+  "AVATAR_PATH": "AVATAR_PATH",
 
   "USE_REDIS": false,
   "REDIS_HOST": "localhost",

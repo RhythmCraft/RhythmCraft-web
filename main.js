@@ -9,6 +9,7 @@ const flash = require('connect-flash');
 const redis = require('redis');
 const RedisStore = require('connect-redis')(session);
 const fs = require('fs');
+const path = require('path');
 
 // 데이터베이스 스키마
 const User = require('./schemas/user');
@@ -95,6 +96,7 @@ const staticoptions = {
     index: setting.INDEX
 }
 app.use(express.static(__dirname + "/public/", staticoptions));
+app.use(express.static(path.join(setting.AVATAR_PATH), staticoptions));
 
 // view engine을 EJS로 설정
 app.set('views', './views');
@@ -141,6 +143,7 @@ app.use((req, res, next) => {
     res.locals.session = req.session;
     res.locals.isClient = req.session.isClient || false;
     res.locals.socket = `${req.protocol}://${req.hostname}:${setting.PORT}`;
+    res.locals.query = req.query;
     next();
 });
 

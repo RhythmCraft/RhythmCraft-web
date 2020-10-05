@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <script>if (typeof module === 'object') {window.module = module; module = undefined;}</script>
+    <script src="/js/bootstrap/jquery-3.2.1.slim.min.js"></script>
+    <script src="/js/bootstrap/popper.min.js"></script>
+    <script src="/js/bootstrap/bootstrap.min.js"></script>
+    <link rel="stylesheet" href="/css/bootstrap/bootstrap.min.css">
+    <script>
+        if(<%=session.isClient%>) {
+            require('electron').remote.getGlobal('globalVars').RichPresence = {
+                details: '창작마당 탐색 중',
+                startTimestamp: Date.now(),
+                largeImageKey: 'main',
+                instance: true
+            }
+        }
+    </script>
+    <script>if (window.module) module = window.module;</script>
+    <title><%=servername%> - 창작마당</title>
+</head>
+
+<body>
+<h1>창작마당</h1>
+<%-include('./layout/menu')%>
+<%-include('./layout/info')%>
+
+<%notes.forEach(note => {%>
+    <h5><a href="/workshop/note?name=<%=encodeURI(note.name)%>"><%=note.originalname%></a></h5>
+<%});%>
+
+<nav aria-label="Page navigation">
+    <ul class="pagination">
+        <%if(page > 1) {%>
+        <li class="page-item"><a class="page-link" href="/workshop?page=<%=page - 1%>&limit=<%=limit%>"></a></li>
+        <%} else {%>
+        <li class="page-item disabled"><a class="page-link" href="/workshop?page=<%=page - 1%>&limit=<%=limit%>">이전</a></li>
+        <%}%>
+        <%for(let i = 1; i <= Math.ceil(count / limit); i++) {%>
+            <li class="page-item"><a class="page-link" href="/workshop?page=<%=i%>&limit=<%=limit%>"><%=i%></a></li>
+        <%}%>
+        <%if(page < Math.ceil(count / limit)) {%>
+        <li class="page-item"><a class="page-link" href="/workshop?page=<%=page + 1%>&limit=<%=limit%>">다음</a></li>
+        <%} else {%>
+        <li class="page-item disabled"><a class="page-link" href="/workshop?page=<%=page + 1%>&limit=<%=limit%>">다음</a></li>
+        <%}%>
+    </ul>
+</nav>
+</body>
+</html>

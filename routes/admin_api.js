@@ -21,7 +21,8 @@ app.post('/admin_editaccount', utils.isAdmin, async (req, res, next) => {
         nick_set: req.body.nick_set == 'true',
         allow_email_ad: req.body.allow_email_ad == 'true',
         block_login: req.body.block_login == 'true',
-        admin: req.body.admin == 'true'
+        admin: req.body.admin == 'true',
+        verified: req.body.verified == 'true'
     });
 
     res.redirect(`/admin/user?id=${req.body.fullID}`);

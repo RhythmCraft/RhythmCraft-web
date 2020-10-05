@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <script>if (typeof module === 'object') {window.module = module; module = undefined;}</script>
+    <script src="/js/bootstrap/jquery-3.2.1.slim.min.js"></script>
+    <script src="/js/bootstrap/popper.min.js"></script>
+    <script src="/js/bootstrap/bootstrap.min.js"></script>
+    <link rel="stylesheet" href="/css/bootstrap/bootstrap.min.css">
+    <script>
+        if(<%=session.isClient%>) {
+            require('electron').remote.getGlobal('globalVars').RichPresence = {
+                details: '창작마당 탐색 중',
+                startTimestamp: Date.now(),
+                largeImageKey: 'main',
+                instance: true
+            }
+        }
+    </script>
+    <script>if (window.module) module = window.module;</script>
+    <title><%=servername%> - 창작마당</title>
+</head>
+
+<body>
+<h1>창작마당</h1>
+<%-include('./layout/menu')%>
+<%-include('./layout/info')%>
+
+<h3>업로드 : <a href="/profile?id=<%=creator.fullID%>"><%=creator.nickname%></a></h3>
+<h3><%=note.originalname%></h3>
+<h5><%=note.description%></h5>
+<br><br>
+<a class="btn btn-primary" href="/testnote?note=<%=note.name%>&from_workshop=true">이 채보 플레이</a>
+<a class="btn btn-primary" href="/saveworkshopnote?name=<%=note.name%>">이 채보 내 보관함에 저장</a>
+</body>
+</html>

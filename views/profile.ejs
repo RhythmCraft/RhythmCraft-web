@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <script>if (typeof module === 'object') {window.module = module; module = undefined;}</script>
+    <script src="/js/bootstrap/jquery-3.2.1.slim.min.js"></script>
+    <script src="/js/bootstrap/popper.min.js"></script>
+    <script src="/js/bootstrap/bootstrap.min.js"></script>
+    <link rel="stylesheet" href="/css/bootstrap/bootstrap.min.css">
+    <script>
+        if(<%=session.isClient%>) {
+            require('electron').remote.getGlobal('globalVars').RichPresence = {
+                details: `<%=profile_user.nickname%>의 프로필을 보는 중`,
+                startTimestamp: Date.now(),
+                largeImageKey: 'main',
+                instance: true
+            }
+        }
+    </script>
+    <script>if (window.module) module = window.module;</script>
+    <title><%=servername%> - 프로필</title>
+</head>
+
+<body>
+<h1>창작마당</h1>
+<%-include('./layout/menu')%>
+<%-include('./layout/info')%>
+
+<img src="<%=profile_image%>" width="100" height="100">
+<h3>이름 : <%=profile_user.nickname%> <%if(profile_user.verified) {%><img src="/img/verified.png" width="50" height="50"><%}%></h3>
+
+<h4>나의 채보</h4>
+<%notes.forEach(note => {%>
+<h5><a href="/workshop/note?name=<%=encodeURI(note.name)%>"><%=note.originalname%></a></h5>
+<%});%>
+</body>
+</html>

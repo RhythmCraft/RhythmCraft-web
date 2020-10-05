@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <script>if (typeof module === 'object') {window.module = module; module = undefined;}</script>
+    <script src="/js/bootstrap/jquery-3.2.1.slim.min.js"></script>
+    <script src="/js/bootstrap/popper.min.js"></script>
+    <script src="/js/bootstrap/bootstrap.min.js"></script>
+    <link rel="stylesheet" href="/css/bootstrap/bootstrap.min.css">
+    <script>
+        if(<%=session.isClient%>) {
+            require('electron').remote.getGlobal('globalVars').RichPresence = {
+                details: '프로필 수정 중',
+                startTimestamp: Date.now(),
+                largeImageKey: 'main',
+                instance: true
+            }
+        }
+    </script>
+    <script>if (window.module) module = window.module;</script>
+    <title><%=servername%> - 프로필 사진 업로드</title>
+</head>
+
+<body>
+<h1>프로필 사진 업로드</h1>
+<%-include('./layout/menu')%>
+<%-include('./layout/info')%>
+
+<form action="/upload_avatar" method="post" enctype="multipart/form-data">
+    <input type="file" id="File" name="file" accept="image/*" required>
+    <br><br><button type="submit" class="btn btn-primary">업로드</button>
+</form>
+</body>
+</html>

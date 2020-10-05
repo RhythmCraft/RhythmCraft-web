@@ -1,6 +1,8 @@
 const express = require('express');
 const bodyParser = require('body-parser');
+
 const User = require('../schemas/user');
+const File = require('../schemas/file');
 
 const utils = require('../utils');
 const setting = require('../setting.json');
@@ -25,6 +27,10 @@ app.post('/editaccount', utils.isLogin, async (req, res, next) => {
         return res.redirect('/mypage');
     }
 
+    const user = await User.findOne({ fullID : req.user.fullID });
+    let verified = user.verified;
+    if(user.nickname != req.body.nickname) verified = false;
+
     try {
         await User.updateOne({
             snsID: req.user.snsID,
@@ -40,7 +46,8 @@ app.post('/editaccount', utils.isLogin, async (req, res, next) => {
             rhythm_key_5: req.body.InputKey5,
             rhythm_key_6: req.body.InputKey6,
             rhythm_key_7: req.body.InputKey7,
-            rhythm_key_8: req.body.InputKey8
+            rhythm_key_8: req.body.InputKey8,
+            verified
         });
         res.redirect('/mypage');
     } catch(err) {
@@ -49,6 +56,30 @@ app.post('/editaccount', utils.isLogin, async (req, res, next) => {
         res.redirect('/mypage');
     }
     return;
+});
+
+app.get('/upload_avatar', utils.isLogin, (req, res, next) => {
+    return res.render('upload_avatar');
+});
+
+app.get('/profile', async (req, res, next) => {
+    const profile_user = await User.findOne({ fullID : req.query.id || req.user.fullID });
+    if(!profile_user) {
+        req.flash('Error', '해당 유저는 존재하지 않습니다.');
+        return res.redirect('/');
+    }
+
+    let profile_image = await File.findOne({ owner : req.user.fullID , file_type : 'avatar' });
+    if(!profile_image) profile_image = '/img/no_avatar.png';
+    else profile_image = `/${profile_image.name}`;
+
+    const notes = await File.find({ owner : req.user.fullID , file_type : 'note' , public : true });
+
+    return res.render('profile', {
+        profile_user,
+        profile_image,
+        notes
+    });
 });
 
 module.exports = app;
