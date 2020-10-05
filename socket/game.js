@@ -192,13 +192,19 @@ module.exports = (io, app) => {
                                 if(Number(i) > checkroom.startpos) rtnote_timeout.push(setTimeout(() => {
                                    io.to(`room_${url_query.room}`).emit('msg', {
                                        'action': 'eval',
-                                       'message': checkroom['note']['jscode'][i].split('/*grave*/').join('`')
+                                       'message': checkroom['note']['jscode'][i]
+                                           .split('/*grave*/').join('`')
+                                           .split('/*openbracket*/').join('{')
+                                           .split('/*closebracket*/').join('}')
                                    });
                                 }, ((Number(i) / (checkroom.pitch / 100)) + countdown - (checkroom.startpos / (checkroom.pitch / 100))) + checkroom.note_speed));
                                 else setImmediate(() => {
                                     io.to(`room_${url_query.room}`).emit('msg', {
                                         'action': 'eval',
-                                        'message': checkroom['note']['jscode'][i].split('/*grave*/').join('`')
+                                        'message': checkroom['note']['jscode'][i]
+                                            .split('/*grave*/').join('`')
+                                            .split('/*openbracket*/').join('{')
+                                            .split('/*closebracket*/').join('}')
                                     });
                                 });
                             }

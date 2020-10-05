@@ -81,7 +81,9 @@ window.onload = () => {
     document.getElementById('SaveScript').onclick = function() {
         const inputscript = document.getElementById('InputScript');
         note['jscode'][inputscript.dataset.effect] = inputscript.value.split('\n').join('/*nextline*/');
-        note['jscode'][inputscript.dataset.effect] = inputscript.value.split('`').join('/*grave*/');
+        note['jscode'][inputscript.dataset.effect] = note['jscode'][inputscript.dataset.effect].split('`').join('/*grave*/');
+        note['jscode'][inputscript.dataset.effect] = note['jscode'][inputscript.dataset.effect].split('{').join('/*openbracket*/');
+        note['jscode'][inputscript.dataset.effect] = note['jscode'][inputscript.dataset.effect].split('}').join('/*closebracket*/');
 
         setTimeout(() => {
             save();
@@ -200,7 +202,9 @@ function renderNote(note, look_time) {
                 const inputscript = document.getElementById('InputScript');
                 inputscript.dataset.effect = i;
                 inputscript.value = note['jscode'][i].split('/*nextline*/').join('\n');
-                inputscript.value = note['jscode'][i].split('/*grave*/').join('`');
+                inputscript.value = inputscript.value.split('/*grave*/').join('`');
+                inputscript.value = inputscript.value.split('/*openbracket*/').join('{');
+                inputscript.value = inputscript.value.split('/*closebracket*/').join('}');
             }
 
             document.body.appendChild(newscript);
