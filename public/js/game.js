@@ -9,6 +9,7 @@ let accurary = 0;
 let possible_max_score = 0;
 let playing = false;
 let last_note_judgement;
+let keymap = {};
 
 window.onload = async () => {
     if(isClient) {
@@ -24,7 +25,6 @@ window.onload = async () => {
     let sound;
     let master;
     let musictimeout;
-    let keymap = {};
     let rtnote;
     let create_mode;
     let scores;
