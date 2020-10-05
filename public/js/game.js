@@ -8,6 +8,7 @@ let multiplier = 1;
 let accurary = 0;
 let possible_max_score = 0;
 let playing = false;
+let last_note_judgement;
 
 window.onload = async () => {
     if(isClient) {
@@ -519,23 +520,28 @@ window.onload = async () => {
             if(distance <= 60 && distance >= -60) {
                 score += 5 * multiplier;
                 flash_note_area(keymap[e.code], 'LightGreen');
+                last_note_judgement = 'green';
             }
             else if(distance <= 140 && distance >= -140) {
                 score += 3 * multiplier;
                 flash_note_area(keymap[e.code], 'Yellow');
+                last_note_judgement = 'yellow';
             }
             else if(distance <= 200 && distance >= -200) {
                 score += 2 * multiplier;
                 flash_note_area(keymap[e.code], 'Orange');
+                last_note_judgement = 'orange';
             }
             else if(distance <= 260 && distance >= -260) {
                 score += 1 * multiplier;
                 flash_note_area(keymap[e.code], 'Tomato');
+                last_note_judgement = 'tomato';
             }
             else {
                 combo = 0;
                 multiplier = 1;
                 flash_note_area(keymap[e.code], 'red');
+                last_note_judgement = 'red';
             }
 
             if(distance <= 140 && distance >= -140) multiplier += 0.01;
