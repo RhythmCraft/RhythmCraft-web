@@ -69,7 +69,7 @@ app.get('/profile', async (req, res, next) => {
         return res.redirect('/');
     }
 
-    let profile_image = await File.findOne({ owner : req.user.fullID , file_type : 'avatar' });
+    let profile_image = await File.findOne({ owner : req.query.id || req.user.fullID , file_type : 'avatar' });
     if(!profile_image) profile_image = '/img/no_avatar.png';
     else profile_image = `/${profile_image.name}`;
 
