@@ -73,7 +73,7 @@ app.get('/profile', async (req, res, next) => {
     if(!profile_image) profile_image = '/img/no_avatar.png';
     else profile_image = `/${profile_image.name}`;
 
-    const notes = await File.find({ owner : req.user.fullID , file_type : 'note' , public : true });
+    const notes = await File.find({ owner : req.query.id || req.user.fullID , file_type : 'note' , public : true });
 
     return res.render('profile', {
         profile_user,
