@@ -223,8 +223,7 @@ function RequestData(method, url, data) {
 }
 
 function getms(px) {
-    let temp = nerdamer.solve(`(((${innerHeight}*0.65/${note_speed})*(x-0))+${innerHeight}*0.65/${note_speed})+${innerHeight}*0.3=${px}`, 'x').toString().replace('[', '').replace(']', '').split('/');
-    return temp[0] / temp[1];
+    return (note_speed * px - 0.3 * innerHeight * note_speed) / (0.65 * innerHeight) - 1;
 }
 
 function save() {
