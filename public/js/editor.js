@@ -2,6 +2,8 @@ let note;
 const note_speed = 1000;
 
 window.onload = () => {
+    $("[data-toggle=popover]").popover();
+
     note = JSON.parse(note_file);
     let note_time = startpos;
     let pressedkey = [];

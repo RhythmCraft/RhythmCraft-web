@@ -57,7 +57,7 @@
         <input id="InputPitch" type="number" value="<%=query.pitch || 100%>" placeholder="피치">
 
         <p><label for="autoplay"><input type="checkbox" id="autoplay"> 자동 플레이</label></p>
-        <p><label for="unsafe_mode" title="서명되지 않은 효과 스크립트를 실행합니다. 문장의 뜻을 이해할 수 없다면 체크하지 마세요."><input type="checkbox" id="unsafe_mode"> 비보호 모드</label></p>
+        <p><label for="unsafe_mode" data-container="body" data-toggle="popover" data-placement="bottom" data-content="서명되지 않은 효과 스크립트를 실행합니다. 문장의 뜻을 이해할 수 없다면 체크하지 마세요." data-trigger="hover"><input type="checkbox" id="unsafe_mode"> 비보호 모드</label></p>
 
         <textarea id="InputScript" class="editscript" placeholder="스크립트를 입력하세요." hidden></textarea>
         <br><button id="SaveScript" class="btn btn-primary editscript" hidden>스크립트 적용</button>
