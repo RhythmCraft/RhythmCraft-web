@@ -8,3 +8,9 @@
     bottom: 80px;
     left: 120px;
 }
+.creator-comment {
+    background-color: #b1eab1;
+}
+.admin-comment {
+    background-color: LightCyan;
+}
