@@ -82,9 +82,10 @@
                 <%}%>
                 <%if(logined && (user.fullID == comment.writer)) {%>
                 <a class="btn btn-danger" href="/workshop/note/removecomment?comment=<%=comment.id%>">이 댓글 삭제</a>
+                <%} else if(logined && user.admin) {%>
+                <a class="btn btn-danger" href="/workshop/note/removecomment?comment=<%=comment.id%>">관리자 권한으로 이 댓글 삭제(남은 필요 투표 수 : <%=comment_delete_required_count - comment.delete_count%>)</a>
                 <%}%>
                 <%if(logined && user.admin) {%>
-                <a class="btn btn-danger" href="/workshop/note/removecomment?comment=<%=comment.id%>">관리자 권한으로 이 댓글 삭제(남은 필요 투표 수 : <%=comment_delete_required_count - comment.delete_count%>)</a>
                 <a class="btn btn-danger" href="/workshop/note/cancelallvotecomment?comment=<%=comment.id%>">이 댓글 삭제 투표 모두 삭제</a>
                 <%}%>
             </div>
