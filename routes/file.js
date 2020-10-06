@@ -360,9 +360,10 @@ app.post('/upload_avatar', utils.isLogin, upload.single('file'), async (req, res
         return res.redirect('/');
     }
 
-    const name = `avatar_${req.user.fullID}${path.extname(req.file.originalname)}`;
+    const name = `avatar_${req.user.fullID}`;
     streamifier.createReadStream(req.file.buffer).pipe(fs.createWriteStream(path.join(setting.AVATAR_PATH, name)));
 
+    await File.deleteMany({ owner : req.user.fullID });
     await File.create({
         name,
         originalname: req.file.originalname,
