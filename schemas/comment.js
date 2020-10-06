@@ -47,11 +47,6 @@ const newSchema = new Schema({
         type: String,
         required: true,
         default: 'nobody'
-    },
-    delete_count: {
-        type: Number,
-        required: true,
-        default: 0
     }
 });
 

@@ -11,6 +11,7 @@ const User = require('../schemas/user');
 const File = require('../schemas/file');
 const Comment = require('../schemas/comment');
 const Like = require('../schemas/like');
+const RemoveCommentVote = require('../schemas/remove_comment_vote');
 
 // app 정의
 const app = express.Router();
@@ -89,6 +90,7 @@ app.get('/workshop/note', async (req, res, next) => {
         else comments[i]['like'] = false;
 
         comments[i]['like_count'] = await Like.countDocuments({ comment_id : comments[i]['id'] });
+        comments[i]['delete_count'] = await RemoveCommentVote.countDocuments({ comment_id : comments[i]['id'] });
     }
 
     return res.render('workshop_note', {
@@ -142,16 +144,27 @@ app.get('/workshop/note/removecomment', utils.isLogin, async (req, res, next) =>
         return res.redirect(`/workshop/note?name=${comment.note_name}`);
     }
     if(req.user.admin) {
-        if(comment.delete_count + 1 >= setting.COMMENT_DELETE_REQUIRED_COUNT) {
+        const delete_count = await RemoveCommentVote.countDocuments({ comment_id : comment.id });
+        const check = await RemoveCommentVote.findOne({ comment_id : comment.id , user : req.user.fullID });
+
+        if(delete_count + 1 >= setting.COMMENT_DELETE_REQUIRED_COUNT && !check) {
             await Comment.deleteOne({ id : req.query.comment });
 
             req.flash('Info', '댓글을 삭제했습니다.');
             return res.redirect(`/workshop/note?name=${comment.note_name}`);
         }
         else {
-            await Comment.updateOne({ id : req.query.comment }, { $inc: { delete_count : 1 } });
+            if(check != null) {
+                req.flash('Error', '이미 투표했습니다.');
+                return res.redirect(`/workshop/note?name=${comment.note_name}`);
+            }
 
-            req.flash('Info', `댓글 삭제 투표를 했습니다. ${setting.COMMENT_DELETE_REQUIRED_COUNT - (comment.delete_count + 1)}명의 승인이 추가로 필요합니다.`);
+            await RemoveCommentVote.create({
+                user: req.user.fullID,
+                comment_id: comment.id
+            });
+
+            req.flash('Info', `댓글 삭제 투표를 했습니다. ${setting.COMMENT_DELETE_REQUIRED_COUNT - (delete_count + 1)}명의 승인이 추가로 필요합니다.`);
             return res.redirect(`/workshop/note?name=${comment.note_name}`);
         }
     }
@@ -243,6 +256,22 @@ app.post('/workshop/note/heartcomment', async (req, res, next) => {
 
         return res.json({ 'result' : 'hearted' , avatar });
     }
+});
+
+app.get('/workshop/note/cancelallvotecomment', utils.isLogin, async (req, res, next) => {
+    const comment = await Comment.findOne({ id : req.query.comment });
+    if(!comment) {
+        req.flash('Error', '해당 댓글이 존재하지 않습니다.');
+        return res.redirect(`/workshop`);
+    }
+    if(!req.user.admin) {
+        req.flash('Error', '권한이 없습니다.');
+        return res.redirect(`/workshop/note?name=${comment.note_name}`);
+    }
+
+    await RemoveCommentVote.deleteMany({ comment_id : comment.id });
+    req.flash('Info', '이 댓글의 모든 삭제 투표를 제거했습니다.');
+    return res.redirect(`/workshop/note?name=${comment.note_name}`);
 });
 
 module.exports = app;
