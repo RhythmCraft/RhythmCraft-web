@@ -96,7 +96,7 @@ const staticoptions = {
     index: setting.INDEX
 }
 app.use(express.static(__dirname + "/public/", staticoptions));
-app.use(express.static(path.join(setting.AVATAR_PATH), staticoptions));
+app.use('/static', express.static(path.join(setting.AVATAR_PATH), staticoptions));
 
 // view engine을 EJS로 설정
 app.set('views', './views');
