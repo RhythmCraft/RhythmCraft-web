@@ -290,13 +290,17 @@ app.get('/unsignnote', utils.isAdmin, async (req, res, next) => {
 });
 
 app.get('/notestatus', utils.isLogin, async (req, res, next) => {
-    const file = await File.findOne({ name : req.query.name , owner : req.user.fullID , file_type : 'note' });
+    const file = await File.findOne({ name : req.query.name , file_type : 'note' });
     if(!file) {
         req.flash('Error', '해당 채보가 존재하지 않습니다.');
         return res.redirect('/note');
     }
+    if(!req.user.admin && file.owner != req.user.fullID) {
+        req.flash('Error', '권한이 없습니다.');
+        return res.redirect('/note');
+    }
 
-    await File.updateOne({ name : req.query.name , owner : req.user.fullID , file_type : 'note' } , { public : req.query.public == 'true' });
+    await File.updateOne({ name : req.query.name , file_type : 'note' } , { public : req.query.public == 'true' });
     req.flash('Info', `${file.originalname} 채보 공개 상태가 업데이트되었습니다.`);
     req.app.get('socket_game').to(`user_${req.user.fullID}`).emit('msg', { 'action' : 'updatenote' });
     return res.redirect('/note');

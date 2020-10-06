@@ -19,7 +19,7 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended : false }));
 
 app.get('/workshop', async (req, res, next) => {
-    const regex = new RegExp(req.query.search || '');
+    const regex = new RegExp((req.query.search || ''), 'i');
     const notes = await File.find({ file_type : 'note' , public : true , originalname : { $regex : regex } }).skip(Number(req.query.page) * (req.query.limit || 20) - (req.query.limit || 20)).limit(Number(req.query.limit));
     const count = await File.countDocuments({ file_type : 'note' , public : true , originalname : { $regex : regex } });
 

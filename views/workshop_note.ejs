@@ -37,6 +37,9 @@
 <br><br>
 <a class="btn btn-primary" href="/testnote?note=<%=note.name%>&from_workshop=true">이 채보 플레이</a>
 <a class="btn btn-primary" href="/saveworkshopnote?name=<%=note.name%>">이 채보 내 보관함에 저장</a>
+<%if(logined && user.admin) {%>
+    <a class="btn btn-danger" href="/notestatus?name=<%=encodeURI(note.name)%>&public=false">이 채보 비공개 처리</a>
+<%}%>
 
 <hr>
 
