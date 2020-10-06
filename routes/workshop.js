@@ -97,7 +97,8 @@ app.get('/workshop/note', async (req, res, next) => {
         creator,
         User,
         File,
-        comments
+        comments,
+        comment_delete_required_count: setting.COMMENT_DELETE_REQUIRED_COUNT
     });
 });
 

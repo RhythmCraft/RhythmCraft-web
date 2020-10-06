@@ -107,8 +107,11 @@
                     <a class="btn btn-primary" href="/workshop/note/pincomment?comment=<%=comment.id%>">이 댓글 고정</a>
                 <%}%>
             <%}%>
-            <%if(logined && (user.admin || user.fullID == note.owner || user.fullID == comment.writer)) {%>
+            <%if(logined && (user.fullID == note.owner || user.fullID == comment.writer)) {%>
                 <a class="btn btn-danger" href="/workshop/note/removecomment?comment=<%=comment.id%>">이 댓글 삭제</a>
+            <%}%>
+            <%if(logined && user.admin) {%>
+            <a class="btn btn-danger" href="/workshop/note/removecomment?comment=<%=comment.id%>">관리자 권한으로 이 댓글 삭제(남은 필요 투표 수 : <%=comment_delete_required_count - comment.delete_count%>)</a>
             <%}%>
         </div>
     </div>
