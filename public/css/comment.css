@@ -1,0 +1,10 @@
+.avatar {
+    border-radius: 50%;
+    width: 100px;
+    height: 100px;
+}
+.comment-text {
+    position: relative;
+    bottom: 80px;
+    left: 120px;
+}

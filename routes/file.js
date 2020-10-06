@@ -12,6 +12,7 @@ const setting = require('../setting.json');
 const utils = require('../utils');
 
 const File = require('../schemas/file');
+const Comment = require('../schemas/comment');
 
 // app 정의
 const app = express.Router();
@@ -161,6 +162,7 @@ app.get('/removenote', utils.isLogin, async (req, res, next) => {
     }
     fs.unlinkSync(path.join(setting.SAVE_FILE_PATH, file.name));
     await File.deleteOne({ owner : req.user.fullID , name : req.query.name , file_type : 'note' });
+    await Comment.deleteMany({ note_name : req.query.name });
 
     req.flash('Info', `${file.originalname}을(를) 삭제했습니다.`);
     req.app.get('socket_game').to(`user_${req.user.fullID}`).emit('msg', { 'action' : 'updatenote' });

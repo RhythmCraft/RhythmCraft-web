@@ -21,6 +21,7 @@
             $("[data-toggle=popover]").popover();
         }
     </script>
+    <link rel="stylesheet" href="/css/comment.css">
     <script>if (window.module) module = window.module;</script>
     <title><%=servername%> - 창작마당</title>
 </head>
@@ -39,5 +40,48 @@
 <br><br>
 <a class="btn btn-primary" href="/testnote?note=<%=note.name%>&from_workshop=true">이 채보 플레이</a>
 <a class="btn btn-primary" href="/saveworkshopnote?name=<%=note.name%>">이 채보 내 보관함에 저장</a>
+
+<hr>
+
+<form action="/workshop/note/comment" method="post">
+    <input type="hidden" name="name" value="<%=note.name%>">
+    <div class="form-group">
+        <label for="InputText">댓글 입력</label>
+        <textarea class="form-control" id="InputText" name="text" placeholder="댓글을 입력하세요."></textarea>
+    </div>
+
+    <button type="submit" class="btn btn-primary">작성</button>
+</form>
+
+<div id="comment">
+    <%comments.forEach(async comment => {%>
+    <div class="comment card">
+        <div class="card-header"><%=comment.user.nickname%> <%if(comment.user.verified) {%><svg width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-check-circle-fill text-secondary" fill="currentColor" xmlns="http://www.w3.org/2000/svg" data-container="body" data-toggle="popover" data-placement="top" data-content="인증된 유저" data-trigger="hover">
+                <path fill-rule="evenodd" d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zm-3.97-3.03a.75.75 0 0 0-1.08.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-.01-1.05z"/>
+            </svg><%}%></div>
+        <div class="card-body">
+            <%if(comment.pin) {%>
+            <h5 class="text-secondary"><svg width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-lock-fill" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M2.5 9a2 2 0 0 1 2-2h7a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-7a2 2 0 0 1-2-2V9z"/>
+                    <path fill-rule="evenodd" d="M4.5 4a3.5 3.5 0 1 1 7 0v3h-1V4a2.5 2.5 0 0 0-5 0v3h-1V4z"/>
+                </svg><%=comment.pinuser.nickname%>님이 고정함</h5>
+            <%}%>
+            <img class="avatar" src="<%=comment.avatar%>">
+            <h5 class="card-text comment-text"><%=comment.text%></h5>
+            <p class="comment-text"><%=comment.createdAt.toLocaleString()%></p>
+            <%if(user.admin || user.fullID == note.owner) {%>
+            <%if(comment.pin) {%>
+            <a class="btn btn-primary" href="/workshop/note/unpincomment?comment=<%=comment.id%>">이 댓글 고정 해제</a>
+            <%} else {%>
+            <a class="btn btn-primary" href="/workshop/note/pincomment?comment=<%=comment.id%>">이 댓글 고정</a>
+            <%}%>
+            <%}%>
+            <%if(user.admin || user.fullID == note.owner || user.fullID == comment.writer) {%>
+                <a class="btn btn-danger" href="/workshop/note/removecomment?comment=<%=comment.id%>">이 댓글 삭제</a>
+            <%}%>
+        </div>
+    </div>
+    <%});%>
+</div>
 </body>
 </html>
