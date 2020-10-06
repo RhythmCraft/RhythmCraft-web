@@ -53,7 +53,7 @@
 <div id="comment">
     <%comments.forEach(async comment => {%>
         <%if(comment.user.admin) {%>
-            <div id="comment_<%=comment.id%>" class="comment card creator-comment">
+            <div id="comment_<%=comment.id%>" class="comment card admin-comment">
         <%} else if(comment.writer == note.owner) {%>
             <div id="comment_<%=comment.id%>" class="comment card creator-comment">
         <%} else {%>
