@@ -1,8 +1,8 @@
-function updatePreview() {
-    var ele = document.getElementById('html_preview');
-    var input = document.getElementById('html');
+window.onload = () => {
+    document.getElementById('html').oninput = () => {
+        const ele = document.getElementById('html_preview');
+        const input = document.getElementById('html');
 
-    ele.innerHTML = input.value;
+        ele.innerHTML = input.value;
+    }
 }
-
-setInterval(updatePreview, 1);
