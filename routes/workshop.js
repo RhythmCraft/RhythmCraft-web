@@ -134,10 +134,26 @@ app.get('/workshop/note/removecomment', utils.isLogin, async (req, res, next) =>
         return res.redirect(`/workshop/note?name=${comment.note_name}`);
     }
 
-    await Comment.deleteOne({ id : req.query.comment });
+    if(note.owner == req.user.fullID || comment.writer == req.user.fullID) {
+        await Comment.deleteOne({ id : req.query.comment });
 
-    req.flash('Info', '댓글을 삭제했습니다.');
-    return res.redirect(`/workshop/note?name=${comment.note_name}`);
+        req.flash('Info', '댓글을 삭제했습니다.');
+        return res.redirect(`/workshop/note?name=${comment.note_name}`);
+    }
+    if(req.user.admin) {
+        if(comment.delete_count + 1 >= setting.COMMENT_DELETE_REQUIRED_COUNT) {
+            await Comment.deleteOne({ id : req.query.comment });
+
+            req.flash('Info', '댓글을 삭제했습니다.');
+            return res.redirect(`/workshop/note?name=${comment.note_name}`);
+        }
+        else {
+            await Comment.updateOne({ id : req.query.comment }, { $inc: { delete_count : 1 } });
+
+            req.flash('Info', `댓글 삭제 투표를 했습니다. ${setting.COMMENT_DELETE_REQUIRED_COUNT - (comment.delete_count + 1)}명의 승인이 추가로 필요합니다.`);
+            return res.redirect(`/workshop/note?name=${comment.note_name}`);
+        }
+    }
 });
 
 app.get('/workshop/note/pincomment', utils.isLogin, async (req, res, next) => {

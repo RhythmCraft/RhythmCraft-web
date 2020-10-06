@@ -1,7 +1,7 @@
 window.onload = () => {
     $("[data-toggle=popover]").popover();
 
-    Array.from(document.getElementsByClassName('comment-like')).forEach(ele => {
+    Array.from(document.getElementsByClassName('comment-like-click')).forEach(ele => {
         ele.onclick = () => {
             const comment = ele.dataset.comment;
             const result = Request('post', `/workshop/note/likecomment?id=${comment}`);
