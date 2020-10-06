@@ -3,6 +3,10 @@
     width: 100px;
     height: 100px;
 }
+.comment {
+    margin-top: 20px;
+    margin-bottom: 20px;
+}
 .comment-text {
     position: relative;
     bottom: 80px;
