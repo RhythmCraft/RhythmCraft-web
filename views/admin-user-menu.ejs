@@ -18,8 +18,10 @@
 <%-include('./layout/info')%>
 
 <form action="/admin/user">
-    <input type="text" name="id" id="input" placeholder="관리 대상 유저 ID를 입력해 주세요." required>
-    <input type="submit" value="확인">
+    <h4>둘중 하나만 입력해도 됩니다.</h4>
+    <input type="text" name="nickname" id="input" placeholder="관리 대상 유저 닉네임을 입력해 주세요.">
+    <br><input type="text" name="id" id="input" placeholder="관리 대상 유저 ID를 입력해 주세요.">
+    <br><br><button class="btn btn-primary" type="submit">확인</button>
 </form>
 </body>
 </html>

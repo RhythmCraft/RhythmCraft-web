@@ -14,9 +14,11 @@ app.get('/admin', utils.isAdmin, (req, res, next) => {
 app.get('/admin/:page', utils.isAdmin, async (req, res, next) => {
     switch(req.params.page) {
         case 'user':
-            if(req.query.id == '' || req.query.id == null) res.render('admin-user-menu');
+            if(!req.query.id && !req.query.nickname) res.render('admin-user-menu');
             else {
-                const user = await User.findOne({ fullID : req.query.id });
+                let user;
+                if(!req.query.nickname) user = await User.findOne({ fullID : req.query.id });
+                else user = await User.findOne({ nickname : req.query.nickname });
                 if(user == null) {
                     req.flash('Error', '해당 유저를 찾을 수 없습니다.');
                     return res.redirect('/admin/user');
