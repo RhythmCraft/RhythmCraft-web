@@ -214,11 +214,11 @@ app.post('/workshop/note/heartcomment', async (req, res, next) => {
     if(!req.user.admin && req.user.fullID != note.owner) return res.json({ 'result' : 'nopermission' });
 
     if(comment.heart) {
-        await Comment.updateOne({ id : comment.id }, { heart : false , heart_by : req.user.fullID });
+        await Comment.updateOne({ id : comment.id }, { heart : false , heart_by : 'nobody' });
         return res.json({ 'result' : 'unhearted' });
     }
     else {
-        await Comment.updateOne({ id : comment.id }, { heart : true , heart_by : 'nobody' });
+        await Comment.updateOne({ id : comment.id }, { heart : true , heart_by : req.user.fullID });
 
         let avatar = await File.findOne({ owner : req.user.fullID , file_type : 'avatar' });
         if(!avatar) avatar = '/img/no_avatar.png';
