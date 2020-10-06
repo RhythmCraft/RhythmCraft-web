@@ -19,7 +19,7 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended : false }));
 
 app.get('/workshop', async (req, res, next) => {
-    const notes = await File.find({ file_type : 'note' , public : true }).skip(Number(req.query.page) * 20 - 20).limit(Number(req.query.limit));
+    const notes = await File.find({ file_type : 'note' , public : true }).skip(Number(req.query.page) * (req.query.limit || 20) - (req.query.limit || 20)).limit(Number(req.query.limit));
     const count = await File.countDocuments({ file_type : 'note' , public : true });
     if(Math.ceil(count / (req.query.limit || 20)) < (req.query.page || 1)) {
         req.flash('Error', '페이지가 잘못되었습니다.');
