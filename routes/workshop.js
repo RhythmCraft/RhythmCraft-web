@@ -10,6 +10,7 @@ const setting = require('../setting.json');
 const User = require('../schemas/user');
 const File = require('../schemas/file');
 const Comment = require('../schemas/comment');
+const Like = require('../schemas/like');
 
 // app 정의
 const app = express.Router();
@@ -24,8 +25,14 @@ app.get('/workshop', async (req, res, next) => {
     const count = await File.countDocuments({ file_type : 'note' , public : true , originalname : { $regex : regex } });
 
     if(count == 0) {
-        req.flash('Error', '검색 결과가 없습니다.');
-        return res.redirect('/workshop');
+        if(!req.query.search) {
+            req.flash('Error', '창작마당에 레벨이 없습니다.');
+            return res.redirect('/');
+        }
+        else {
+            req.flash('Error', '검색 결과가 없습니다.');
+            return res.redirect('/workshop');
+        }
     }
 
     if(Math.ceil(count / (req.query.limit || 20)) < (req.query.page || 1)) {
@@ -59,7 +66,7 @@ app.get('/workshop/note', async (req, res, next) => {
     }
 
     const creator = await User.findOne({ fullID : note.owner });
-    const comments = await Comment.find({ note_name : note.name }).sort('-pin');
+    const comments = await Comment.find({ note_name : note.name }).sort('-pin -like');
 
     for(let i in comments) {
         comments[i]['user'] = await User.findOne({ fullID : comments[i]['writer'] });
@@ -71,6 +78,17 @@ app.get('/workshop/note', async (req, res, next) => {
         comments[i]['avatar'] = profile_image;
 
         comments[i]['pinuser'] = await User.findOne({ fullID : comments[i]['pin_by'] });
+        comments[i]['heartuser'] = await User.findOne({ fullID : comments[i]['heart_by'] });
+        let heart_user_profile_image = await File.findOne({ owner : comments[i]['heart_by'] , file_type : 'avatar' });
+        if(!heart_user_profile_image) heart_user_profile_image = '/img/no_avatar.png';
+        else heart_user_profile_image = `/avatar/${heart_user_profile_image.name}`;
+
+        comments[i]['heart_avatar'] = heart_user_profile_image;
+
+        if(req.isAuthenticated()) comments[i]['like'] = await Like.findOne({ user : req.user.fullID , comment_id : comments[i]['id'] });
+        else comments[i]['like'] = false;
+
+        comments[i]['like_count'] = await Like.countDocuments({ comment_id : comments[i]['id'] });
     }
 
     return res.render('workshop_note', {
@@ -161,6 +179,53 @@ app.get('/workshop/note/unpincomment', utils.isLogin, async (req, res, next) => 
 
     req.flash('Info', '댓글을 고정 해제했습니다.');
     return res.redirect(`/workshop/note?name=${comment.note_name}`);
+});
+
+app.post('/workshop/note/likecomment', async (req, res, next) => {
+    if(!req.isAuthenticated()) return res.send('로그인 후 좋아요를 누를 수 있습니다.');
+    const comment = await Comment.findOne({ id : req.query.id });
+    if(!comment) return res.send('해당 댓글이 존재하지 않습니다.');
+
+    let liked = await Like.findOne({ user : req.user.fullID , comment_id : comment.id });
+    if(!liked) liked = false;
+    else liked = true;
+
+    if(!liked) await Like.create({
+            user: req.user.fullID,
+            comment_id: comment.id
+        });
+    else await Like.deleteOne({ user : req.user.fullID , comment_id : comment.id });
+
+    const like_count = await Like.countDocuments({ comment_id : comment.id });
+    await Comment.updateOne({ id : req.query.id }, { like : like_count });
+
+    if(liked) return res.send('unliked');
+    else res.send('liked');
+});
+
+app.post('/workshop/note/heartcomment', async (req, res, next) => {
+    if(!req.isAuthenticated()) return res.json({ 'message' : '로그인을 해 주세요.' });
+    const comment = await Comment.findOne({ id : req.query.id });
+    if(!comment) return res.json({ 'message' : '해당 댓글이 존재하지 않습니다.' });
+
+    const note = await File.findOne({ name : comment.note_name });
+    if(!note) return res.json({ 'message' : '댓글 데이터가 잘못되었습니다.' });
+
+    if(!req.user.admin && req.user.fullID != note.owner) return res.json({ 'result' : 'nopermission' });
+
+    if(comment.heart) {
+        await Comment.updateOne({ id : comment.id }, { heart : false });
+        return res.json({ 'result' : 'unhearted' });
+    }
+    else {
+        await Comment.updateOne({ id : comment.id }, { heart : true });
+
+        let avatar = await File.findOne({ owner : req.query.id || req.user.fullID , file_type : 'avatar' });
+        if(!avatar) avatar = '/img/no_avatar.png';
+        else avatar = `/avatar/${avatar.name}`;
+
+        return res.json({ 'result' : 'hearted' , avatar });
+    }
 });
 
 module.exports = app;

@@ -13,6 +13,7 @@ const utils = require('../utils');
 
 const File = require('../schemas/file');
 const Comment = require('../schemas/comment');
+const Like = require('../schemas/like');
 
 // app 정의
 const app = express.Router();
@@ -162,6 +163,12 @@ app.get('/removenote', utils.isLogin, async (req, res, next) => {
     }
     fs.unlinkSync(path.join(setting.SAVE_FILE_PATH, file.name));
     await File.deleteOne({ owner : req.user.fullID , name : req.query.name , file_type : 'note' });
+
+    const comments = await Comment.find({ note_name : req.query.name });
+    comments.forEach(async comment => {
+        await Like.deleteMany({ comment_id : comment.id });
+    });
+
     await Comment.deleteMany({ note_name : req.query.name });
 
     req.flash('Info', `${file.originalname}을(를) 삭제했습니다.`);

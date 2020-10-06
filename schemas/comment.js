@@ -32,6 +32,21 @@ const newSchema = new Schema({
         type: String,
         required: true,
         default: 'nobody'
+    },
+    like: {
+        type: Number,
+        required: true,
+        default: 0
+    },
+    heart: {
+        type: Boolean,
+        required: true,
+        default: false
+    },
+    heart_by: {
+        type: String,
+        required: true,
+        default: 'nobody'
     }
 });
 

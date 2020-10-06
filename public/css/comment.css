@@ -19,3 +19,30 @@
 .admin-comment {
     background-color: LightCyan;
 }
+.comment-like {
+    width: 50px;
+    height: 50px;
+    margin-bottom: 10px;
+}
+.comment-like {
+    cursor: pointer;
+}
+.heart-button {
+    position: relative;
+    bottom: 82px;
+    left: 90px;
+    width: 50px;
+    height: 50px;
+}
+.heart-button-click {
+    cursor: pointer
+}
+.heart-avatar {
+    position: relative;
+    bottom: 66px;
+    left: 60px;
+    width: 40px;
+    height: 40px;
+    z-index: 1;
+    border-radius: 50%;
+}

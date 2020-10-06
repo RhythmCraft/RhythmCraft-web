@@ -16,6 +16,7 @@ const User = require('./schemas/user');
 const Room = require('./schemas/room');
 const RoomUser = require('./schemas/room_user');
 const File = require('./schemas/file');
+const Comment = require('./schemas/comment');
 
 // 웹소켓
 const webSocket = require('./socket');
