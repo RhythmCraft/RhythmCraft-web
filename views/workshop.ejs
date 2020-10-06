@@ -42,7 +42,7 @@
 <hr>
 
 <%notes.forEach(note => {%>
-    <h5><a href="/workshop/note?name=<%=encodeURI(note.name)%>"><%=note.originalname%></a></h5>
+    <h5><a href="/workshop/note?name=<%=encodeURI(note.name)%>"><%=note.workshop_title%></a></h5>
 <%});%>
 
 <nav aria-label="Page navigation">

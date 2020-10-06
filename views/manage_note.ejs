@@ -68,11 +68,15 @@
         <form action="/editnotedescription" method="post">
             <input type="hidden" name="name" value="<%=file.name%>">
             <div class="form-group">
+                <br><label for="InputTitle">창작마당 표시 제목 수정</label>
+                <br><textarea name="title" id="InputTitle" class="form-control" placeholder="창작마당 표시 제목"><%=file.workshop_title%></textarea>
+            </div>
+            <div class="form-group">
                 <br><label for="InputDescription">채보 설명 수정</label>
-                <br><textarea name="description" id="InputDescription" class="form-control"><%=file.description%></textarea>
+                <br><textarea name="description" id="InputDescription" class="form-control" placeholder="창작마당 표시 설명"><%=file.description%></textarea>
             </div>
 
-            <button type="submit" class="btn btn-primary">채보 설명 적용</button>
+            <button type="submit" class="btn btn-primary">채보 정보 적용</button>
         </form>
     </h4>
 <hr>

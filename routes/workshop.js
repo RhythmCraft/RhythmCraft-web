@@ -111,6 +111,11 @@ app.post('/workshop/note/comment', utils.isLogin, async (req, res, next) => {
         return res.redirect(`/workshop`);
     }
 
+    if(/^(\s|\u0009-\u000d|\u0020|\u0085|\u00a0|\u1680|\u180e|\u2000-\u200d|\u2028-\u2029|\u202f|\u205f-\u2060|\u3000|\ufeff)*$/.test(req.body.text)) {
+        req.flash('Error', '내용이 없습니다.');
+        return res.redirect(`/workshop/note?name=${req.body.name}`);
+    }
+
     await Comment.create({
         writer: req.user.fullID,
         note_name: req.body.name,

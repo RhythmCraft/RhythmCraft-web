@@ -307,6 +307,11 @@ app.get('/notestatus', utils.isLogin, async (req, res, next) => {
         return res.redirect('/note');
     }
 
+    if(!file.workshop_title) {
+        req.flash('Error', '창작마당용 제목을 정해주세요.');
+        return res.redirect('/note');
+    }
+
     await File.updateOne({ name : req.query.name , file_type : 'note' } , { public : req.query.public == 'true' });
     req.flash('Info', `${file.originalname} 채보 공개 상태가 업데이트되었습니다.`);
     req.app.get('socket_game').to(`user_${req.user.fullID}`).emit('msg', { 'action' : 'updatenote' });
@@ -320,9 +325,9 @@ app.post('/editnotedescription', utils.isLogin, async (req, res, next) => {
         return res.redirect('/note');
     }
 
-    await File.updateOne({ name : req.body.name , owner : req.user.fullID , file_type : 'note' }, { description : req.body.description });
+    await File.updateOne({ name : req.body.name , owner : req.user.fullID , file_type : 'note' }, { workshop_title : req.body.title , description : req.body.description });
 
-    req.flash('Info', `${checkfile.originalname} 채보의 설명이 수정되었습니다.`);
+    req.flash('Info', `${checkfile.originalname} 채보의 정보가 수정되었습니다.`);
     return res.redirect('/note');
 });
 

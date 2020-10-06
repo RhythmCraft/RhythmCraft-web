@@ -22,6 +22,9 @@ const newSchema = new Schema({
         type: String,
         required: true
     },
+    workshop_title: {
+        type: String
+    },
     description: {
         type: String
     }
