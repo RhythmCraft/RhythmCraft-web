@@ -7,6 +7,7 @@
     position: relative;
     bottom: 80px;
     left: 120px;
+    width: 80%;
 }
 .creator-comment {
     background-color: #b1eab1;
