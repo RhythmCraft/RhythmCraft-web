@@ -16,6 +16,10 @@
                 instance: true
             }
         }
+
+        window.onload = () => {
+            document.getElementById('InputSearch').focus();
+        }
     </script>
     <script>if (window.module) module = window.module;</script>
     <title><%=servername%> - 창작마당</title>
@@ -25,6 +29,17 @@
 <h1>창작마당</h1>
 <%-include('./layout/menu')%>
 <%-include('./layout/info')%>
+
+<form action="/workshop" method="get">
+    <div class="form-group">
+        <label for="InputSearch">검색어 입력</label>
+        <input type="text" id="InputSearch" class="form-control" name="search" placeholder="검색어를 입력하세요.">
+    </div>
+
+    <button type="submit" class="btn btn-primary">검색</button>
+</form>
+
+<hr>
 
 <%notes.forEach(note => {%>
     <h5><a href="/workshop/note?name=<%=encodeURI(note.name)%>"><%=note.originalname%></a></h5>

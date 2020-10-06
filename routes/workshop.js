@@ -19,8 +19,15 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended : false }));
 
 app.get('/workshop', async (req, res, next) => {
-    const notes = await File.find({ file_type : 'note' , public : true }).skip(Number(req.query.page) * (req.query.limit || 20) - (req.query.limit || 20)).limit(Number(req.query.limit));
-    const count = await File.countDocuments({ file_type : 'note' , public : true });
+    const regex = new RegExp(req.query.search || '');
+    const notes = await File.find({ file_type : 'note' , public : true , originalname : { $regex : regex } }).skip(Number(req.query.page) * (req.query.limit || 20) - (req.query.limit || 20)).limit(Number(req.query.limit));
+    const count = await File.countDocuments({ file_type : 'note' , public : true , originalname : { $regex : regex } });
+
+    if(count == 0) {
+        req.flash('Error', '검색 결과가 없습니다.');
+        return res.redirect('/workshop');
+    }
+
     if(Math.ceil(count / (req.query.limit || 20)) < (req.query.page || 1)) {
         req.flash('Error', '페이지가 잘못되었습니다.');
         return res.redirect('/workshop');
