@@ -18,4 +18,8 @@ app.get('/debug', utils.isLogin, (req, res, next) => {
     });
 });
 
+app.get('/adofai-converter', utils.isLogin, (req, res, next) => {
+    return res.render('adofai-converter');
+});
+
 module.exports = app;

@@ -7,6 +7,7 @@ const fs = require('fs');
 const fileType = require('file-type');
 const bodyParser = require('body-parser');
 const jwt = require('jsonwebtoken');
+const adofai = require('../adofai_converter');
 
 const setting = require('../setting.json');
 const utils = require('../utils');
@@ -41,7 +42,7 @@ app.post('/uploadmusic', utils.isLogin, upload.single('file'), async (req, res, 
     }
     if(req.file.size > 1024 * 1024 * 100) {
         req.flash('Error', '파일이 100MB를 초과합니다.');
-        return res.redirect('/');
+        return res.redirect('/music');
     }
 
     const name = `${uniqueString()}${path.extname(req.file.originalname)}`;
@@ -127,7 +128,7 @@ app.post('/uploadnote', utils.isLogin, upload.single('file'), async (req, res, n
     }
     if(req.file.size > 1024 * 1024 * 100) {
         req.flash('Error', '파일이 100MB를 초과합니다.');
-        return res.redirect('/');
+        return res.redirect('/note');
     }
 
     const name = `${uniqueString()}${path.extname(req.file.originalname)}`;
@@ -228,7 +229,7 @@ app.post('/signnote', utils.isAdmin, upload.single('file'), async (req, res, nex
         description: '레벨에 대해 말해보세요!'
     });
 
-    req.flash('Info', `서명된 채보 ${req.file.originalname}이(가) 성공적으로 업로드되었습니다. 채보 관리 페이지에서 확인하세요.`);
+    req.flash('Info', `서명된 채보 ${req.file.originalname}이(가) 성공적으로 업로드되었습니다. <a href="/note">채보 관리 페이지</a>에서 확인하세요.`);
     req.app.get('socket_game').to(`user_${req.user.fullID}`).emit('msg', { 'action' : 'updatenote' });
     return res.redirect('/admin/sign');
 });
@@ -378,6 +379,64 @@ app.post('/upload_avatar', utils.isLogin, upload.single('file'), async (req, res
 
     req.flash('Info', `프로필 사진 ${req.file.originalname}이(가) 성공적으로 업로드되었습니다.`);
     return res.redirect('/mypage');
+});
+
+app.post('/adofai-converter', utils.isLogin, upload.fields([{ name : 'music' }, { name : 'adofai' }]), async (req, res, next) => {
+    let key_limit = req.body.key_limit;
+    if(typeof key_limit == 'string') key_limit = [key_limit];
+    key_limit = key_limit.map(a => Number(a));
+
+    const music_filetype = await fileType.fromBuffer(req.files.music[0].buffer);
+    if(!music_filetype || !music_filetype.mime.startsWith('audio/')) {
+        req.flash('Error', '음악 파일이 아닙니다.');
+        return res.redirect('/adofai-converter');
+    }
+    if(req.files.music[0].size > 1024 * 1024 * 100) {
+        req.flash('Error', '파일이 100MB를 초과합니다.');
+        return res.redirect('/adofai-converter');
+    }
+
+    if(req.files.adofai[0].mimetype != 'application/octet-stream' || path.extname(req.files.adofai[0].originalname) != '.adofai') {
+        req.flash('Error', 'ADOFAI 채보 파일이 아닙니다.');
+        return res.redirect('/adofai-converter');
+    }
+    if(req.files.adofai[0].size > 1024 * 1024 * 100) {
+        req.flash('Error', '파일이 100MB를 초과합니다.');
+        return res.redirect('/adofai-converter');
+    }
+
+    if(isNaN(req.body.fast_input_limit)) {
+        req.flash('Error', '연타 인식 제한이 잘못되었습니다.');
+        return res.redirect('/adofai-converter');
+    }
+
+    const music_name = `${uniqueString()}${path.extname(req.files.music[0].originalname)}`;
+    const note_name = `${uniqueString()}.rhythmcraft`;
+
+    const convert_result = adofai(req.files.adofai[0].buffer, music_name, req.files.music[0].originalname, key_limit, Number(req.body.fast_input_limit), req.body.control_note_speed == 'true', req.user);
+
+    fs.writeFileSync(path.join(setting.SAVE_FILE_PATH, note_name), convert_result);
+
+    await File.create({
+        name: note_name,
+        originalname: req.files.adofai[0].originalname.replace('.adofai', '.rhythmcraft'),
+        owner: req.user.fullID,
+        file_type: 'note',
+        description: '레벨에 대해 말해보세요!'
+    });
+
+    streamifier.createReadStream(req.files.music[0].buffer).pipe(fs.createWriteStream(path.join(setting.SAVE_FILE_PATH, music_name)));
+
+    await File.create({
+        name: music_name,
+        originalname: req.files.music[0].originalname,
+        owner: req.user.fullID,
+        file_type: 'music',
+        public: true
+    });
+
+    req.flash('Info', '변환에 성공하였습니다. <a href="/note">채보 관리 페이지</a>에서 확인하세요.');
+    return res.redirect('/adofai-converter');
 });
 
 module.exports = app;

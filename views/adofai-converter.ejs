@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <script>if (typeof module === 'object') {window.module = module; module = undefined;}</script>
+    <script src="/js/bootstrap/jquery-3.2.1.slim.min.js"></script>
+    <script src="/js/bootstrap/popper.min.js"></script>
+    <script src="/js/bootstrap/bootstrap.min.js"></script>
+    <link rel="stylesheet" href="/css/bootstrap/bootstrap.min.css">
+    <script>
+        if(<%=session.isClient%>) {
+            require('electron').remote.getGlobal('globalVars').RichPresence = {
+                details: '채보 변환 페이지',
+                startTimestamp: Date.now(),
+                largeImageKey: 'main',
+                instance: true
+            }
+        }
+    </script>
+    <script src="/js/adofai-converter.js"></script>
+    <script>if (window.module) module = window.module;</script>
+    <title><%=servername%> - ADOFAI 컨버터</title>
+</head>
+
+<body>
+<h1>ADOFAI 컨버터</h1>
+<%-include('./layout/menu')%>
+<%-include('./layout/info')%>
+
+<form action="/adofai-converter" method="post" enctype="multipart/form-data">
+    <label for="InputMusic"><p class="btn btn-primary">클릭하여 음악 업로드</p></label>
+    <input type="file" name="music" accept="audio/*" id="InputMusic" class="inputfile" data-type="music" hidden required>
+
+    <br><label for="InputADOFAI"><p class="btn btn-primary">클릭하여 ADOFAI 파일 업로드</p></label>
+    <input type="file" name="adofai" id="InputADOFAI" class="inputfile" data-type="adofai" hidden required>
+
+    <p>키 제한</p>
+    <input id="key_limit_1" type="checkbox" name="key_limit" value="1" checked>
+    <label for="key_limit_1"> 1번 노트</label>
+
+    <input id="key_limit_2" type="checkbox" name="key_limit" value="2" checked>
+    <label for="key_limit_2"> 2번 노트</label>
+
+    <input id="key_limit_3" type="checkbox" name="key_limit" value="3" checked>
+    <label for="key_limit_3"> 3번 노트</label>
+
+    <input id="key_limit_4" type="checkbox" name="key_limit" value="4" checked>
+    <label for="key_limit_4"> 4번 노트</label>
+
+    <input id="key_limit_5" type="checkbox" name="key_limit" value="5" checked>
+    <label for="key_limit_5"> 5번 노트</label>
+
+    <input id="key_limit_6" type="checkbox" name="key_limit" value="6" checked>
+    <label for="key_limit_6"> 6번 노트</label>
+
+    <input id="key_limit_7" type="checkbox" name="key_limit" value="7" checked>
+    <label for="key_limit_7"> 7번 노트</label>
+
+    <input id="key_limit_8" type="checkbox" name="key_limit" value="8" checked>
+    <label for="key_limit_8"> 8번 노트</label>
+
+    <div class="form-group">
+        <label for="InputFast" data-toggle="popover" data-trigger="hover" data-content="이전 노트와 현재 노트의 시간 차가 여기서 설정한 ms 이하인 경우 이전 노트와 좌우 반전된 노트를 치게 됩니다.(난이도가 내려가고, 가독성이 올라갑니다.)">연타 인식 제한(ms) (마우스 올려 정보 확인)</label>
+        <input name="fast_input_limit" id="InputFast" class="form-control" type="number" value="150" required>
+    </div>
+
+    <input id="control_note_speed" name="control_note_speed" type="checkbox" value="true" checked>
+    <label for="control_note_speed" data-toggle="popover" data-trigger="hover" data-content="ADOFAI 채보에서 토끼나 달팽이가 나올 시 리듬크래프트 노트가 내려오는 속도도 같이 조절합니다."> 가감속시 노트 속도 같이 조절</label>
+
+    <br><button type="button" id="submit" class="btn btn-primary">변환</button>
+    <button type="submit" id="sendform" hidden></button>
+</form>
+</body>
+</html>

@@ -2,6 +2,12 @@ const jwt = require('jsonwebtoken');
 
 const setting = require('./setting.json');
 
+const getRandomInt = (min, max) => {
+    min = Math.ceil(min);
+    max = Math.floor(max + 1);
+    return Math.floor(Math.random() * (max - min)) + min;
+}
+
 module.exports.isLogin = (req, res, next) => {
     if(!req.isAuthenticated()) {
         res.redirect('/login');
@@ -30,7 +36,7 @@ module.exports.isAdmin = (req, res, next) => {
     next();
 }
 
-module.exports.verifyToken = (token) => {
+module.exports.verifyToken = token => {
     try {
         const decoded = jwt.verify(token, setting.TOKEN_SECRET);
         return decoded;
@@ -42,3 +48,7 @@ module.exports.verifyToken = (token) => {
         return { "error" : true , "code" : "error" , "message" : "유효하지 않은 토큰입니다." , "errcode" : err.name };
     }
 }
+
+module.exports.getRandomNote = key_limit => {
+    return key_limit[getRandomInt(0, key_limit.length - 1)];
+};
