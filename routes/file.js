@@ -411,15 +411,19 @@ app.post('/adofai-converter', utils.isLogin, upload.fields([{ name : 'music' }, 
     }
 
     const music_name = `${uniqueString()}${path.extname(req.files.music[0].originalname)}`;
-    const note_name = `${uniqueString()}.rhythmcraft`;
+    const note_name = `${uniqueString()}.signedrhythmcraft`;
 
     const convert_result = adofai(req.files.adofai[0].buffer, music_name, req.files.music[0].originalname, key_limit, Number(req.body.fast_input_limit), req.body.control_note_speed == 'true', req.user);
 
-    fs.writeFileSync(path.join(setting.SAVE_FILE_PATH, note_name), convert_result);
+    const token = jwt.sign(JSON.parse(convert_result), setting.TOKEN_SECRET, {
+        issuer: setting.SERVER_NAME
+    });
+
+    fs.writeFileSync(path.join(setting.SAVE_FILE_PATH, note_name), token);
 
     await File.create({
         name: note_name,
-        originalname: req.files.adofai[0].originalname.replace('.adofai', '.rhythmcraft'),
+        originalname: req.files.adofai[0].originalname.replace('.adofai', '.signedrhythmcraft'),
         owner: req.user.fullID,
         file_type: 'note',
         description: '레벨에 대해 말해보세요!'
