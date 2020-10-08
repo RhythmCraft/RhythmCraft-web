@@ -296,15 +296,16 @@ module.exports = (io, app) => {
             if(data.note != 'rhythmcraft_mode') {
                 note = await File.findOne({ name : data.note , file_type : 'note' });
                 if(!note) return socket.emit('msg', { 'action' : 'alert' , 'message' : '채보 선택이 잘못되었습니다.' });
-                note_file = JSON.parse(fs.readFileSync(path.join(setting.SAVE_FILE_PATH, note.name)));
+                note_file = String(fs.readFileSync(path.join(setting.SAVE_FILE_PATH, note.name)));
 
                 if(path.extname(note.name) == '.signedrhythmcraft') {
-                    const token_result = utils.verifyToken(note_file);
-                    if (token_result.error) return res.send(`채보 오류 : ${token_result.message}`);
+                    token_result = utils.verifyToken(note_file);
+                    if (token_result.error) return socket.emit('msg', { 'action' : 'alert' , 'message' : `채보 오류 : ${token_result.message}` });
                 }
+                else note_file = JSON.parse(note_file);
             }
 
-            const music = await File.findOne({ name : note != null ? note_file.music : data.music , public : true , file_type : 'music' });
+            const music = await File.findOne({ name : note != null ? (token_result != null ? token_result.music : note_file.music) : data.music , public : true , file_type : 'music' });
 
             if(!music) return socket.emit('msg', { 'action' : 'alert' , 'message' : '음악이 잘못되었습니다.' });
 
