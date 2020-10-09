@@ -386,14 +386,18 @@ app.post('/adofai-converter', utils.isLogin, upload.fields([{ name : 'music' }, 
     if(typeof key_limit == 'string') key_limit = [key_limit];
     key_limit = key_limit.map(a => Number(a));
 
-    const music_filetype = await fileType.fromBuffer(req.files.music[0].buffer);
-    if(!music_filetype || !music_filetype.mime.startsWith('audio/')) {
-        req.flash('Error', '음악 파일이 아닙니다.');
-        return res.redirect('/adofai-converter');
-    }
-    if(req.files.music[0].size > 1024 * 1024 * 100) {
-        req.flash('Error', '파일이 100MB를 초과합니다.');
-        return res.redirect('/adofai-converter');
+    const nomusicselect = req.body.music_select == 'noselect';
+
+    if(nomusicselect) {
+        const music_filetype = await fileType.fromBuffer(req.files.music[0].buffer);
+        if (!music_filetype || !music_filetype.mime.startsWith('audio/')) {
+            req.flash('Error', '음악 파일이 아닙니다.');
+            return res.redirect('/adofai-converter');
+        }
+        if (req.files.music[0].size > 1024 * 1024 * 100) {
+            req.flash('Error', '파일이 100MB를 초과합니다.');
+            return res.redirect('/adofai-converter');
+        }
     }
 
     if(req.files.adofai[0].mimetype != 'application/octet-stream' || path.extname(req.files.adofai[0].originalname) != '.adofai') {
@@ -410,10 +414,20 @@ app.post('/adofai-converter', utils.isLogin, upload.fields([{ name : 'music' }, 
         return res.redirect('/adofai-converter');
     }
 
-    const music_name = `${uniqueString()}${path.extname(req.files.music[0].originalname)}`;
+    if(nomusicselect && !req.files.music[0]) {
+        req.flash('Error', '음악이 선택되지 않았습니다.');
+        return res.redirect('/adofai-converter');
+    }
+
+    let music;
+    if(req.body.music_select != null) music = await File.findOne({ name : req.body.music_select });
+
+    let music_name;
+    if(nomusicselect) music_name = `${uniqueString()}${path.extname(req.files.music[0].originalname)}`;
+    else music_name = music.name;
     const note_name = `${uniqueString()}.signedrhythmcraft`;
 
-    const convert_result = adofai(req.files.adofai[0].buffer, music_name, req.files.music[0].originalname, key_limit, Number(req.body.fast_input_limit), req.body.control_note_speed == 'true', req.user);
+    const convert_result = adofai(req.files.adofai[0].buffer, music_name, !music ? req.files.music[0].originalname : music.originalname, key_limit, Number(req.body.fast_input_limit), req.body.control_note_speed == 'true', req.user);
 
     const token = jwt.sign(JSON.parse(convert_result), setting.TOKEN_SECRET, {
         issuer: setting.SERVER_NAME
@@ -429,15 +443,17 @@ app.post('/adofai-converter', utils.isLogin, upload.fields([{ name : 'music' }, 
         description: '레벨에 대해 말해보세요!'
     });
 
-    streamifier.createReadStream(req.files.music[0].buffer).pipe(fs.createWriteStream(path.join(setting.SAVE_FILE_PATH, music_name)));
+    if(nomusicselect) {
+        streamifier.createReadStream(req.files.music[0].buffer).pipe(fs.createWriteStream(path.join(setting.SAVE_FILE_PATH, music_name)));
 
-    await File.create({
-        name: music_name,
-        originalname: req.files.music[0].originalname,
-        owner: req.user.fullID,
-        file_type: 'music',
-        public: true
-    });
+        await File.create({
+            name: music_name,
+            originalname: req.files.music[0].originalname,
+            owner: req.user.fullID,
+            file_type: 'music',
+            public: true
+        });
+    }
 
     req.flash('Info', '변환에 성공하였습니다. <a href="/note">채보 관리 페이지</a>에서 확인하세요.');
     return res.redirect('/adofai-converter');

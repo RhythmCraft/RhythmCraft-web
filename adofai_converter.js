@@ -111,7 +111,7 @@ module.exports = (adofai, music, musicname, key_limit, fast_input_limit, control
 
                 rtnote['note'][`note${note_position}`].push(ms + lastms + offset - first_spin_timing);
 
-                if(control_note_speed && bpm_set) rtnote['jscode'][Math.floor(ms + lastms + offset - first_spin_timing - ((60 / bpm) * 1000))] = `note_speed = note_speed / ${bpm / before_bpm}`;
+                if(control_note_speed && bpm_set) rtnote['jscode'][Math.floor(lastms)] = `note_speed = note_speed / ${bpm / before_bpm}`;
 
                 lastms += ms - first_spin_timing;
                 last_note_ms = ms;

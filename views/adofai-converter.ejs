@@ -29,7 +29,17 @@
 
 <form action="/adofai-converter" method="post" enctype="multipart/form-data">
     <label for="InputMusic"><p class="btn btn-primary">클릭하여 음악 업로드</p></label>
-    <input type="file" name="music" accept="audio/*" id="InputMusic" class="inputfile" data-type="music" hidden required>
+    <input type="file" name="music" accept="audio/*" id="InputMusic" class="inputfile" data-type="music" hidden>
+
+    <div class="form-group">
+        <label for="InputMusic">또는 이미 존재하는 음악 선택</label>
+        <select name="music_select" class="form-control" id="InputMusicSelect">
+            <option value="noselect">음악 선택</option>
+            <%files.forEach(file => {%>
+            <option value="<%=file.name%>"><%=file.originalname%></option>
+            <%});%>
+        </select>
+    </div>
 
     <br><label for="InputADOFAI"><p class="btn btn-primary">클릭하여 ADOFAI 파일 업로드</p></label>
     <input type="file" name="adofai" id="InputADOFAI" class="inputfile" data-type="adofai" hidden required>
