@@ -25,6 +25,7 @@ module.exports = (io, app) => {
         let rtnote_timeout = [];
         let notepersecond;
         let pitch;
+        let note_name;
 
         io.to(`user_${user.fullID}`).emit('msg', { 'action' : 'exit' , 'message' : '다중접속' });
 
@@ -91,6 +92,7 @@ module.exports = (io, app) => {
             'password': room.password,
             'note_speed': room.note_speed,
             'music': room.music,
+            'note': room.note_name,
             'startpos': room.startpos,
             'public': room.public,
             'pitch': room.pitch
@@ -330,10 +332,13 @@ module.exports = (io, app) => {
                 password : data.password,
                 note_speed : data.note_speed,
                 music : music.name,
+                note : data.note,
                 startpos : data.startpos,
                 public : data.public,
                 pitch: data.pitch
             });
+
+            note_name = data.note;
             return;
         });
 

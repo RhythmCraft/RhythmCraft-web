@@ -183,6 +183,7 @@ window.onload = async () => {
                 document.getElementById('InputPassword').value = data.password;
                 document.getElementById('InputNoteSpeed').value = data.note_speed;
                 document.getElementById('InputMusic').value = data.music;
+                document.getElementById('InputNote').value = data.note;
                 document.getElementById('InputStartpos').value = data.startpos;
                 document.getElementById('public').checked = data.public;
                 document.getElementById('InputPitch').value = data.pitch;
