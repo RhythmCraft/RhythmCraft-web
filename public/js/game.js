@@ -127,7 +127,7 @@ window.onload = async () => {
         else password = prompt('방 비밀번호를 입력해 주세요.');
     }
 
-    if(location.hash.startsWith('#pw=')) password = location.hash.replace('#pw=', '');
+    if(location.hash.startsWith('#pw=') && isClient) password = Buffer.from(location.hash.replace('#pw=', ''), 'base64').toString();
     location.hash = '';
 
     socket = io.connect(`${socket_address}/game?password=${password}`, {
@@ -182,7 +182,7 @@ window.onload = async () => {
                         partyId: location.search.replace('?room=', ''),
                         partySize: data.now_player + 1,
                         partyMax: data.max_player,
-                        joinSecret: `${location.search.replace('?room=', '')}||${data.password || 'nopassword'}`
+                        joinSecret: `${location.search.replace('?room=', '')}||${Buffer.from(data.password || 'nopassword').toString('base64')}`
                     }
                 }
 
