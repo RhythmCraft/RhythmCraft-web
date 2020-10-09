@@ -12,16 +12,6 @@ let last_note_judgement;
 let keymap = {};
 
 window.onload = async () => {
-    if(isClient) {
-        require('electron').remote.getGlobal('globalVars').RichPresence = {
-            details: '게임 준비 중',
-            state: '게임 준비 중 입니다.',
-            startTimestamp: Date.now(),
-            largeImageKey: 'main',
-            instance: true
-        }
-    }
-
     let sound;
     let master;
     let musictimeout;
@@ -125,7 +115,7 @@ window.onload = async () => {
     });
 
     let password;
-    if(room_have_password && location.hash != '#master') {
+    if(room_have_password && location.hash != '#master' && !location.hash.startsWith('#pw=')) {
         if(isClient) password = await require('electron-prompt')({
             title: '비밀번호 입력',
             label: '아래에 비밀번호를 입력하세요.',
@@ -135,8 +125,10 @@ window.onload = async () => {
             type: 'input'
         });
         else password = prompt('방 비밀번호를 입력해 주세요.');
-        location.hash = '';
     }
+
+    if(location.hash.startsWith('#pw=')) password = location.hash.replace('#pw=', '');
+    location.hash = '';
 
     socket = io.connect(`${socket_address}/game?password=${password}`, {
         path: '/socket'
@@ -179,6 +171,21 @@ window.onload = async () => {
                 location.href = data.url;
                 break;
             case 'roomInfo':
+                if(isClient) {
+                    console.log(data)
+                    require('electron').remote.getGlobal('globalVars').RichPresence = {
+                        details: '게임 준비 중',
+                        state: '게임 준비 중 입니다.',
+                        startTimestamp: Date.now(),
+                        largeImageKey: 'main',
+                        instance: true,
+                        partyId: location.search.replace('?room=', ''),
+                        partySize: data.now_player + 1,
+                        partyMax: data.max_player,
+                        joinSecret: `${location.search.replace('?room=', '')}||${data.password || 'nopassword'}`
+                    }
+                }
+
                 document.getElementById('InputName').value = data.name;
                 document.getElementById('InputPassword').value = data.password;
                 document.getElementById('InputNoteSpeed').value = data.note_speed;
@@ -187,6 +194,7 @@ window.onload = async () => {
                 document.getElementById('InputStartpos').value = data.startpos;
                 document.getElementById('public').checked = data.public;
                 document.getElementById('InputPitch').value = data.pitch;
+
                 break;
             case 'gamestart':
                 playing = true;

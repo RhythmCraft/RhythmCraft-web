@@ -95,7 +95,9 @@ module.exports = (io, app) => {
             'note': room.note_name,
             'startpos': room.startpos,
             'public': room.public,
-            'pitch': room.pitch
+            'pitch': room.pitch,
+            'now_player': room.now_player,
+            'max_player': room.max_player
         });
 
         socket.emit('msg', {
