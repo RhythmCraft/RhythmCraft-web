@@ -24,11 +24,20 @@ window.onload = async () => {
     let countdown;
     let ready_rich_presence;
 
+    $("[data-toggle=popover]").popover();
+
     document.getElementById('InputMusic').innerHTML = Request('get', '/select_music');
     document.getElementById('InputNote').innerHTML = Request('get', '/select_note');
 
     const hitsound = new Howl({
         src: ['/game/sound/hitsound.mp3'],
+        autoplay: false,
+        volume: 0.5,
+        html5: true
+    });
+
+    const chatsound = new Howl({
+        src: ['/game/sound/chat.mp3'],
         autoplay: false,
         volume: 0.5,
         html5: true
@@ -375,12 +384,23 @@ window.onload = async () => {
         button.classList.add('list-group-item');
         button.classList.add('list-group=item-action');
         button.innerText = data.nickname;
+
+        if(data.verified) {
+            const verified = document.createElement('svg');
+            button.appendChild(verified);
+            verified.outerHTML = ` <svg width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-check-circle-fill text-secondary" fill="currentColor" xmlns="http://www.w3.org/2000/svg" data-container="body" data-toggle="popover" data-placement="top" data-content="인증된 유저" data-trigger="hover">
+        <path fill-rule="evenodd" d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zm-3.97-3.03a.75.75 0 0 0-1.08.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-.01-1.05z"/>
+    </svg>`;
+        }
+
         button.dataset.fullId = data.fullID;
         button.id = `user_list_${data.fullID}`;
         button.onclick = function() {
             socket.emit('kickUser', { fullID : data.fullID });
         }
         document.getElementById('user-list').appendChild(button);
+
+        $("[data-toggle=popover]").popover();
 
         if(isClient && ready_rich_presence != null) {
             ready_rich_presence.partySize = document.getElementsByClassName('user').length;
@@ -470,6 +490,18 @@ window.onload = async () => {
         nickname2.innerText = data.nickname;
         nickname.classList.add(`chat-nickname`);
         nickname2.classList.add(`chat-nickname`);
+        if(data.verified) {
+            const verified = document.createElement('svg');
+            const verified2 = document.createElement('svg');
+            nickname.appendChild(verified);
+            nickname2.appendChild(verified2);
+            verified.outerHTML = ` <svg width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-check-circle-fill text-secondary" fill="currentColor" xmlns="http://www.w3.org/2000/svg" data-container="body" data-toggle="popover" data-placement="top" data-content="인증된 유저" data-trigger="hover">
+        <path fill-rule="evenodd" d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zm-3.97-3.03a.75.75 0 0 0-1.08.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-.01-1.05z"/>
+    </svg>`;
+            verified2.outerHTML = ` <svg width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-check-circle-fill text-secondary" fill="currentColor" xmlns="http://www.w3.org/2000/svg" data-container="body" data-toggle="popover" data-placement="top" data-content="인증된 유저" data-trigger="hover">
+        <path fill-rule="evenodd" d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zm-3.97-3.03a.75.75 0 0 0-1.08.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-.01-1.05z"/>
+    </svg>`;
+        }
         nickname.classList.add(`${data.chattype}-chat-nickname`);
         nickname2.classList.add(`${data.chattype}-chat-nickname`);
         newchat.appendChild(nickname);
@@ -497,6 +529,10 @@ window.onload = async () => {
 
         ChatBox.scrollTo(0, ChatBox.scrollHeight);
         ChatBox2.scrollTo(0, ChatBox2.scrollHeight);
+
+        $("[data-toggle=popover]").popover();
+
+        chatsound.play();
     });
 
     socket.on('ScoreUpdate', data => {

@@ -78,11 +78,12 @@ module.exports = (io, app) => {
             socket.emit('userJoin', user);
         });
 
-        io.to(`room_${url_query.room}`).emit('userJoin', { "nickname" : user.nickname , "fullID" : user.fullID });
+        io.to(`room_${url_query.room}`).emit('userJoin', { "nickname" : user.nickname , "fullID" : user.fullID , "verified" : user.verified });
         io.to(`room_${url_query.room}`).emit('Chat', {
             nickname: `시스템`,
             chattype: 'system',
-            chat: `<strong>${user.nickname}</strong>님이 입장하셨습니다.`
+            chat: `<strong>${user.nickname}</strong>님이 입장하셨습니다.`,
+            verified: true
         });
         await RoomUser.create({ "nickname" : user.nickname , "fullID" : user.fullID , "roomcode" : url_query.room });
 
@@ -221,7 +222,8 @@ module.exports = (io, app) => {
                             socket.emit('Chat', {
                                 nickname: '시스템',
                                 chattype: 'system',
-                                chat: '자동플레이가 활성화되었습니다.'
+                                chat: '자동플레이가 활성화되었습니다.',
+                                verified: true
                             });
                         }
                     }
@@ -326,7 +328,13 @@ module.exports = (io, app) => {
                 trusted: !token_result ? false : true
             });
             app.get('socket_main').emit('msg', { 'action' : 'reload_room' });
-            if(data.show_alert) socket.emit('msg', { 'action' : 'alert' , 'message' : '방 설정이 적용되었습니다.' });
+
+            socket.emit('Chat', {
+                nickname: '시스템',
+                chattype: 'system',
+                chat: '방장이 방 설정을 변경하였습니다.',
+                verified: true
+            });
 
             io.to(`room_${url_query.room}`).emit('msg', {
                 action : 'roomInfo',
@@ -398,7 +406,8 @@ module.exports = (io, app) => {
                             socket.emit('Chat', {
                                 nickname: '시스템',
                                 chattype: 'system',
-                                chat: '자동플레이 명령이 실행되었습니다.'
+                                chat: '자동플레이 명령이 실행되었습니다.',
+                                verified: true
                             });
                             break;
                         case 'notepersecond':
@@ -406,7 +415,8 @@ module.exports = (io, app) => {
                                 socket.emit('Chat', {
                                     nickname: '시스템',
                                     chattype: 'system',
-                                    chat: '옵션이 잘못되었습니다.<br>사용법 : /debug notepersecond <노트번호> <간격 ms>'
+                                    chat: '옵션이 잘못되었습니다.<br>사용법 : /debug notepersecond <노트번호> <간격 ms>',
+                                    verified: true
                                 });
                                 break;
                             }
@@ -420,7 +430,8 @@ module.exports = (io, app) => {
                             socket.emit('Chat', {
                                 nickname: '시스템',
                                 chattype: 'system',
-                                chat: `${params[1]}번 노트가 ${params[2]}ms마다 생성됩니다.`
+                                chat: `${params[1]}번 노트가 ${params[2]}ms마다 생성됩니다.`,
+                                verified: true
                             });
                             break;
                         case 'stopnote':
@@ -432,14 +443,16 @@ module.exports = (io, app) => {
                             socket.emit('Chat', {
                                 nickname: '시스템',
                                 chattype: 'system',
-                                chat: '모든 노트 대기열을 정지했습니다.'
+                                chat: '모든 노트 대기열을 정지했습니다.',
+                                verified: true
                             });
                             break;
                         default:
                             socket.emit('Chat', {
                                 nickname: '시스템',
                                 chattype: 'system',
-                                chat: '존재하지 않는 디버그 옵션입니다.'
+                                chat: '존재하지 않는 디버그 옵션입니다.',
+                                verified: true
                             });
                             break;
                     }
@@ -454,7 +467,8 @@ module.exports = (io, app) => {
                     socket.emit('Chat', {
                         nickname: '시스템',
                         chattype: 'system',
-                        chat: '존재하지 않는 명령어입니다.'
+                        chat: '존재하지 않는 명령어입니다.',
+                        verified: true
                     });
             }
 
@@ -463,7 +477,8 @@ module.exports = (io, app) => {
             io.to(`room_${url_query.room}`).emit('Chat', {
                 nickname: user.nickname,
                 chattype,
-                chat: data.chat
+                chat: data.chat,
+                verified: user.verified
             });
         });
 
@@ -507,7 +522,8 @@ module.exports = (io, app) => {
                 io.to(`room_${url_query.room}`).emit('Chat', {
                     nickname: `시스템`,
                     chattype: 'system',
-                    chat: `<strong>${user.nickname}</strong>님이 퇴장하셨습니다.`
+                    chat: `<strong>${user.nickname}</strong>님이 퇴장하셨습니다.`,
+                    verified: true
                 });
             }
         });
