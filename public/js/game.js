@@ -142,7 +142,6 @@ window.onload = async () => {
     }
 
     if(location.hash.startsWith('#pw=') && isClient) password = Buffer.from(location.hash.replace('#pw=', ''), 'base64').toString();
-    location.hash = '';
 
     socket = io.connect(`${socket_address}/game?password=${password}`, {
         path: '/socket'
@@ -178,6 +177,8 @@ window.onload = async () => {
                 //     "action": "gamestart"
                 // });
                 break;
+            case 'im_not_master':
+                location.hash = '';
             case 'alert':
                 alert(data.message);
                 break;

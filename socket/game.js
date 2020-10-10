@@ -29,10 +29,14 @@ module.exports = (io, app) => {
 
         io.to(`user_${user.fullID}`).emit('msg', { 'action' : 'exit' , 'message' : '다중접속' });
 
-        let master = false;
+        let master;
         if(room.master == user.fullID) {
             master = true;
             socket.emit('msg', { 'action' : 'im_master' });
+        }
+        else {
+            master = false;
+            socket.emit('msg', { 'action' : 'im_not_master' });
         }
 
         if(room.playing) {
