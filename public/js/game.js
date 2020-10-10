@@ -170,6 +170,7 @@ window.onload = async () => {
                         "action": "gamestart"
                     });
                 }
+                console.log('im master!');
                 location.hash = '';
 
                 // 테스트용 코드
@@ -178,6 +179,7 @@ window.onload = async () => {
                 // });
                 break;
             case 'im_not_master':
+                console.log('im not master');
                 location.hash = '';
                 break;
             case 'alert':
