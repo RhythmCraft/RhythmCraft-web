@@ -380,10 +380,20 @@ window.onload = async () => {
             socket.emit('kickUser', { fullID : data.fullID });
         }
         document.getElementById('user-list').appendChild(button);
+
+        if(isClient && ready_rich_presence != null) {
+            ready_rich_presence.partySize = document.getElementsByClassName('user').length;
+            require('electron').remote.getGlobal('globalVars').RichPresence = ready_rich_presence;
+        }
     });
 
     socket.on('userLeave', data => {
         document.getElementById(`user_list_${data.fullID}`).remove();
+
+        if(isClient && ready_rich_presence != null) {
+            ready_rich_presence.partySize = document.getElementsByClassName('user').length;
+            require('electron').remote.getGlobal('globalVars').RichPresence = ready_rich_presence;
+        }
     });
 
     socket.on('GiveNote', data => {
