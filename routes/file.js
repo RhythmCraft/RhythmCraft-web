@@ -122,8 +122,9 @@ app.get('/note', utils.isLogin, async (req, res, next) => {
         { owner : req.user.fullID , file_type : 'note' , workshop_title : { $regex : regex } },
         { owner : req.user.fullID , file_type : 'note' , description : { $regex : regex } }
         ]);
-    res.render('manage_note', {
-        files
+    return res.render('manage_note', {
+        files,
+        allowed_tags: setting.SEARCH_TAGS
     });
 });
 
@@ -325,14 +326,29 @@ app.get('/notestatus', utils.isLogin, async (req, res, next) => {
     return res.redirect('/note');
 });
 
-app.post('/editnotedescription', utils.isLogin, async (req, res, next) => {
+app.post('/editnoteinfo', utils.isLogin, async (req, res, next) => {
     const checkfile = await File.findOne({ name : req.body.name , owner : req.user.fullID , file_type : 'note' });
     if(!checkfile) {
         req.flash('Error', '해당 채보가 존재하지 않습니다.');
         return res.redirect('/note');
     }
 
-    await File.updateOne({ name : req.body.name , owner : req.user.fullID , file_type : 'note' }, { workshop_title : req.body.title , description : req.body.description });
+    let tags;
+    let savetags = [];
+    if(req.body.tags != null) {
+        if (typeof req.body.tags == 'string') tags = [req.body.tags];
+        else tags = req.body.tags;
+
+        tags.forEach(tag => {
+            if (setting.SEARCH_TAGS.indexOf(tag) != -1) savetags.push(tag);
+        });
+    }
+
+    await File.updateOne({name : req.body.name , owner : req.user.fullID , file_type : 'note' }, {
+        workshop_title : req.body.title,
+        description : req.body.description,
+        tags: savetags.join(',')
+    });
 
     req.flash('Info', `${checkfile.originalname} 채보의 정보가 수정되었습니다.`);
     return res.redirect('/note');

@@ -77,7 +77,7 @@
             <br><a href="/unsignnote?name=<%=encodeURI(file.name)%>&originalname=<%=encodeURI(file.originalname)%>">채보 서명 해제</a>
         <%}%>
 
-        <form action="/editnotedescription" method="post">
+        <form action="/editnoteinfo" method="post">
             <input type="hidden" name="name" value="<%=file.name%>">
             <div class="form-group">
                 <br><label for="InputTitle">창작마당 표시 제목 수정</label>
@@ -87,8 +87,20 @@
                 <br><label for="InputDescription">채보 설명 수정</label>
                 <br><textarea name="description" id="InputDescription" class="form-control" placeholder="창작마당 표시 설명"><%=file.description%></textarea>
             </div>
+            <h4>태그 선택</h4>
+            <%for(let i in allowed_tags) {%>
+            <%let using_tags = file.tags || [];%>
+            <div class="form-check">
+                <%if(using_tags.indexOf(allowed_tags[i]) != -1) {%>
+                <input name="tags" class="form-check-input" type="checkbox" value="<%=allowed_tags[i]%>" id="<%=file.name%>_tag_<%=i%>" checked>
+                <%} else {%>
+                <input name="tags" class="form-check-input" type="checkbox" value="<%=allowed_tags[i]%>" id="<%=file.name%>_tag_<%=i%>">
+                <%}%>
+                <label class="form-check-label" for="<%=file.name%>_tag_<%=i%>"><%=allowed_tags[i]%></label>
+            </div>
+            <%}%>
 
-            <button type="submit" class="btn btn-primary">채보 정보 적용</button>
+            <br><button type="submit" class="btn btn-primary">채보 정보 적용</button>
         </form>
     </h4>
 <hr>

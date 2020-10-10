@@ -21,18 +21,27 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended : false }));
 
 app.get('/workshop', async (req, res, next) => {
+    let tags = typeof req.query.tags == 'string' ? [req.query.tags] : req.query.tags;
+    if(!tags) tags = [];
     const regex = new RegExp((req.query.search || ''), 'i');
-    const notes = await File.find().or([
+    let or = [
         { file_type : 'note' , public : true , originalname : { $regex : regex }},
         { file_type : 'note' , public : true , workshop_title : { $regex : regex }},
         { file_type : 'note' , public : true , description : { $regex : regex }}
-        ])
+    ];
+    or = { $or : or };
+
+    const match = [];
+
+    tags.forEach(tag => {
+        const regex = new RegExp(tag, 'i');
+        match.push({ file_type : 'note' , public : true , tags : { $regex : regex }});
+    });
+    match.push(or);
+
+    const notes = await File.find().and(match)
         .skip(Number(req.query.page) * (req.query.limit || 20) - (req.query.limit || 20)).limit(Number(req.query.limit));
-    const count = await File.countDocuments().or([
-        { file_type : 'note' , public : true , originalname : { $regex : regex }},
-        { file_type : 'note' , public : true , workshop_title : { $regex : regex }},
-        { file_type : 'note' , public : true , description : { $regex : regex }}
-    ]);
+    const count = await File.countDocuments(match).or(or);
 
     if(count == 0) {
         if(!req.query.search) {
@@ -53,7 +62,8 @@ app.get('/workshop', async (req, res, next) => {
         notes,
         count,
         page: Number(req.query.page) || 1,
-        limit: Number(req.query.limit) || 20
+        limit: Number(req.query.limit) || 20,
+        allowed_tags: setting.SEARCH_TAGS
     });
 });
 

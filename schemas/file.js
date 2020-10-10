@@ -27,6 +27,9 @@ const newSchema = new Schema({
     },
     description: {
         type: String
+    },
+    tags: {
+        type: String
     }
 });
 

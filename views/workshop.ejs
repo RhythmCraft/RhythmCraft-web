@@ -19,6 +19,10 @@
 
         window.onload = () => {
             document.getElementById('InputSearch').focus();
+
+            document.getElementById('toggle_tag_search').onclick = () => {
+                document.getElementById('tag_search').hidden = !document.getElementById('tag_search').hidden;
+            }
         }
     </script>
     <script>if (window.module) module = window.module;</script>
@@ -36,7 +40,23 @@
         <input type="text" id="InputSearch" class="form-control" name="search" placeholder="검색어를 입력하세요." value="<%=query.search%>">
     </div>
 
-    <button type="submit" class="btn btn-primary">검색</button>
+    <button id="toggle_tag_search" type="button" class="btn btn-primary">태그 검색 펼치기 / 접기</button>
+    <div id="tag_search" hidden>
+        <br>
+        <%for(let i in allowed_tags) {%>
+            <div class="form-check">
+                <%if(((typeof query.tags == 'string' ? [query.tags] : query.tags) || []).indexOf(allowed_tags[i]) != -1) {%>
+                <input name="tags" class="form-check-input" type="checkbox" value="<%=allowed_tags[i]%>" id="tag_<%=i%>" checked>
+                <%} else {%>
+                <input name="tags" class="form-check-input" type="checkbox" value="<%=allowed_tags[i]%>" id="tag_<%=i%>">
+                <%}%>
+                <label class="form-check-label" for="tag_<%=i%>"><%=allowed_tags[i]%></label>
+            </div>
+        <br>
+        <%}%>
+    </div>
+
+    <br><br><button type="submit" class="btn btn-primary">검색</button>
 </form>
 
 <hr>

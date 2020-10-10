@@ -25,6 +25,8 @@
   "MONGODB_PASSWORD": "PASS",
   "DBNAME": "rhythmcraft",
 
+  "SEARCH_TAGS": [ "TESTTAG" ],
+
   "TOKEN_SECRET": "SECRET",
 
   "SMTP_MAIL_ADDRESS": "example@example.com",
