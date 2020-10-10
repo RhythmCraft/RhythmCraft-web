@@ -22,6 +22,7 @@ window.onload = async () => {
     let hitsound_collection = [];
     let pressedkey = [];
     let countdown;
+    let ready_rich_presence;
 
     document.getElementById('InputMusic').innerHTML = Request('get', '/select_music');
     document.getElementById('InputNote').innerHTML = Request('get', '/select_note');
@@ -172,8 +173,7 @@ window.onload = async () => {
                 break;
             case 'roomInfo':
                 if(isClient) {
-                    console.log(data)
-                    require('electron').remote.getGlobal('globalVars').RichPresence = {
+                    ready_rich_presence = {
                         details: '게임 준비 중',
                         state: '게임 준비 중 입니다.',
                         startTimestamp: Date.now(),
@@ -184,6 +184,7 @@ window.onload = async () => {
                         partyMax: data.max_player,
                         joinSecret: `${location.search.replace('?room=', '')}||${Buffer.from(data.password || 'nopassword').toString('base64')}`
                     }
+                    require('electron').remote.getGlobal('globalVars').RichPresence = ready_rich_presence;
                 }
 
                 document.getElementById('InputName').value = data.name;
@@ -309,15 +310,9 @@ window.onload = async () => {
                 break;
             case 'gameend':
                 if(isClient) {
-                    require('electron').remote.getGlobal('globalVars').RichPresence = {
-                        details: '게임 준비 중',
-                        state: '게임 준비 중 입니다.',
-                        startTimestamp: Date.now(),
-                        largeImageKey: 'main',
-                        instance: true
-                    }
+                    ready_rich_presence.startTimestamp = Date.now();
+                    require('electron').remote.getGlobal('globalVars').RichPresence = ready_rich_presence;
                 }
-
                 Array.from(document.getElementsByClassName('note')).forEach(ele => {
                     ele.remove();
                 });
