@@ -94,6 +94,10 @@ window.onload = async () => {
         e.stopPropagation();
     }
 
+    document.getElementById('CopyURL').onclick = function() {
+        copyToClipboard(location.href);
+    }
+
     Array.from(document.getElementsByClassName('note_area')).forEach(ele => {
         ele.ontouchstart = e => {
             e.preventDefault();
@@ -749,4 +753,13 @@ function ChangeRoomSetting(show) {
         public: document.getElementById('public').checked,
         pitch: document.getElementById('InputPitch').value
     });
+}
+
+function copyToClipboard(str) {
+    const el = document.createElement('textarea');
+    el.value = str;
+    document.body.appendChild(el);
+    el.select();
+    document.execCommand('copy');
+    document.body.removeChild(el);
 }
