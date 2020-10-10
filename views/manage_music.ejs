@@ -7,6 +7,19 @@
     <script src="/js/bootstrap/popper.min.js"></script>
     <script src="/js/bootstrap/bootstrap.min.js"></script>
     <link rel="stylesheet" href="/css/bootstrap/bootstrap.min.css">
+    <script>
+        if(<%=session.isClient%>) {
+            require('electron').remote.getGlobal('globalVars').RichPresence = {
+                details: '음악 목록 보는 중',
+                startTimestamp: Date.now(),
+                largeImageKey: 'main',
+                instance: true
+            }
+        }
+        window.onload = () => {
+            document.getElementById('InputSearch').focus();
+        }
+    </script>
     <script>if (window.module) module = window.module;</script>
     <title><%=servername%> - 음악 관리</title>
 </head>
@@ -27,6 +40,15 @@
     <button type="submit" class="btn btn-primary">업로드</button>
 </form>
 
+<hr>
+<form action="/music" method="get">
+    <div class="form-group">
+        <label for="InputSearch">검색어 입력</label>
+        <input type="text" id="InputSearch" class="form-control" name="search" placeholder="검색어를 입력하세요.">
+    </div>
+
+    <button type="submit" class="btn btn-primary">검색</button>
+</form>
 <hr>
 
 <%files.forEach(file => {%>

@@ -28,7 +28,8 @@ const upload = multer({
 });
 
 app.get('/music', utils.isLogin, async (req, res, next) => {
-    const files = await File.find({ owner : req.user.fullID , file_type : 'music' });
+    const regex = new RegExp((req.query.search || ''), 'i');
+    const files = await File.find({ owner : req.user.fullID , file_type : 'music' , originalname : { $regex : regex } });
     res.render('manage_music', {
         files
     });
@@ -115,7 +116,12 @@ app.get('/musicstatus', utils.isLogin, async (req, res, next) => {
 });
 
 app.get('/note', utils.isLogin, async (req, res, next) => {
-    const files = await File.find({ owner : req.user.fullID , file_type : 'note' });
+    const regex = new RegExp((req.query.search || ''), 'i');
+    const files = await File.find().or(
+        { owner : req.user.fullID , file_type : 'note' , originalname : { $regex : regex } },
+        { owner : req.user.fullID , file_type : 'note' , workshop_title : { $regex : regex } },
+        { owner : req.user.fullID , file_type : 'note' , workshop_description : { $regex : regex } }
+        );
     res.render('manage_note', {
         files
     });

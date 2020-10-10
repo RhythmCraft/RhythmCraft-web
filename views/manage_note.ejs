@@ -21,6 +21,10 @@
                 instance: true
             }
         }
+        window.onload = () => {
+            document.getElementById('InputSearch').focus();
+        }
+    </script>
     </script>
     <script>if (window.module) module = window.module;</script>
     <title><%=servername%> - 채보 관리</title>
@@ -41,6 +45,15 @@
     <button type="submit" class="btn btn-primary">업로드</button>
 </form>
 
+<hr>
+<form action="/note" method="get">
+    <div class="form-group">
+        <label for="InputSearch">검색어 입력</label>
+        <input type="text" id="InputSearch" class="form-control" name="search" placeholder="검색어를 입력하세요.">
+    </div>
+
+    <button type="submit" class="btn btn-primary">검색</button>
+</form>
 <hr>
 
 <%files.forEach(file => {%>
