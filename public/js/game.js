@@ -245,6 +245,7 @@ window.onload = async () => {
                 document.getElementById('ChatBox').scrollTo(0, ChatBox.scrollHeight);
                 document.getElementById('ChatBoxForGame').scrollTo(0, ChatBox2.scrollHeight);
 
+                document.getElementById('CountDown').style.fontSize = '100px';
                 document.getElementById('CountDown').innerText = '음악 다운로드 중...';
                 break;
             case 'gamestartreal':
