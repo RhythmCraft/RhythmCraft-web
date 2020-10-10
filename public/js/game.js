@@ -179,6 +179,7 @@ window.onload = async () => {
                 break;
             case 'im_not_master':
                 location.hash = '';
+                break;
             case 'alert':
                 alert(data.message);
                 break;
