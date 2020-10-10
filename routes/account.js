@@ -264,7 +264,7 @@ app.post('/find_my_password', async (req, res, next) => {
     transport.sendMail(message);
 
     req.flash('Info', '이메일을 발송했습니다. 이메일로 보내진 링크를 눌러 비밀번호를 변경하세요.(30분간만 유효합니다.)');
-    res.redirect('/find_my_password');
+    return res.redirect('/find_my_password');
 });
 
 app.get('/change_password', (req, res, next) => {
