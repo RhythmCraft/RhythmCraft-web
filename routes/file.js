@@ -117,11 +117,11 @@ app.get('/musicstatus', utils.isLogin, async (req, res, next) => {
 
 app.get('/note', utils.isLogin, async (req, res, next) => {
     const regex = new RegExp((req.query.search || ''), 'i');
-    const files = await File.find().or(
+    const files = await File.find().or([
         { owner : req.user.fullID , file_type : 'note' , originalname : { $regex : regex } },
         { owner : req.user.fullID , file_type : 'note' , workshop_title : { $regex : regex } },
-        { owner : req.user.fullID , file_type : 'note' , workshop_description : { $regex : regex } }
-        );
+        { owner : req.user.fullID , file_type : 'note' , description : { $regex : regex } }
+        ]);
     res.render('manage_note', {
         files
     });
