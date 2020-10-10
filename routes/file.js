@@ -456,6 +456,8 @@ app.post('/adofai-converter', utils.isLogin, upload.fields([{ name : 'music' }, 
     }
 
     req.flash('Info', '변환에 성공하였습니다. <a href="/note">채보 관리 페이지</a>에서 확인하세요.');
+    req.app.get('socket_game').to(`user_${req.user.fullID}`).emit('msg', { 'action' : 'updatemusic' });
+    req.app.get('socket_game').to(`user_${req.user.fullID}`).emit('msg', { 'action' : 'updatenote' });
     return res.redirect('/adofai-converter');
 });
 
