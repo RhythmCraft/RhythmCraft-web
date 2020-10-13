@@ -77,7 +77,7 @@ app.get('/login', utils.isNotLogin, (req, res, next) => {
 // 로그 아웃
 app.get('/logout', (req, res, next) => {
     req.logout();
-    res.redirect('/');
+    res.redirect(req.get('referrer'));
     return;
 });
 

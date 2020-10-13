@@ -1,4 +1,5 @@
 const jwt = require('jsonwebtoken');
+const Url = require('url');
 
 const setting = require('./setting.json');
 
@@ -16,7 +17,7 @@ module.exports.getRandomInt = (min, max) => {
 
 module.exports.isLogin = (req, res, next) => {
     if(!req.isAuthenticated()) {
-        res.redirect('/login');
+        res.redirect(`/login?redirect=${req.url}`);
         return;
     }
     next();

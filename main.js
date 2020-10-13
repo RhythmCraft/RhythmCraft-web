@@ -10,6 +10,7 @@ const redis = require('redis');
 const RedisStore = require('connect-redis')(session);
 const fs = require('fs');
 const path = require('path');
+const Url = require('url');
 
 // 데이터베이스 스키마
 const User = require('./schemas/user');
@@ -145,6 +146,8 @@ app.use((req, res, next) => {
     res.locals.isClient = req.session.isClient || false;
     res.locals.socket = `${req.protocol}://${req.hostname}:${setting.PORT}`;
     res.locals.query = req.query;
+    res.locals.referrer = req.get('referrer');
+    res.locals.referrer_path = Url.parse(req.get('referrer')).path;
     next();
 });
 
