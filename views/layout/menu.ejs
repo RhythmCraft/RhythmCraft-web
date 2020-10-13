@@ -13,7 +13,7 @@
             <a class="dropdown-item" href="/profile">프로필</a>
             <a class="dropdown-item" href="/adofai-converter">ADOFAI 컨버터</a>
         <%} else {%>
-            <a class="dropdown-item" href="/login?redirect=<%=referrer_path%>">로그인</a>
+            <a class="dropdown-item" href="/login?redirect=<%=encodeURIComponent(referrer_path)%>">로그인</a>
         <%}%>
         <div class="dropdown-divider"></div>
             <a class="dropdown-item" href="/">메인 메뉴</a>

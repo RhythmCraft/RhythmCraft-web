@@ -17,7 +17,7 @@ module.exports.getRandomInt = (min, max) => {
 
 module.exports.isLogin = (req, res, next) => {
     if(!req.isAuthenticated()) {
-        res.redirect(`/login?redirect=${req.url}`);
+        res.redirect(`/login?redirect=${encodeURIComponent(req.url)}`);
         return;
     }
     next();

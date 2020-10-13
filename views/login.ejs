@@ -52,7 +52,7 @@
 <%if(!session.isClient) {%>
 <h2>SNS 로그인</h2>
 <%login_list.forEach((name) => {%>
-<h2><a class="btn btn-primary" href="/login/<%=name.replace('.js', '')%>?redirect=<%=query.redirect || '/'%>"><%=login[`${name.replace('.js', '').toUpperCase()}_TRANSLATE_NAME`]%></a></h2>
+<h2><a class="btn btn-primary" href="/login/<%=name.replace('.js', '')%>?redirect=<%=encodeURIComponent(query.redirect || '/')%>"><%=login[`${name.replace('.js', '').toUpperCase()}_TRANSLATE_NAME`]%></a></h2>
 <%});%>
 <%}%>
 </body>
