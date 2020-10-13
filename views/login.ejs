@@ -23,6 +23,7 @@
 <%-include('./layout/info')%>
 
 <form action="/login" method="post" id="LoginForm">
+    <input type="hidden" name="redirect" value="<%=query.redirect || '/'%>">
     <div class="form-group">
         <label for="InputEmail">이메일 주소</label>
         <input type="email" class="form-control" id="InputEmail" placeholder="이메일 주소" name="email" required>
@@ -51,7 +52,7 @@
 <%if(!session.isClient) {%>
 <h2>SNS 로그인</h2>
 <%login_list.forEach((name) => {%>
-<h2><a class="btn btn-primary" href="/login/<%=name.replace('.js', '')%>"><%=login[`${name.replace('.js', '').toUpperCase()}_TRANSLATE_NAME`]%></a></h2>
+<h2><a class="btn btn-primary" href="/login/<%=name.replace('.js', '')%>?redirect=<%=query.redirect || '/'%>"><%=login[`${name.replace('.js', '').toUpperCase()}_TRANSLATE_NAME`]%></a></h2>
 <%});%>
 <%}%>
 </body>

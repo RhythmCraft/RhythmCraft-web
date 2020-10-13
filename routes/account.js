@@ -50,6 +50,7 @@ login_dir_list.forEach((file) => {
             return;
         }
         else {
+            req.session.LoginRedirect = req.query.redirect || '/';
             next();
         }
     }, passport.authenticate(provider), (req, res, next) => {
@@ -59,7 +60,7 @@ login_dir_list.forEach((file) => {
     app.get(login[`${provider.toUpperCase()}_CALLBACK_URL`], passport.authenticate(provider, {
         failureRedirect: '/loginfail'
     }), (req, res, next) => {
-        res.redirect('/');
+        res.redirect(req.session.LoginRedirect || '/');
         return;
     });
 });
@@ -101,7 +102,7 @@ app.post('/login', utils.isNotLogin, (req, res, next) => {
             if(loginError) {
                 console.error(loginError);
             }
-            if(!res.headersSent) return res.redirect('/');
+            if(!res.headersSent) return res.redirect(req.body.redirect || '/');
         });
     })(req, res, next);
 });
