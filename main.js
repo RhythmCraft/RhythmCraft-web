@@ -147,7 +147,7 @@ app.use((req, res, next) => {
     res.locals.socket = `${req.protocol}://${req.hostname}:${setting.PORT}`;
     res.locals.query = req.query;
     res.locals.referrer = req.get('referrer');
-    res.locals.referrer_path = Url.parse(req.get('referrer')).path;
+    res.locals.referrer_path = req.get('referrer') != null ? Url.parse(req.get('referrer')).path : req.url;
     next();
 });
 
