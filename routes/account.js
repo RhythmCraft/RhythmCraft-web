@@ -269,21 +269,37 @@ app.post('/find_my_password', async (req, res, next) => {
 });
 
 app.get('/change_password', (req, res, next) => {
-    const token_result = utils.verifyToken(req.query.token);
-    if(token_result.error) return res.send(token_result.message);
+    let token_result;
+    if(req.query.from_mypage == 'true') {
+        if(!req.isAuthenticated()) {
+            return res.redirect('/login');
+        }
+    }
+    else {
+        token_result = utils.verifyToken(req.query.token);
+        if (token_result.error) return res.send(token_result.message);
+    }
 
-    res.render('change_password', {
+    return res.render('change_password', {
         token: req.query.token
     });
 });
 
 app.post('/change_password', async (req, res, next) => {
-    const token_result = utils.verifyToken(req.body.token);
-    if(token_result.error) return res.send(token_result.message);
+    let token_result;
+    if(req.body.from_mypage == 'true') {
+        if(!req.isAuthenticated()) {
+            return res.redirect('/login');
+        }
+    }
+    else {
+        token_result = utils.verifyToken(req.body.token);
+        if (token_result.error) return res.send(token_result.message);
+    }
 
     const hash = await bcrypt.hash(req.body.password, 12);
 
-    await User.updateOne({ fullID : token_result.account_fullID }, { password : hash });
+    await User.updateOne({ fullID : req.body.from_mypage == 'true' ? req.user.fullID : token_result.account_fullID }, { password : hash });
     return res.send(`<h1>비밀번호가 변경되었습니다.</h1><h2><a href="/">메인으로 돌아가기</a></h2>`);
 });
 
