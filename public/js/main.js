@@ -14,7 +14,7 @@ window.onload = () => {
         }
     }
 
-    const socket = io.connect('/main', {
+    const socket = io.connect(`${socket_address}/main`, {
         path: '/socket'
     });
     socket.on('msg', data => {
