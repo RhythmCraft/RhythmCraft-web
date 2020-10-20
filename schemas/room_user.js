@@ -10,6 +10,11 @@ const newSchema = new Schema({
         type: String,
         required: true
     },
+    verified: {
+        type: Boolean,
+        required: true,
+        default: false
+    },
     roomcode: {
         type: String,
         required: true

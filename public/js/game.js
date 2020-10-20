@@ -250,6 +250,7 @@ window.onload = async () => {
                 data.players.forEach(player => {
                     scores[player.fullID] = {};
                     scores[player.fullID]['nickname'] = player.nickname;
+                    scores[player.fullID]['verified'] = player.verified;
                     scores[player.fullID]['score'] = 0;
                     scores[player.fullID]['accurary'] = 0;
                     scores[player.fullID]['combo'] = 0;
@@ -460,6 +461,13 @@ window.onload = async () => {
 
         const show_nickname = document.createElement('h4');
         show_nickname.innerText = data.nickname;
+        if(data.verified) {
+            const verified = document.createElement('svg');
+            show_nickname.appendChild(verified);
+            verified.outerHTML = ` <svg width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-check-circle-fill text-secondary" fill="currentColor" xmlns="http://www.w3.org/2000/svg" data-container="body" data-toggle="popover" data-placement="top" data-content="인증된 유저" data-trigger="hover">
+        <path fill-rule="evenodd" d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zm-3.97-3.03a.75.75 0 0 0-1.08.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-.01-1.05z"/>
+    </svg>`;
+        }
         newarea.appendChild(show_nickname);
 
         const show_score = document.createElement('p');
@@ -475,6 +483,8 @@ window.onload = async () => {
         newarea.appendChild(show_combo);
 
         document.getElementById('user_leaderboard').appendChild(newarea);
+
+        $("[data-toggle=popover]").popover();
     });
 
     socket.on('Chat', data => {
@@ -767,6 +777,13 @@ function showScore(scores) {
         const nickname = document.createElement('strong');
         nickname.style.fontSize = '25px';
         nickname.innerText = scores[key].nickname;
+        if(scores[key].verified) {
+            const verified = document.createElement('svg');
+            nickname.appendChild(verified);
+            verified.outerHTML = ` <svg width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-check-circle-fill text-secondary" fill="currentColor" xmlns="http://www.w3.org/2000/svg" data-container="body" data-toggle="popover" data-placement="top" data-content="인증된 유저" data-trigger="hover">
+        <path fill-rule="evenodd" d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zm-3.97-3.03a.75.75 0 0 0-1.08.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-.01-1.05z"/>
+    </svg>`;
+        }
         player.appendChild(nickname);
 
         const userscore = document.createElement('p');
@@ -791,6 +808,7 @@ function showScore(scores) {
 
         leaderboard.appendChild(player);
     }
+    $("[data-toggle=popover]").popover();
 }
 
 function ChangeRoomSetting(show) {

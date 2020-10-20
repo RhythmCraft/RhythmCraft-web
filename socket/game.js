@@ -89,7 +89,12 @@ module.exports = (io, app) => {
             chat: `<strong>${user.nickname}</strong>님이 입장하셨습니다.`,
             verified: true
         });
-        await RoomUser.create({ "nickname" : user.nickname , "fullID" : user.fullID , "roomcode" : url_query.room });
+        await RoomUser.create({
+            "nickname" : user.nickname,
+            "fullID" : user.fullID,
+            "verified": user.verified,
+            "roomcode" : url_query.room
+        });
 
         socket.emit('msg', {
             'action': 'roomInfo',
@@ -386,7 +391,8 @@ module.exports = (io, app) => {
                 nickname: user.nickname,
                 score: data.score,
                 accurary: data.accurary,
-                max_combo: data.max_combo
+                max_combo: data.max_combo,
+                verified: user.verified
             });
         });
 
