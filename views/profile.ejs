@@ -38,7 +38,7 @@
 
 <h4>나의 채보</h4>
 <%notes.forEach(note => {%>
-<h5><a href="/workshop/note?name=<%=encodeURI(note.name)%>"><%=note.originalname%></a></h5>
+<h5><a href="/workshop/note?name=<%=encodeURI(note.name)%>"><%=note.workshop_title%></a></h5>
 <%});%>
 </body>
 </html>
