@@ -433,6 +433,7 @@ window.onload = async () => {
         note.classList.add(`note`);
         note.classList.add(`note_${data.note}`);
         note.dataset.rhythm_time = new Date().getTime() + data.note_speed;
+        note.dataset.note = data.note;
 
         const image = document.createElement('img');
         image.src = `/game/img/note_${data.note}.png`;
@@ -662,6 +663,7 @@ function note_interval_func() {
         ele.style.bottom = `${(((innerHeight * 0.65 / note_speed) * (ele.dataset.rhythm_time - new Date().getTime())) + innerHeight * 0.65 / note_speed) + innerHeight * 0.3}px`;
 
         if((ele.dataset.rhythm_time - new Date().getTime() + (note_speed / 20)) < -150) {
+            flash_note_area(ele.dataset.note, 'purple');
             ele.remove();
             combo = 0;
             multiplier = 1;
