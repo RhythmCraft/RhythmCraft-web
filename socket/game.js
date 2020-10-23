@@ -364,7 +364,7 @@ module.exports = (io, app) => {
         socket.on('GiveNote', async data => {
             const room = await Room.findOne({ roomcode : url_query.room });
 
-            if(master) {
+            if(master && !room.note) {
                 let key;
                 if(data.key == user.rhythm_key_1) key = 1;
                 if(data.key == user.rhythm_key_2) key = 2;
