@@ -11,6 +11,7 @@ const RedisStore = require('connect-redis')(session);
 const fs = require('fs');
 const path = require('path');
 const Url = require('url');
+const uniqueString = require('unique-string');
 
 // 데이터베이스 스키마
 const User = require('./schemas/user');
@@ -24,6 +25,7 @@ const webSocket = require('./socket');
 
 // 설정 파일, 유틸
 const setting = require('./setting.json');
+const utils = require('./utils');
 
 // app 정의
 const app = express();
@@ -191,4 +193,35 @@ webSocket(server, app, sessionMiddleware);
 setImmediate(async () => {
     await Room.deleteMany({});
     await RoomUser.deleteMany({});
+
+    CreateOfficialRoom();
 });
+
+async function CreateOfficialRoom() {
+    const count = await File.countDocuments({ public : true , file_type : 'note' });
+    const note = await File.findOne({ public : true , file_type : 'note' }).skip(utils.getRandomInt(0, count - 1));
+
+    let token_result;
+    let note_file = String(fs.readFileSync(path.join(setting.SAVE_FILE_PATH, note.name)));
+    if(path.extname(note.name) == '.signedrhythmcraft') {
+        token_result = utils.verifyToken(note_file);
+        if (token_result.error) return CreateOfficialRoom();
+    }
+    else note_file = JSON.parse(note_file);
+
+    const music = await File.findOne({ name : token_result != null ? token_result.music : note_file.music , public : true , file_type : 'music' });
+    if(!music) return CreateOfficialRoom();
+
+    await Room.create({
+        name: "자동 진행 공식 방",
+        master: "no_master",
+        note_speed: 1000,
+        max_player: 100,
+        roomcode: `official_${uniqueString()}`,
+        music: music.name,
+        music_name: music.originalname,
+        note: token_result || note_file,
+        trusted: token_result != null,
+        auto_manage_room: true
+    });
+}

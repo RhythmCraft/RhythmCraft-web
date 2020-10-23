@@ -86,6 +86,7 @@ window.onload = () => {
         note['jscode'][inputscript.dataset.effect] = note['jscode'][inputscript.dataset.effect].split('`').join('/*grave*/');
         note['jscode'][inputscript.dataset.effect] = note['jscode'][inputscript.dataset.effect].split('{').join('/*openbracket*/');
         note['jscode'][inputscript.dataset.effect] = note['jscode'][inputscript.dataset.effect].split('}').join('/*closebracket*/');
+        note['jscode'][inputscript.dataset.effect] = note['jscode'][inputscript.dataset.effect].split('"').join('/*bigcomma*/');
 
         setTimeout(() => {
             save();
@@ -207,6 +208,7 @@ function renderNote(note, look_time) {
                 inputscript.value = inputscript.value.split('/*grave*/').join('`');
                 inputscript.value = inputscript.value.split('/*openbracket*/').join('{');
                 inputscript.value = inputscript.value.split('/*closebracket*/').join('}');
+                inputscript.value = inputscript.value.split('/*bigcomma*/').join('"');
             }
 
             document.body.appendChild(newscript);

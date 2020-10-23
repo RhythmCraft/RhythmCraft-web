@@ -28,7 +28,7 @@ app.get('/game', utils.isLogin, async (req, res, next) => {
     const notes = await File.find({ owner : req.user.fullID , file_type : 'note' });
 
     return res.render('game', {
-        room_have_password: room.password != '',
+        room_have_password: room.password != null && room.password != '',
         files,
         notes
     });

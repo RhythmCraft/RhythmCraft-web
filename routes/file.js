@@ -251,6 +251,8 @@ app.get('/signnotetext', utils.isAdmin, async (req, res, next) => {
     const name = `${uniqueString()}.signedrhythmcraft`;
 
     const note = JSON.parse(fs.readFileSync(path.join(setting.SAVE_FILE_PATH, req.query.name)));
+    delete note.iss;
+    delete note.iat;
     const token = jwt.sign(note, setting.TOKEN_SECRET, {
         issuer: setting.SERVER_NAME
     });

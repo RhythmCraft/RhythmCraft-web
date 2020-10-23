@@ -240,7 +240,7 @@ window.onload = async () => {
                         document.getElementById('CountDown').innerText = '다른 유저를 기다리는 중...';
                     },
                     onend: () => {
-                        if(master) socket.emit('msg', { 'action' : 'gameend' });
+                        socket.emit('msg', { 'action' : 'gameend' });
                     }
                 });
 

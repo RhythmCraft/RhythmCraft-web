@@ -26,6 +26,8 @@ module.exports = (io, app) => {
         let notepersecond;
         let pitch;
         let note_name;
+        let timestamp = 10000;
+        let auto_manage_interval;
 
         io.to(`user_${user.fullID}`).emit('msg', { 'action' : 'exit' , 'message' : '다중접속' });
 
@@ -122,6 +124,46 @@ module.exports = (io, app) => {
             'key8': user.rhythm_key_8
         });
 
+        if(room.auto_manage_room && !room.auto_manage_room_timeout_setted) {
+            auto_manage_interval = setInterval(async () => {
+                const before_timestamp = timestamp;
+                timestamp -= 1000;
+                if(before_timestamp < 0) return;
+                if(before_timestamp == 0) {
+                    const players = await RoomUser.find({ roomcode : url_query.room });
+                    await Room.updateOne({ roomcode : url_query.room , playing : true });
+                    app.get('socket_main').emit('msg', { 'action' : 'reload_room' });
+                    const checkroom = await Room.findOne({ roomcode : url_query.room });
+                    return io.to(`room_${url_query.room}`).emit('msg', {
+                        'action': 'gamestart',
+                        'music': checkroom.music,
+                        'create_mode': !checkroom.note,
+                        'players': players,
+                        'pitch': checkroom.pitch
+                    });
+                }
+                if(before_timestamp == 30000) return io.to(`room_${url_query.room}`).emit('Chat', {
+                    nickname: '시스템',
+                    chattype: 'system',
+                    chat: '30초 후 게임이 시작됩니다.',
+                    verified: true
+                });
+                if(before_timestamp == 20000) return io.to(`room_${url_query.room}`).emit('Chat', {
+                    nickname: '시스템',
+                    chattype: 'system',
+                    chat: '20초 후 게임이 시작됩니다.',
+                    verified: true
+                });
+                if(before_timestamp <= 10000 && timestamp % 1000 == 0) return io.to(`room_${url_query.room}`).emit('Chat', {
+                    nickname: '시스템',
+                    chattype: 'system',
+                    chat: `${timestamp / 1000}초 후 게임이 시작됩니다.`,
+                    verified: true
+                });
+            }, 1000);
+            await Room.updateOne({ roomcode : url_query.room }, { auto_manage_room_timeout_setted : true });
+        }
+
         socket.on('msg', async data => {
             let checkroom = await Room.findOne({ roomcode : url_query.room });
             switch(data.action) {
@@ -210,6 +252,7 @@ module.exports = (io, app) => {
                                            .split('/*grave*/').join('`')
                                            .split('/*openbracket*/').join('{')
                                            .split('/*closebracket*/').join('}')
+                                           .split('/*bigcomma*/').join('"')
                                    });
                                 }, ((Number(i) / (checkroom.pitch / 100)) + countdown - (checkroom.startpos / (checkroom.pitch / 100))) + checkroom.note_speed));
                                 else setImmediate(() => {
@@ -219,6 +262,7 @@ module.exports = (io, app) => {
                                             .split('/*grave*/').join('`')
                                             .split('/*openbracket*/').join('{')
                                             .split('/*closebracket*/').join('}')
+                                            .split('/*bigcomma*/').join('"')
                                     });
                                 });
                             }
@@ -238,7 +282,10 @@ module.exports = (io, app) => {
                     }
                     break;
                 case 'gameend':
-                    if(master) {
+                    if(master || room.auto_manage_room) {
+                        let checkroom = await Room.findOne({ roomcode : url_query.room });
+                        if(!checkroom.playing) return;
+
                         await Room.updateOne({ roomcode: url_query.room, playing: false });
                         app.get('socket_main').emit('msg', { 'action': 'reload_room' });
                         if (master) io.to(`room_${url_query.room}`).emit('msg', {
@@ -246,7 +293,7 @@ module.exports = (io, app) => {
                             rtnote
                         });
 
-                        let checkroom = await Room.findOne({ roomcode : url_query.room });
+                        checkroom = await Room.findOne({ roomcode : url_query.room });
 
                         rtnote = {};
                         rtnote.music = checkroom.music;
@@ -286,6 +333,7 @@ module.exports = (io, app) => {
                                 "url": `/workshop/note?name=${checkroom.note_name}`
                             });
                         }
+                        timestamp = 10000;
                     }
                     break;
             }
@@ -527,6 +575,7 @@ module.exports = (io, app) => {
             }
             else {
                 await Room.updateOne( { roomcode: url_query.room }, { $inc: { now_player: -1 } } );
+                let checkroom = await Room.findOne({ roomcode : url_query.room });
                 app.get('socket_main').emit('msg', { 'action' : 'reload_room' });
                 io.to(`room_${url_query.room}`).emit('userLeave', { 'nickname' : user.nickname , 'fullID' : user.fullID });
                 io.to(`room_${url_query.room}`).emit('Chat', {
@@ -535,7 +584,43 @@ module.exports = (io, app) => {
                     chat: `<strong>${user.nickname}</strong>님이 퇴장하셨습니다.`,
                     verified: true
                 });
+
+                if(checkroom.now_player == 0) {
+                    await Room.deleteOne({ roomcode : url_query.room });
+                    app.get('socket_main').emit('msg', { 'action': 'reload_room' });
+                    await CreateOfficialRoom();
+                    app.get('socket_main').emit('msg', { 'action': 'reload_room' });
+                }
             }
         });
+    });
+}
+
+async function CreateOfficialRoom() {
+    const count = await File.countDocuments({ public : true , file_type : 'note' });
+    const note = await File.findOne({ public : true , file_type : 'note' }).skip(utils.getRandomInt(0, count - 1));
+
+    let token_result;
+    let note_file = String(fs.readFileSync(path.join(setting.SAVE_FILE_PATH, note.name)));
+    if(path.extname(note.name) == '.signedrhythmcraft') {
+        token_result = utils.verifyToken(note_file);
+        if (token_result.error) return CreateOfficialRoom();
+    }
+    else note_file = JSON.parse(note_file);
+
+    const music = await File.findOne({ name : token_result != null ? token_result.music : note_file.music , public : true , file_type : 'music' });
+    if(!music) return CreateOfficialRoom();
+
+    await Room.create({
+        name: "자동 진행 공식 방",
+        master: "no_master",
+        note_speed: 1000,
+        max_player: 100,
+        roomcode: `official_${uniqueString()}`,
+        music: music.name,
+        music_name: music.originalname,
+        note: token_result || note_file,
+        trusted: token_result != null,
+        auto_manage_room: true
     });
 }

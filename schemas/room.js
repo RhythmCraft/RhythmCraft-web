@@ -102,6 +102,16 @@ const newSchema = new Schema({
     },
     note_name: {
         type: String
+    },
+    auto_manage_room: {
+        type: Boolean,
+        required: true,
+        default: false
+    },
+    auto_manage_room_timeout_setted: {
+        type: Boolean,
+        required: true,
+        default: false
     }
 });
 
