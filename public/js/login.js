@@ -16,7 +16,7 @@ window.onload = function() {
                 break;
             case 'saveid':
                 socketid = data.id;
-                document.getElementById('qrlogin').src = encodeURI(`/getqrcode?socketID=${socketid}`);
+                document.getElementById('qrlogin').src = encodeURI(`${location.protocol}//${location.hostname}:${data.port}/getqrcode?socketID=${socketid}`);
                 break;
             case 'alert':
                 alert(data.msg);
