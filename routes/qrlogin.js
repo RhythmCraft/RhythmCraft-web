@@ -38,7 +38,7 @@ app.get('/getqrcode', utils.isNotLogin, async (req, res, next) => {
         return res.redirect('/');
     }
     const data = {
-        "RequestURL" : `${req.protocol}://${req.hostname}/qrloginapi`,
+        "RequestURL" : `${req.protocol}://${req.hostname}:${setting.PORT}/qrloginapi`,
         "socketID": req.query.socketID.replace('<sh>', '#')
     }
     const img = qrcode.image(JSON.stringify(data), { type: 'png' });
