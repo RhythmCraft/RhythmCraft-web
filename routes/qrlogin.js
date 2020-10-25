@@ -47,6 +47,6 @@ app.get('/getqrcode', utils.isNotLogin, async (req, res, next) => {
 
 app.get('/qrappprivacy', (req, res, next) => {
     return res.send(`<h1>카메라는 QR코드 인식에만 사용되며, 이미지는 저장되지 않습니다.</h1>`);
-})
+});
 
 module.exports = app;
