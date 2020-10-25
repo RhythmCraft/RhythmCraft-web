@@ -18,6 +18,7 @@
                 instance: true
             }
         }
+        game_skin_value = "<%=user.game_skin%>";
     </script>
     <title><%=servername%> - 마이페이지</title>
 </head>
@@ -46,6 +47,30 @@
     <br>게임 키 6 : <input type="text" id="InputKey6" class="setkey" name="InputKey6" value="<%=user.rhythm_key_6%>" placeholder="6번 키">
     <br>게임 키 7 : <input type="text" id="InputKey7" class="setkey" name="InputKey7" value="<%=user.rhythm_key_7%>" placeholder="7번 키">
     <br>게임 키 8 : <input type="text" id="InputKey8" class="setkey" name="InputKey8" value="<%=user.rhythm_key_8%>" placeholder="8번 키">
+    <br><br>
+    <%if(user.show_accurary_center) {%>
+        <p><label for="show_accurary_center">게임 중 정확도 중앙에 표시 : <input type="checkbox" name="show_accurary_center" id="show_accurary_center" value="true" checked></label></p>
+    <%} else {%>
+        <p><label for="show_accurary_center">게임 중 정확도 중앙에 표시 : <input type="checkbox" name="show_accurary_center" id="show_accurary_center" value="true"></label></p>
+    <%}%>
+
+    <br>
+
+    <div class="form-group">
+        <label for="InputGameSkin">게임 스킨</label>
+        <select name="game_skin" class="form-control" id="InputGameSkin" required>
+            <option value="no_skin">없음</option>
+            <option value="custom_skin">커스텀</option>
+            <%game_skins.forEach(skin => {%>
+            <option value="<%=skin%>"><%=skin%></option>
+            <%});%>
+        </select>
+    </div>
+
+    <div class="form-group" id="input_custom_skin" hidden>
+        <label for="CustomGameSkin">커스텀 게임 스킨</label>
+        <textarea id="CustomGameSkin" name="custom_game_skin" class="form-control" placeholder="커스텀 게임 스킨 CSS를 입력하세요."><%=user.custom_game_skin%></textarea>
+    </div>
 
     <br><br><input class="btn btn-primary" type="submit" value="저장">
 </form>

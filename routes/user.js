@@ -1,5 +1,6 @@
 const express = require('express');
 const bodyParser = require('body-parser');
+const fs = require('fs');
 
 const User = require('../schemas/user');
 const File = require('../schemas/file');
@@ -13,7 +14,10 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended : false }));
 
 app.get('/mypage', utils.isLogin, (req, res, next) => {
-    res.render('mypage');
+    const game_skins = fs.readdirSync('./public/skin/game').map(n => n.replace('.css', ''));
+    res.render('mypage', {
+        game_skins
+    });
 });
 
 app.post('/editaccount', utils.isLogin, async (req, res, next) => {
@@ -47,7 +51,10 @@ app.post('/editaccount', utils.isLogin, async (req, res, next) => {
             rhythm_key_6: req.body.InputKey6,
             rhythm_key_7: req.body.InputKey7,
             rhythm_key_8: req.body.InputKey8,
-            verified
+            verified,
+            show_accurary_center: req.body.show_accurary_center == 'true',
+            game_skin: req.body.game_skin,
+            custom_game_skin: req.body.custom_game_skin
         });
         res.redirect('/mypage');
     } catch(err) {

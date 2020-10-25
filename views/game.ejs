@@ -17,6 +17,14 @@
         socket_address = "<%=socket%>";
         isClient = <%=session.isClient || false%>;
     </script>
+    <%if(user.game_skin != 'no_skin' && user.game_skin != 'custom_skin') {%>
+        <link rel="stylesheet" href="/skin/game/<%=encodeURIComponent(user.game_skin)%>.css">
+    <%}%>
+    <%if(user.game_skin == 'custom_skin') {%>
+        <style>
+            <%=user.custom_game_skin%>
+        </style>
+    <%}%>
 </head>
 
 <body>
@@ -69,16 +77,16 @@
     <div id="accurary">0%</div>
     <div id="combo">0콤보</div>
     <div id="max_combo">최대 0콤보</div>
-    <div id="note_check_line"></div>
-    <div id="game_line"></div>
-    <div id="note_1_area" class="note_area"><div id="note_area_background_1" class="note_area_background"></div></div>
-    <div id="note_2_area" class="note_area"><div id="note_area_background_2" class="note_area_background"></div></div>
-    <div id="note_3_area" class="note_area"><div id="note_area_background_3" class="note_area_background"></div></div>
-    <div id="note_4_area" class="note_area"><div id="note_area_background_4" class="note_area_background"></div></div>
-    <div id="note_5_area" class="note_area"><div id="note_area_background_5" class="note_area_background"></div></div>
-    <div id="note_6_area" class="note_area"><div id="note_area_background_6" class="note_area_background"></div></div>
-    <div id="note_7_area" class="note_area"><div id="note_area_background_7" class="note_area_background"></div></div>
-    <div id="note_8_area" class="note_area"><div id="note_area_background_8" class="note_area_background"></div></div>
+    <div id="note_check_line" class="note_line"></div>
+    <div id="game_line" class="note_line"></div>
+    <div id="note_1_area" class="note_area note_line"><div id="note_area_background_1" class="note_area_background"></div></div>
+    <div id="note_2_area" class="note_area note_line"><div id="note_area_background_2" class="note_area_background"></div></div>
+    <div id="note_3_area" class="note_area note_line"><div id="note_area_background_3" class="note_area_background"></div></div>
+    <div id="note_4_area" class="note_area note_line"><div id="note_area_background_4" class="note_area_background"></div></div>
+    <div id="note_5_area" class="note_area note_line"><div id="note_area_background_5" class="note_area_background"></div></div>
+    <div id="note_6_area" class="note_area note_line"><div id="note_area_background_6" class="note_area_background"></div></div>
+    <div id="note_7_area" class="note_area note_line"><div id="note_area_background_7" class="note_area_background"></div></div>
+    <div id="note_8_area" class="note_area note_line"><div id="note_area_background_8" class="note_area_background"></div></div>
 
 
     <div id="ChatBoxForGame"></div>
@@ -87,6 +95,7 @@
     <div id="Live_LeaderBoard"></div>
 
     <h1 id="CountDown">3</h1>
+    <h1 id="center_accurary" hidden>100%</h1>
 
     <div class="progress">
         <div id="progressbar" class="progress-bar" role="progressbar"></div>

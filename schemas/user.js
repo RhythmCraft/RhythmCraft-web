@@ -101,6 +101,19 @@ const userSchema = new Schema({
         type: Boolean,
         required: true,
         default: false
+    },
+    show_accurary_center: {
+        type: Boolean,
+        required: true,
+        default: false
+    },
+    game_skin: {
+        type: String,
+        required: true,
+        default: 'no_skin'
+    },
+    custom_game_skin: {
+        type: String
     }
 });
 

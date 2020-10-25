@@ -121,7 +121,8 @@ module.exports = (io, app) => {
             'key5': user.rhythm_key_5,
             'key6': user.rhythm_key_6,
             'key7': user.rhythm_key_7,
-            'key8': user.rhythm_key_8
+            'key8': user.rhythm_key_8,
+            'show_accurary_center': user.show_accurary_center
         });
 
         if(room.auto_manage_room && !room.auto_manage_room_timeout_setted) {

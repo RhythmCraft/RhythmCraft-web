@@ -384,6 +384,7 @@ window.onload = async () => {
                 keymap[data.key6] = 6;
                 keymap[data.key7] = 7;
                 keymap[data.key8] = 8;
+                document.getElementById('center_accurary').hidden = !data.show_accurary_center;
                 break;
             case 'updatemusic':
                 if(master) updateMusic();
@@ -463,8 +464,6 @@ window.onload = async () => {
         note.appendChild(image);
 
         document.getElementById('game').appendChild(note);
-
-        possible_max_score += 5;
 
         if(autoplay) setTimeout(() => {
             for(let key in keymap) {
@@ -644,6 +643,7 @@ window.onload = async () => {
 
             if(distance <= 260 && distance >= -260) {
                 note.remove();
+                possible_max_score += 5;
                 combo += 1;
                 if(combo > max_combo) max_combo = combo;
             }
@@ -677,11 +677,12 @@ function Request(method, url) {
 }
 
 function note_interval_func() {
-    document.getElementById('score').innerText = `${score}점`;
+    document.getElementById('score').innerText = `${score.toFixed(0)}점`;
     document.getElementById('multiplier').innerText = `${multiplier.toFixed(2)}X`;
-    document.getElementById('accurary').innerText = `${accurary}%`;
+    document.getElementById('accurary').innerText = `${accurary.toFixed(2)}%`;
     document.getElementById('combo').innerText = `${combo}콤보`;
     document.getElementById('max_combo').innerText = `최대 ${max_combo}콤보`;
+    document.getElementById('center_accurary').innerText = `${accurary.toFixed(2)}%`;
 
     Array.from(document.getElementsByClassName('note')).forEach(ele => {
         ele.style.bottom = `${(((innerHeight * 0.65 / note_speed) * (ele.dataset.rhythm_time - new Date().getTime())) + innerHeight * 0.65 / note_speed) + innerHeight * 0.3}px`;
@@ -689,6 +690,7 @@ function note_interval_func() {
         if((ele.dataset.rhythm_time - new Date().getTime() + (note_speed / 20)) < -150) {
             if(!master) flash_note_area(ele.dataset.note, 'purple');
             ele.remove();
+            possible_max_score += 5;
             combo = 0;
             multiplier = 1;
             accurary = score / possible_max_score * 100;
@@ -814,12 +816,12 @@ function showScore(scores) {
 
         const userscore = document.createElement('p');
         userscore.style.fontSize = '20px'
-        userscore.innerText = `${scores[key].score}점`;
+        userscore.innerText = `${scores[key].score.toFixed(0)}점`;
         player.appendChild(userscore);
 
         const useraccurary = document.createElement('p');
         useraccurary.style.fontSize = '20px'
-        useraccurary.innerText = `${scores[key].accurary}%`;
+        useraccurary.innerText = `${scores[key].accurary.toFixed(2)}%`;
         player.appendChild(useraccurary);
 
         const usercombo = document.createElement('p');
