@@ -1,0 +1,13 @@
+body {
+    color: white;
+    background-color: black;
+}
+.note_line {
+    border: solid 1px white;
+}
+.chat {
+    color: black;
+}
+input {
+    background-color: black;
+}
