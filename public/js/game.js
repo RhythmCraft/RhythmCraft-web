@@ -2,6 +2,7 @@ let socket;
 let note_interval;
 let note_speed;
 let score = 0;
+let score_no_multiplier = 0;
 let combo = 0;
 let max_combo = 0;
 let multiplier = 1;
@@ -315,6 +316,7 @@ window.onload = async () => {
                 note_speed = data.note_speed;
                 note_interval = setInterval(note_interval_func, 1);
                 score = 0;
+                score_no_multiplier = 0;
                 combo = 0;
                 max_combo = 0;
                 multiplier = 1;
@@ -354,10 +356,18 @@ window.onload = async () => {
                 document.getElementById('game').hidden = true;
                 sound.stop();
                 clearTimeout(musictimeout);
+
+                let rank;
+                if(accurary >= 97) rank = 'S';
+                else if (accurary >= 90) rank = 'A';
+                else if (accurary >= 80) rank = 'B';
+                else if (accurary >= 70) rank = 'C';
+                else rank = 'F';
                 socket.emit('MyScore', {
                     score,
                     accurary,
-                    max_combo
+                    max_combo,
+                    rank
                 });
                 rtnote = data.rtnote;
                 document.getElementById('Save_rtnote').hidden = false;
@@ -485,9 +495,13 @@ window.onload = async () => {
         show_accurary.innerText = `${data.accurary}%`;
         newarea.appendChild(show_accurary);
 
-        const show_combo = document.createElement('combo');
+        const show_combo = document.createElement('p');
         show_combo.innerText = `최대 ${data.max_combo}콤보`;
         newarea.appendChild(show_combo);
+
+        const show_rank = document.createElement('p');
+        show_rank.innerText = `랭크 : ${data.rank}`;
+        newarea.appendChild(show_rank);
 
         document.getElementById('user_leaderboard').appendChild(newarea);
 
@@ -596,21 +610,25 @@ window.onload = async () => {
             const distance = note.dataset.rhythm_time - new Date().getTime() + (note_speed / 20);
             if(distance <= 60 && distance >= -60) {
                 score += 5 * multiplier;
+                score_no_multiplier += 5;
                 flash_note_area(keymap[e.code], 'LightGreen');
                 last_note_judgement = 'green';
             }
             else if(distance <= 140 && distance >= -140) {
                 score += 3 * multiplier;
+                score_no_multiplier += 3;
                 flash_note_area(keymap[e.code], 'Yellow');
                 last_note_judgement = 'yellow';
             }
             else if(distance <= 200 && distance >= -200) {
                 score += 2 * multiplier;
+                score_no_multiplier += 2;
                 flash_note_area(keymap[e.code], 'Orange');
                 last_note_judgement = 'orange';
             }
             else if(distance <= 260 && distance >= -260) {
                 score += 1 * multiplier;
+                score_no_multiplier += 1;
                 flash_note_area(keymap[e.code], 'Tomato');
                 last_note_judgement = 'tomato';
             }
@@ -630,7 +648,7 @@ window.onload = async () => {
                 if(combo > max_combo) max_combo = combo;
             }
 
-            accurary = score / possible_max_score * 100;
+            accurary = score_no_multiplier / possible_max_score * 100;
 
             socket.emit('ScoreUpdate', {
                 score,

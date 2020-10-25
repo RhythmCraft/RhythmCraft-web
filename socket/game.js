@@ -440,7 +440,8 @@ module.exports = (io, app) => {
                 score: data.score,
                 accurary: data.accurary,
                 max_combo: data.max_combo,
-                verified: user.verified
+                verified: user.verified,
+                rank: data.rank
             });
         });
 
