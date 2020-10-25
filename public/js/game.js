@@ -10,10 +10,10 @@ let possible_max_score = 0;
 let playing = false;
 let last_note_judgement;
 let keymap = {};
+let master;
 
 window.onload = async () => {
     let sound;
-    let master;
     let musictimeout;
     let rtnote;
     let create_mode;
@@ -221,6 +221,10 @@ window.onload = async () => {
                 document.getElementById('lobby').hidden = true;
                 document.getElementById('game').hidden = false;
 
+                const pg = document.getElementById('progressbar');
+                pg.style.transition = `width linear 0s 0s`;
+                pg.style.width = '0%';
+
                 Array.from(document.getElementsByClassName('note')).forEach(ele => {
                     ele.remove();
                 });
@@ -238,6 +242,8 @@ window.onload = async () => {
                     onload: () => {
                         socket.emit('msg', { 'action' : 'gameready' });
                         document.getElementById('CountDown').innerText = '다른 유저를 기다리는 중...';
+                        pg.style.transition = `width linear ${sound._duration}s 3s`;
+                        pg.style.width = '100%';
                     },
                     onend: () => {
                         socket.emit('msg', { 'action' : 'gameend' });
@@ -663,7 +669,7 @@ function note_interval_func() {
         ele.style.bottom = `${(((innerHeight * 0.65 / note_speed) * (ele.dataset.rhythm_time - new Date().getTime())) + innerHeight * 0.65 / note_speed) + innerHeight * 0.3}px`;
 
         if((ele.dataset.rhythm_time - new Date().getTime() + (note_speed / 20)) < -150) {
-            flash_note_area(ele.dataset.note, 'purple');
+            if(!master) flash_note_area(ele.dataset.note, 'purple');
             ele.remove();
             combo = 0;
             multiplier = 1;
