@@ -10,7 +10,7 @@
     <link rel="stylesheet" href="/css/mypage.css">
     <script src="/js/mypage.js"></script>
     <script>
-        if(<%=session.isClient%>) {
+        if(<%=session.isClient || false%>) {
             require('electron').remote.getGlobal('globalVars').RichPresence = {
                 details: '프로필 수정 중',
                 startTimestamp: Date.now(),
