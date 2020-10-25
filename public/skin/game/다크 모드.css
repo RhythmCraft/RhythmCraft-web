@@ -12,3 +12,8 @@ input {
     background-color: black;
     color: white;
 }
+.user {
+    background-color: black;
+    color: white;
+    border: solid 1px white;
+}
