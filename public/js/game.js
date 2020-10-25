@@ -12,12 +12,12 @@ let playing = false;
 let last_note_judgement;
 let keymap = {};
 let master;
+let create_mode;
 
 window.onload = async () => {
     let sound;
     let musictimeout;
     let rtnote;
-    let create_mode;
     let scores;
     let autoplay;
     let hitsound_collection = [];
@@ -688,7 +688,7 @@ function note_interval_func() {
         ele.style.bottom = `${(((innerHeight * 0.65 / note_speed) * (ele.dataset.rhythm_time - new Date().getTime())) + innerHeight * 0.65 / note_speed) + innerHeight * 0.3}px`;
 
         if((ele.dataset.rhythm_time - new Date().getTime() + (note_speed / 20)) < -150) {
-            if(!master) flash_note_area(ele.dataset.note, 'purple');
+            if(!master || !create_mode) flash_note_area(ele.dataset.note, 'purple');
             ele.remove();
             possible_max_score += 5;
             combo = 0;
