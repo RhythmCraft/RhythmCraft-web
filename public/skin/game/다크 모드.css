@@ -17,3 +17,6 @@ input {
     color: white;
     border: solid 1px white;
 }
+.user-chat-nickname, .user-chat-text {
+    color: white;
+}
