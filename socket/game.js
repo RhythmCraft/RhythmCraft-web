@@ -12,6 +12,8 @@ const File = require('../schemas/file');
 const setting = require('../setting.json');
 const utils = require('../utils');
 
+const ko_bad = require('../assets/bad_words.json').words;
+
 module.exports = (io, app) => {
     io.on('connection', async socket => {
         const user = await User.findOne({ fullID : socket.request.session.passport.user.fullID });
@@ -533,6 +535,21 @@ module.exports = (io, app) => {
             }
 
             if(data.chat.startsWith('/') && user.admin) return;
+
+            let flag_dont_send = false;
+            ko_bad.forEach(w => {
+                if(data.chat.includes(w)) {
+                    socket.emit('Chat', {
+                        nickname: `시스템`,
+                        chattype: 'system',
+                        chat: `채팅에 부적절한 단어가 포함되어 전송되지 않았습니다.`,
+                        verified: true
+                    });
+                    return flag_dont_send = true;
+                }
+            });
+
+            if(flag_dont_send) return;
 
             io.to(`room_${url_query.room}`).emit('Chat', {
                 nickname: user.nickname,
