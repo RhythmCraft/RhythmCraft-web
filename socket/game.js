@@ -449,16 +449,17 @@ module.exports = (io, app) => {
         });
 
         socket.on('Chat', async data => {
+            const checkuser = await User.findOne({ fullID : user.fullID });
             const checkroom = await Room.findOne({ roomcode : url_query.room });
 
             let chattype;
-            if(user.admin) chattype = 'admin';
+            if(checkuser.admin) chattype = 'admin';
             else if(master) chattype = 'roomowner';
             else chattype = 'user';
 
             const params = data.chat.replace('/', '').split(' ');
             params.splice(0, 1);
-            if(data.chat.startsWith('/') && user.admin) switch(data.chat.replace('/', '').split(' ')[0]) {
+            if(data.chat.startsWith('/') && checkuser.admin) switch(data.chat.replace('/', '').split(' ')[0]) {
                 case 'debug':
                     switch(params[0]) {
                         case 'autoplay':
@@ -534,17 +535,16 @@ module.exports = (io, app) => {
                     });
             }
 
-            if(data.chat.startsWith('/') && user.admin) return;
+            if(data.chat.startsWith('/') && checkuser.admin) return;
 
-            if(user.block_chat >= Date.now()) return socket.emit('Chat', {
+            if(checkuser.block_chat >= Date.now()) return socket.emit('Chat', {
                 nickname: `시스템`,
                 chattype: 'system',
-                chat: `관리자에 의해 채팅이 정지되어 ${new Date(user.block_chat).toLocaleDateString()} ${new Date(user.block_chat).toLocaleTimeString()}까지 채팅 사용이 불가능합니다.<br>채팅 정지 사유 : ${user.block_chat_reason || '사유가 지정되지 않음'}`,
+                chat: `관리자에 의해 채팅이 정지되어 ${new Date(checkuser.block_chat).toLocaleDateString()} ${new Date(checkuser.block_chat).toLocaleTimeString()}까지 채팅 사용이 불가능합니다.<br>채팅 정지 사유 : ${checkuser.block_chat_reason || '사유가 지정되지 않음'}`,
                 verified: true
             });
 
-            let flag_dont_send = false;
-            ko_bad.forEach(w => {
+            for (const w of ko_bad) {
                 if(data.chat.includes(w)) {
                     socket.emit('Chat', {
                         nickname: `시스템`,
@@ -552,17 +552,22 @@ module.exports = (io, app) => {
                         chat: `채팅에 부적절한 단어가 포함되어 전송되지 않았습니다.`,
                         verified: true
                     });
-                    return flag_dont_send = true;
-                }
-            });
+                    const d = new Date();
+                    d.setMinutes(d.getMinutes() + 5);
 
-            if(flag_dont_send) return;
+                    await User.updateOne({ fullID : checkuser.fullID }, {
+                        block_chat: d.getTime(),
+                        block_chat_reason: '채팅에 부적절한 언어 사용'
+                    });
+                    return;
+                }
+            }
 
             io.to(`room_${url_query.room}`).emit('Chat', {
-                nickname: user.nickname,
+                nickname: checkuser.nickname,
                 chattype,
                 chat: data.chat,
-                verified: user.verified
+                verified: checkuser.verified
             });
         });
 
