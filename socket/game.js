@@ -536,6 +536,13 @@ module.exports = (io, app) => {
 
             if(data.chat.startsWith('/') && user.admin) return;
 
+            if(user.block_chat >= Date.now()) return socket.emit('Chat', {
+                nickname: `시스템`,
+                chattype: 'system',
+                chat: `관리자에 의해 채팅이 정지되어 ${new Date(user.block_chat).toLocaleDateString()} ${new Date(user.block_chat).toLocaleTimeString()}까지 채팅 사용이 불가능합니다.<br>채팅 정지 사유 : ${user.block_chat_reason || '사유가 지정되지 않음'}`,
+                verified: true
+            });
+
             let flag_dont_send = false;
             ko_bad.forEach(w => {
                 if(data.chat.includes(w)) {

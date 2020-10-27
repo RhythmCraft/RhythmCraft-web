@@ -48,9 +48,20 @@ const userSchema = new Schema({
         default: true
     },
     block_login: {
-        type: Boolean,
+        type: Number,
         required: true,
-        default: false
+        default: 0
+    },
+    block_login_reason: {
+        type: String
+    },
+    block_chat: {
+        type: Number,
+        required: true,
+        default: 0
+    },
+    block_chat_reason: {
+        type: String
     },
     admin: {
         type: Boolean,

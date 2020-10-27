@@ -20,9 +20,12 @@ app.post('/admin_editaccount', utils.isAdmin, async (req, res, next) => {
         provider: req.body.provider,
         nick_set: req.body.nick_set == 'true',
         allow_email_ad: req.body.allow_email_ad == 'true',
-        block_login: req.body.block_login == 'true',
         admin: req.body.admin == 'true',
-        verified: req.body.verified == 'true'
+        verified: req.body.verified == 'true',
+        block_login: new Date(req.body.block_login).getTime(),
+        block_login_reason: req.body.block_login_reason,
+        block_chat: new Date(req.body.block_chat).getTime(),
+        block_chat_reason: req.body.block_chat_reason
     });
 
     res.redirect(`/admin/user?id=${req.body.fullID}`);

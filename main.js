@@ -121,9 +121,9 @@ app.use((req, res, next) => {
 
 // 벤 감지
 app.use((req, res, next) => {
-    if(req.isAuthenticated() && req.user.block_login) {
+    if(req.isAuthenticated() && req.user.block_login >= Date.now()) {
+        req.flash('Error', `관리자에 의해 계정이 정지되어 ${new Date(req.user.block_login).toLocaleDateString()} ${new Date(req.user.block_login).toLocaleTimeString()}까지 로그인이 불가능합니다.<br>계정 정지 사유 : ${req.user.block_login_reason || '사유가 지정되지 않음'}`);
         req.logout();
-        req.flash('Error', '정지된 계정입니다. 관리자에게 문의하세요.');
         return res.redirect('/login');
     }
     next();

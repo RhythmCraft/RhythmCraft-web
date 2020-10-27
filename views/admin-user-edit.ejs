@@ -45,11 +45,6 @@
     <%} else {%>
         <p><label for="allow_email_ad">홍보 이메일 수신 동의 : <input type="checkbox" name="allow_email_ad" id="allow_email_ad" value="true"></label></p>
     <%}%>
-    <%if(edituser.block_login) {%>
-        <p><label for="block_login">로그인 금지 : <input type="checkbox" name="block_login" id="block_login" value="true" checked></label></p>
-    <%} else {%>
-        <p><label for="block_login">로그인 금지 : <input type="checkbox" name="block_login" id="block_login" value="true"></label></p>
-    <%}%>
     <%if(edituser.admin) {%>
         <p><label for="admin">관리자 : <input type="checkbox" name="admin" id="admin" value="true" checked></label></p>
     <%} else {%>
@@ -60,6 +55,26 @@
     <%} else {%>
         <p><label for="verified">인증됨 : <input type="checkbox" name="verified" id="verified" value="true"></label></p>
     <%}%>
+    <div class="form-group">
+        <label for="InputAccountBan">계정 벤(설정 날짜까지 로그인 불가능)</label>
+        <%const ban_d = new Date(edituser.block_login);%>
+        <%ban_d.setHours(ban_d.getHours() + 9);%>
+        <input type="datetime-local" id="InputAccountBan" class="form-control" name="block_login" value="<%=ban_d.toISOString().replace(/:.{2}\..*/, '');%>" required>
+    </div>
+    <div class="form-group">
+        <label for="InputAccountBanReason">계정 벤 사유(로그인이 막힐 때 보이게 됨)</label>
+        <input type="text" id="InputAccountBanReason" class="form-control" name="block_login_reason" placeholder="계정 벤 사유를 입력해 주세요." value="<%=edituser.block_login_reason%>">
+    </div>
+    <div class="form-group">
+        <label for="InputChatBan">채팅 벤(설정 날짜까지 채팅 불가능)</label>
+        <%const chat_d = new Date(edituser.block_chat);%>
+        <%chat_d.setHours(chat_d.getHours() + 9);%>
+        <input type="datetime-local" id="InputChatBan" class="form-control" name="block_chat" value="<%=chat_d.toISOString().replace(/:.{2}\..*/, '');%>" required>
+    </div>
+    <div class="form-group">
+        <label for="InputChatBanReason">채팅 벤 사유(채팅이 막힐 때 보이게 됨)</label>
+        <input type="text" id="InputChatBanReason" class="form-control" name="block_chat_reason" placeholder="채팅 벤 사유를 입력해 주세요." value="<%=edituser.block_chat_reason%>">
+    </div>
 
     <button class="btn btn-primary" type="submit">저장</button>
 </form>
