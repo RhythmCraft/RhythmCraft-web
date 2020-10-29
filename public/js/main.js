@@ -25,6 +25,10 @@ window.onload = () => {
                 document.getElementById('room').innerHTML = result;
         }
     });
+
+    SecretKey.add('wasans', () => {
+        alert('와! 샌즈 아시는구나!');
+    });
 }
 
 const script = document.createElement('script');
