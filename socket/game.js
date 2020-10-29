@@ -127,7 +127,7 @@ module.exports = (io, app) => {
             'show_accurary_center': user.show_accurary_center
         });
 
-        socket.emit('Chat', {
+        if(room.public) socket.emit('Chat', {
             nickname: `시스템`,
             chattype: 'system',
             chat: `신고 기능 작동을 위해 채팅이 로깅됩니다. 동의하지 않을 경우 채팅을 사용하지 마세요!`,
