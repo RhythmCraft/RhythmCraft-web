@@ -29,6 +29,10 @@ window.onload = () => {
     SecretKey.add('wasans', () => {
         alert('와! 샌즈 아시는구나!');
     });
+
+    SecretKey.add('maple', () => {
+        location.href = '/testnote?note=f3d82b657f0e0e24b4061dedea94f875.signedrhythmcraft&from_workshop=true';
+    });
 }
 
 const script = document.createElement('script');
