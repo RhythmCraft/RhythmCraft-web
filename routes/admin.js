@@ -5,6 +5,7 @@ const Comment = require('../schemas/comment');
 const RemoveCommentVote = require('../schemas/remove_comment_vote');
 const File = require('../schemas/file');
 const Like = require('../schemas/like');
+const Chat = require('../schemas/chat');
 
 const utils = require('../utils');
 const setting = require('../setting.json');
@@ -74,6 +75,17 @@ app.get('/admin/:page', utils.isAdmin, async (req, res, next) => {
             res.render('admin-comment-vote', {
                 comments,
                 comment_delete_required_count: setting.COMMENT_DELETE_REQUIRED_COUNT
+            });
+            return;
+        case 'chat-report':
+            const chats = await Chat.find({ reported : true });
+            for(let i in chats) {
+                const user = await User.findOne({ fullID : chats[i]['fullID'] });
+                chats[i]['nickname'] = user.nickname;
+                chats[i]['verified'] = user.verified;
+            }
+            res.render('admin-chat-report', {
+                chats
             });
             return;
         default:

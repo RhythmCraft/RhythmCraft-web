@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <script>if (typeof module === 'object') {window.module = module; module = undefined;}</script>
+    <script src="/js/bootstrap/jquery-3.2.1.slim.min.js"></script>
+    <script src="/js/bootstrap/popper.min.js"></script>
+    <script src="/js/bootstrap/bootstrap.min.js"></script>
+    <link rel="stylesheet" href="/css/bootstrap/bootstrap.min.css">
+    <script>
+        if(<%=session.isClient%>) {
+            require('electron').remote.getGlobal('globalVars').RichPresence = {
+                details: '관리자 페이지',
+                startTimestamp: Date.now(),
+                largeImageKey: 'main',
+                instance: true
+            }
+        }
+    </script>
+    <link rel="stylesheet" href="/css/admin-chat-report.css">
+    <script>if (window.module) module = window.module;</script>
+    <title><%=servername%> - 채팅 신고 관리</title>
+</head>
+
+<body>
+<h1>채팅 신고 관리</h1>
+<%-include('./layout/menu')%>
+<%-include('./layout/info')%>
+
+<h3>아래에 신고된 채팅이 표시됩니다.</h3>
+
+<%chats.forEach(chat => {%>
+    <div class="chat">
+        <h4><strong class="chat-nickname"><%=chat.nickname%>
+                <%if(chat.verified) {%>
+                    <svg width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-check-circle-fill text-secondary" fill="currentColor" xmlns="http://www.w3.org/2000/svg" data-container="body" data-toggle="popover" data-placement="top" data-content="인증된 유저" data-trigger="hover" data-original-title="" title="">
+                        <path fill-rule="evenodd" d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zm-3.97-3.03a.75.75 0 0 0-1.08.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-.01-1.05z"></path>
+                    </svg>
+                <%}%>
+            </strong></h4>
+
+        <h5 class="chat-text"><%=chat.text%></h5>
+
+        <a class="btn btn-primary" href="/admin/user?id=<%=chat.fullID%>">신고받은 유저 관리</a>
+        <a class="btn btn-danger" href="/admin/user?id=<%=chat.reported_by%>">신고한 유저 관리</a>
+
+        <br><br><a class="btn btn-success" href="/remove-report?chat=<%=chat.chat_id%>">채팅 처리 완료</a>
+    </div>
+<%});%>
+</body>
+</html>

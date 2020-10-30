@@ -1,7 +1,9 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const nodemailer = require('nodemailer');
+
 const User = require('../schemas/user');
+const Chat = require('../schemas/chat');
 
 const utils = require('../utils');
 const setting = require('../setting.json');
@@ -62,6 +64,18 @@ app.post('/admin_mail', utils.isAdmin, async (req, res, next) => {
     });
     res.redirect('/admin/mail');
     return;
+});
+
+app.get('/remove-report', utils.isAdmin, async (req, res, next) => {
+    const chat = await Chat.findOne({ chat_id : req.query.chat , reported : true });
+    if(!chat) {
+        req.flash('Error', '신고된 채팅중 해당 채팅을 찾을 수 없습니다.');
+        return res.redirect('/admin/chat-report');
+    }
+
+    await Chat.updateOne({ chat_id : req.query.chat , reported : true } , { reported : false , reported_by : 'no_user' });
+    req.flash('Info', '요청이 처리되었습니다. 신고 관리 목록에서 제거하였습니다.');
+    return res.redirect('/admin/chat-report');
 });
 
 module.exports = app;

@@ -8,6 +8,7 @@ const User = require('../schemas/user');
 const Room = require('../schemas/room');
 const RoomUser = require('../schemas/room_user');
 const File = require('../schemas/file');
+const Chat = require('../schemas/chat');
 
 const setting = require('../setting.json');
 const utils = require('../utils');
@@ -124,13 +125,14 @@ module.exports = (io, app) => {
             'key6': user.rhythm_key_6,
             'key7': user.rhythm_key_7,
             'key8': user.rhythm_key_8,
-            'show_accurary_center': user.show_accurary_center
+            'show_accurary_center': user.show_accurary_center,
+            'my_nick': user.nickname
         });
 
         if(room.public) socket.emit('Chat', {
             nickname: `시스템`,
             chattype: 'system',
-            chat: `신고 기능 작동을 위해 채팅이 로깅됩니다. 동의하지 않을 경우 채팅을 사용하지 마세요!`,
+            chat: `신고 기능 작동을 위해 채팅이 최대 3일(신고 처리중일시 처리시까지 삭제 안됨) 로깅됩니다. 동의하지 않을 경우 채팅을 사용하지 마세요!`,
             verified: true
         });
 
@@ -551,30 +553,39 @@ module.exports = (io, app) => {
                 verified: true
             });
 
-            if(checkroom.public) for (const w of ko_bad) {
-                if(data.chat.includes(w)) {
-                    socket.emit('Chat', {
-                        nickname: `시스템`,
-                        chattype: 'system',
-                        chat: `채팅에 부적절한 단어가 포함되어 전송되지 않았습니다.`,
-                        verified: true
-                    });
-                    const d = new Date();
-                    d.setMinutes(d.getMinutes() + 5);
+            const chat_id = uniqueString();
+            if(checkroom.public) {
+                for (const w of ko_bad) {
+                    if(data.chat.includes(w)) {
+                        socket.emit('Chat', {
+                            nickname: `시스템`,
+                            chattype: 'system',
+                            chat: `채팅에 부적절한 단어가 포함되어 전송되지 않았습니다.`,
+                            verified: true
+                        });
+                        const d = new Date();
+                        d.setMinutes(d.getMinutes() + 5);
 
-                    await User.updateOne({ fullID : checkuser.fullID }, {
-                        block_chat: d.getTime(),
-                        block_chat_reason: '채팅에 부적절한 언어 사용'
-                    });
-                    return;
+                        await User.updateOne({ fullID : checkuser.fullID }, {
+                            block_chat: d.getTime(),
+                            block_chat_reason: '채팅에 부적절한 언어 사용'
+                        });
+                        return;
+                    }
                 }
+                await Chat.create({
+                    fullID: checkuser.fullID,
+                    text: data.chat,
+                    chat_id
+                });
             }
 
             io.to(`room_${url_query.room}`).emit('Chat', {
                 nickname: checkuser.nickname,
                 chattype,
                 chat: data.chat,
-                verified: checkuser.verified
+                verified: checkuser.verified,
+                chat_id
             });
         });
 

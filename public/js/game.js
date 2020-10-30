@@ -24,6 +24,7 @@ window.onload = async () => {
     let pressedkey = [];
     let countdown;
     let ready_rich_presence;
+    let my_nick;
 
     $("[data-toggle=popover]").popover();
 
@@ -385,6 +386,7 @@ window.onload = async () => {
                 keymap[data.key7] = 7;
                 keymap[data.key8] = 8;
                 document.getElementById('center_accurary').hidden = !data.show_accurary_center;
+                my_nick = data.my_nick;
                 break;
             case 'updatemusic':
                 if(master) updateMusic();
@@ -559,6 +561,40 @@ window.onload = async () => {
         newchat.appendChild(chat);
         newchat2.appendChild(chat2);
 
+        if(document.getElementById('public').checked && data.chattype != 'system') {
+            const do_report = () => {
+                if(confirm('정말 신고하시겠습니까? 허위 신고시 신고자의 계정이 정지됩니다.')) {
+                    const result = RequestData('POST', `/chat-report`, {
+                        chat_id: data.chat_id
+                    });
+                    alert(result);
+                }
+            }
+            const report = document.createElement('button');
+            const report2 = document.createElement('button');
+            report.innerHTML = '신고';
+            report2.innerHTML = '신고';
+            report.classList.add('btn');
+            report2.classList.add('btn');
+            report.classList.add('btn-primary');
+            report2.classList.add('btn-primary');
+            report.classList.add('btn-sm');
+            report2.classList.add('btn-sm');
+            report.classList.add('report-button');
+            report2.classList.add('report-button');
+            if(data.nickname == my_nick) {
+                report.disabled = true;
+                report2.disabled = true;
+            }
+            else {
+                report.onclick = do_report;
+                report2.onclick = do_report;
+            }
+
+            newchat.appendChild(report);
+            newchat2.appendChild(report2);
+        }
+
         ChatBox.appendChild(newchat);
         ChatBox2.appendChild(newchat2);
 
@@ -673,6 +709,14 @@ function Request(method, url) {
     var xhr = new XMLHttpRequest();
     xhr.open( method , url , false );
     xhr.send( null );
+    return xhr.responseText;
+}
+
+function RequestData(method, url, data) {
+    var xhr = new XMLHttpRequest();
+    xhr.open( method , url , false );
+    xhr.setRequestHeader("Content-type", "application/json");
+    xhr.send( JSON.stringify(data) );
     return xhr.responseText;
 }
 

@@ -9,6 +9,7 @@ const setting = require('../setting.json');
 
 const Room = require('../schemas/room');
 const File = require('../schemas/file');
+const Chat = require('../schemas/chat');
 
 // app 정의
 const app = express.Router();
@@ -102,6 +103,17 @@ app.get('/testnote', utils.isLogin, async (req, res, next) => {
     });
 
     return res.redirect(`/game?room=${roomcode}#start`);
+});
+
+app.post('/chat-report', utils.isLogin, async (req, res, next) => {
+    const chat = await Chat.findOne({ chat_id : req.body.chat_id });
+    if(!chat) return res.send('잘못된 채팅 ID입니다.');
+    if(chat.fullID == req.user.fullID) return res.send('스스로 벤?');
+    if(chat.reported) return res.send('신고가 접수되었습니다. 관리자 확인 후 신고가 처리됩니다.');
+
+    await Chat.updateOne({ chat_id : req.body.chat_id }, { reported : true , reported_by : req.user.fullID });
+    return res.send('신고가 접수되었습니다. 관리자 확인 후 신고가 처리됩니다.');
+    // return res.send('wa sans ashinenguna gup na are ryop seph ni da nen hut so ri go sasil not implemented yet');
 });
 
 module.exports = app;

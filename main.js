@@ -19,6 +19,7 @@ const Room = require('./schemas/room');
 const RoomUser = require('./schemas/room_user');
 const File = require('./schemas/file');
 const Comment = require('./schemas/comment');
+const Chat = require('./schemas/chat');
 
 // 웹소켓
 const webSocket = require('./socket');
@@ -225,3 +226,7 @@ async function CreateOfficialRoom() {
         auto_manage_room: true
     });
 }
+
+setInterval(async () => {
+    await Chat.deleteMany({ createdAt : { $lt : Date.now() - 259200000 } , reported : false });
+}, 60000);
