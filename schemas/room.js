@@ -31,7 +31,8 @@ const newSchema = new Schema({
     },
     roomcode: {
         type: String,
-        required: true
+        required: true,
+        unique: true
     },
     playing: {
         type: Boolean,

@@ -4,11 +4,13 @@ const { Schema } = mongoose;
 const newSchema = new Schema({
     nickname: {
         type: String,
-        required: true
+        required: true,
+        unique: true
     },
     fullID: {
         type: String,
-        required: true
+        required: true,
+        unique: true
     },
     verified: {
         type: Boolean,

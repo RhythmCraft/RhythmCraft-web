@@ -21,7 +21,8 @@ const newSchema = new Schema({
     },
     id: {
         type: String,
-        required: true
+        required: true,
+        unique: true
     },
     pin: {
         type: Number,
