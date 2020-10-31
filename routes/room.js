@@ -81,7 +81,8 @@ app.post('/newroom', utils.isLogin, async (req, res, next) => {
         public: req.body.public == 'true',
         pitch: req.body.pitch,
         trusted: !token_result ? false : true,
-        note_name: req.body.note
+        note_name: req.body.note,
+        packet_multiplier: req.body.packet_multiplier
     });
 
     res.redirect(`/game?room=${roomcode}#master`);

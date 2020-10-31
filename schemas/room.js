@@ -112,6 +112,11 @@ const newSchema = new Schema({
         type: Boolean,
         required: true,
         default: false
+    },
+    packet_multiplier: {
+        type: Number,
+        required: true,
+        default: 1
     }
 });
 

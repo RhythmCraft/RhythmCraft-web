@@ -215,7 +215,8 @@ window.onload = async () => {
                 document.getElementById('InputStartpos').value = data.startpos;
                 document.getElementById('public').checked = data.public;
                 document.getElementById('InputPitch').value = data.pitch;
-
+                if(document.getElementById('InputPacketMultiplier') != null)
+                    document.getElementById('InputPacketMultiplier').value = data.packet_multiplier
                 break;
             case 'gamestart':
                 playing = true;
@@ -897,7 +898,8 @@ function ChangeRoomSetting(show) {
         show_alert: show,
         startpos: document.getElementById('InputStartpos').value,
         public: document.getElementById('public').checked,
-        pitch: document.getElementById('InputPitch').value
+        pitch: document.getElementById('InputPitch').value,
+        packet_multiplier: !document.getElementById('InputPacketMultiplier') ? 1 : document.getElementById('InputPacketMultiplier').value
     });
 }
 

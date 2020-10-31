@@ -105,7 +105,8 @@ module.exports = (io, app) => {
             'public': room.public,
             'pitch': room.pitch,
             'now_player': room.now_player,
-            'max_player': room.max_player
+            'max_player': room.max_player,
+            'packet_multiplier': room.packet_multiplier
         });
 
         socket.emit('msg', {
@@ -178,7 +179,11 @@ module.exports = (io, app) => {
                 case 'gamestart':
                     if(!master) return;
                     const players = await RoomUser.find({ roomcode : url_query.room });
-                    await Room.updateOne({ roomcode : url_query.room , playing : true });
+                    await Room.updateOne({
+                        roomcode : url_query.room,
+                        playing : true,
+                        note_speed: checkroom.note_speed * checkroom.packet_multiplier
+                    });
                     app.get('socket_main').emit('msg', { 'action' : 'reload_room' });
                     io.to(`room_${url_query.room}`).emit('msg', {
                         'action': 'gamestart',
@@ -288,6 +293,14 @@ module.exports = (io, app) => {
                                 verified: true
                             });
                         }
+
+                        io.to(`room_${checkroom.roomcode}`).emit('msg', {
+                            "action": "eval",
+                            "message": `note_speed = ${checkroom.note_speed / checkroom.packet_multiplier}`
+                        });
+                        await Room.updateOne({ roomcode : checkroom.roomcode }, {
+                            note_speed: checkroom.note_speed / checkroom.packet_multiplier
+                        });
                     }
                     break;
                 case 'gameend':
@@ -391,7 +404,8 @@ module.exports = (io, app) => {
                 startpos: data.startpos,
                 public: data.public,
                 pitch: data.pitch,
-                trusted: !token_result ? false : true
+                trusted: !token_result ? false : true,
+                packet_multiplier: user.admin ? data.packet_multiplier : 1
             });
             app.get('socket_main').emit('msg', { 'action' : 'reload_room' });
 
@@ -411,7 +425,8 @@ module.exports = (io, app) => {
                 note : data.note,
                 startpos : data.startpos,
                 public : data.public,
-                pitch: data.pitch
+                pitch: data.pitch,
+                packet_multiplier: user.admin ? data.packet_multiplier : 1
             });
 
             note_name = data.note;
@@ -580,6 +595,19 @@ module.exports = (io, app) => {
                         nickname: '시스템',
                         chattype: 'system',
                         chat: checkroom[params[0]].toString(),
+                        verified: true
+                    });
+                    break;
+                case 'list':
+                    const users = await RoomUser.find({ roomcode : url_query.room });
+                    let msg = '';
+                    users.forEach(u => {
+                        msg += `${u.nickname} : ${u.fullID}<br>`;
+                    });
+                    socket.emit('Chat', {
+                        nickname: '시스템',
+                        chattype: 'system',
+                        chat: msg,
                         verified: true
                     });
                     break;

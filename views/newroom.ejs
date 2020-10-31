@@ -61,6 +61,12 @@
         <label for="InputPitch">피치</label>
         <input type="number" class="form-control" id="InputPitch" placeholder="피치를 입력하세요." min="50" max="400" value="100" name="pitch" required>
     </div>
+    <%if(user.admin) {%>
+        <div class="form-group">
+            <label for="InputPacketMultiplier">패킷 전송량 배수(1로 설정시 일반, 2로 설정시 2배로 전송, 0.5로 설정시 0.5배로 전송)</label>
+            <input type="number" class="form-control" id="InputPacketMultiplier" placeholder="패킷 전송량 배수를 입력하세요." value="1" name="packet_multiplier" required>
+        </div>
+    <%}%>
     <p><label for="public"><input type="checkbox" name="public" id="public" value="true" checked> 방 공개(해제시 URL로만 접속 가능)</label></p>
 
     <button type="submit" class="btn btn-primary">생성</button>

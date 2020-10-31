@@ -195,7 +195,7 @@ setImmediate(async () => {
     await Room.deleteMany({});
     await RoomUser.deleteMany({});
 
-    CreateOfficialRoom();
+    // CreateOfficialRoom();
 });
 
 async function CreateOfficialRoom() {
