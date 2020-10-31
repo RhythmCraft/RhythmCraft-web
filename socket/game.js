@@ -42,14 +42,8 @@ module.exports = (io, app) => {
             return socket.disconnect();
         }
         let master;
-        if(room.master == user.fullID) {
-            master = true;
-            socket.emit('msg', { 'action' : 'im_master' });
-        }
-        else {
-            master = false;
-            socket.emit('msg', { 'action' : 'im_not_master' });
-        }
+        if(room.master == user.fullID) master = true;
+        else master = false;
 
         if(room.playing) {
             socket.emit('msg', {
@@ -175,6 +169,9 @@ module.exports = (io, app) => {
             await Room.updateOne({ roomcode : url_query.room }, { auto_manage_room_timeout_setted : true });
         }
 
+        if(master) socket.emit('msg', { 'action' : 'im_master' });
+        else socket.emit('msg', { 'action' : 'im_not_master' });
+
         socket.on('msg', async data => {
             let checkroom = await Room.findOne({ roomcode : url_query.room });
             switch(data.action) {
@@ -212,7 +209,7 @@ module.exports = (io, app) => {
                     await Room.updateOne( { roomcode : url_query.room }, { $inc: { ready_player : 1 } } );
                     checkroom = await Room.findOne({ roomcode : url_query.room });
 
-                    if(checkroom.ready_player == checkroom.now_player) {
+                    if(checkroom.ready_player >= checkroom.now_player || checkroom.now_player == 1) {
                         io.to(`room_${url_query.room}`).emit('msg', {
                             'action': 'gamestartreal',
                             'note_speed': checkroom.note_speed,
