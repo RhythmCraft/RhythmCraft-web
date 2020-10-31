@@ -245,7 +245,7 @@ app.get('/signnotetext', utils.isAdmin, async (req, res, next) => {
     const testnote = await File.findOne({ owner : req.user.fullID , file_type : 'note' , name : req.query.name });
     if(!testnote) {
         req.flash('Error', '해당 채보가 존재하지 않습니다.');
-        return res.redirect('/note');
+        return res.redirect(req.get('referrer'));
     }
 
     const name = `${uniqueString()}.signedrhythmcraft`;
@@ -263,12 +263,14 @@ app.get('/signnotetext', utils.isAdmin, async (req, res, next) => {
         originalname: req.query.originalname.replace('.rhythmcraft', '.signedrhythmcraft'),
         owner: req.user.fullID,
         file_type: 'note',
-        description: '레벨에 대해 말해보세요!'
+        workshop_title: testnote.workshop_title,
+        description: testnote.description,
+        tags: testnote.tags
     });
 
     req.flash('Info', `채보 ${req.query.originalname}를 성공적으로 서명하였습니다.`);
     req.app.get('socket_game').to(`user_${req.user.fullID}`).emit('msg', { 'action' : 'updatenote' });
-    return res.redirect('/note');
+    return res.redirect(req.get('referrer'));
 });
 
 app.get('/unsignnote', utils.isAdmin, async (req, res, next) => {
@@ -310,29 +312,29 @@ app.get('/notestatus', utils.isLogin, async (req, res, next) => {
     const file = await File.findOne({ name : req.query.name , file_type : 'note' });
     if(!file) {
         req.flash('Error', '해당 채보가 존재하지 않습니다.');
-        return res.redirect('/note');
+        return res.redirect(req.get('referrer'));
     }
     if(!req.user.admin && file.owner != req.user.fullID) {
         req.flash('Error', '권한이 없습니다.');
-        return res.redirect('/note');
+        return res.redirect(req.get('referrer'));
     }
 
     if(!file.workshop_title) {
         req.flash('Error', '창작마당용 제목을 정해주세요.');
-        return res.redirect('/note');
+        return res.redirect(req.get('referrer'));
     }
 
     await File.updateOne({ name : req.query.name , file_type : 'note' } , { public : req.query.public == 'true' });
     req.flash('Info', `${file.originalname} 채보 공개 상태가 업데이트되었습니다.`);
     req.app.get('socket_game').to(`user_${req.user.fullID}`).emit('msg', { 'action' : 'updatenote' });
-    return res.redirect('/note');
+    return res.redirect(req.get('referrer'));
 });
 
 app.post('/editnoteinfo', utils.isLogin, async (req, res, next) => {
     const checkfile = await File.findOne({ name : req.body.name , owner : req.user.fullID , file_type : 'note' });
     if(!checkfile) {
         req.flash('Error', '해당 채보가 존재하지 않습니다.');
-        return res.redirect('/note');
+        return res.redirect(req.get('referrer'));
     }
 
     let tags;
@@ -353,7 +355,7 @@ app.post('/editnoteinfo', utils.isLogin, async (req, res, next) => {
     });
 
     req.flash('Info', `${checkfile.originalname} 채보의 정보가 수정되었습니다.`);
-    return res.redirect('/note');
+    return res.redirect(req.get('referrer'));
 });
 
 app.get('/saveworkshopnote', utils.isLogin, async (req, res, next) => {
