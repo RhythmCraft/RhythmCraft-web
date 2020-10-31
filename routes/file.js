@@ -277,12 +277,12 @@ app.get('/unsignnote', utils.isAdmin, async (req, res, next) => {
     const testnote = await File.findOne({ owner : req.user.fullID , file_type : 'note' , name : req.query.name });
     if(!testnote) {
         req.flash('Error', '해당 채보가 존재하지 않습니다.');
-        return res.redirect('/note');
+        return res.redirect(req.get('referrer'));
     }
 
     if(path.extname(testnote.name) != '.signedrhythmcraft') {
         req.flash('Error', '서명된 채보 파일이 아닙니다.');
-        return res.redirect('/note');
+        return res.redirect(req.get('referrer'));
     }
 
     const name = `${uniqueString()}.rhythmcraft`;
@@ -291,7 +291,7 @@ app.get('/unsignnote', utils.isAdmin, async (req, res, next) => {
     const result = utils.verifyToken(note);
     if (result.error) {
         req.flash('Error', `채보 오류 : ${result.message}`);
-        return res.redirect('/note');
+        return res.redirect(req.get('referrer'));
     }
     fs.writeFileSync(path.join(setting.SAVE_FILE_PATH, name), JSON.stringify(result));
 
@@ -300,12 +300,14 @@ app.get('/unsignnote', utils.isAdmin, async (req, res, next) => {
         originalname: req.query.originalname.replace('.signedrhythmcraft', '.rhythmcraft'),
         owner: req.user.fullID,
         file_type: 'note',
-        description: '레벨에 대해 말해보세요!'
+        workshop_title: testnote.workshop_title,
+        description: testnote.description,
+        tags: testnote.tags
     });
 
     req.flash('Info', `채보 ${req.query.originalname}를 성공적으로 서명 해제하였습니다.`);
     req.app.get('socket_game').to(`user_${req.user.fullID}`).emit('msg', { 'action' : 'updatenote' });
-    return res.redirect('/note');
+    return res.redirect(req.get('referrer'));
 });
 
 app.get('/notestatus', utils.isLogin, async (req, res, next) => {
