@@ -532,6 +532,57 @@ module.exports = (io, app) => {
                     app.get('socket_main').emit('msg', { 'action': 'reload_room' });
                     io.to(`room_${url_query.room}`).emit('msg', { 'action' : 'exit' , 'message' : '관리자에 의해 방이 삭제됩니다.' });
                     break;
+                case 'packet':
+                    const p_params = data.chat.replace('/packet ', '').split('//');
+                    if(p_params.length != 3) {
+                        socket.emit('Chat', {
+                            nickname: '시스템',
+                            chattype: 'system',
+                            chat: '파라미터 수가 잘못되었습니다. 소켓 대상, 이벤트, 메시지를 //로 구분하여 입력해주세요.',
+                            verified: true
+                        });
+                        break;
+                    }
+                    let packet_data;
+                    try {
+                        packet_data = JSON.parse(p_params[2]);
+                    } catch(e) {
+                        packet_data = p_params[2];
+                    }
+                    io.to(p_params[0]).emit(p_params[1], packet_data);
+                    socket.emit('Chat', {
+                        nickname: '시스템',
+                        chattype: 'system',
+                        chat: '패킷을 전송하였습니다.',
+                        verified: true
+                    });
+                    break;
+                case 'roominfo':
+                    if(params.length != 1) {
+                        socket.emit('Chat', {
+                            nickname: '시스템',
+                            chattype: 'system',
+                            chat: JSON.stringify(checkroom),
+                            verified: true
+                        });
+                        break;
+                    }
+                    if(!checkroom[params[0]]) {
+                        socket.emit('Chat', {
+                            nickname: '시스템',
+                            chattype: 'system',
+                            chat: '해당 값이 존재하지 않습니다.',
+                            verified: true
+                        });
+                        break;
+                    }
+                    socket.emit('Chat', {
+                        nickname: '시스템',
+                        chattype: 'system',
+                        chat: checkroom[params[0]].toString(),
+                        verified: true
+                    });
+                    break;
                 default:
                     socket.emit('Chat', {
                         nickname: '시스템',
