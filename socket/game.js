@@ -180,10 +180,11 @@ module.exports = (io, app) => {
             let checkroom = await Room.findOne({ roomcode : url_query.room });
             switch(data.action) {
                 case 'gamestart':
+                    if(!master) return;
                     const players = await RoomUser.find({ roomcode : url_query.room });
                     await Room.updateOne({ roomcode : url_query.room , playing : true });
                     app.get('socket_main').emit('msg', { 'action' : 'reload_room' });
-                    if(master) io.to(`room_${url_query.room}`).emit('msg', {
+                    io.to(`room_${url_query.room}`).emit('msg', {
                         'action': 'gamestart',
                         'music': checkroom.music,
                         'create_mode': !checkroom.note,
