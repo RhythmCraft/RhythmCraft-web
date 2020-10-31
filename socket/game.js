@@ -34,6 +34,13 @@ module.exports = (io, app) => {
 
         io.to(`user_${user.fullID}`).emit('msg', { 'action' : 'exit' , 'message' : '다중접속' });
 
+        if(!room) {
+            socket.emit('msg', {
+                'action' : 'exit',
+                'message' : '해당 방이 존재하지 않습니다.\n서버가 재시작되었을 수 있습니다.'
+            });
+            return socket.disconnect();
+        }
         let master;
         if(room.master == user.fullID) {
             master = true;
@@ -70,14 +77,6 @@ module.exports = (io, app) => {
 
         await Room.updateOne({ roomcode : url_query.room }, { $inc : { now_player : 1 } });
         app.get('socket_main').emit('msg', { 'action' : 'reload_room' });
-
-        if(!room) {
-            socket.emit('msg', {
-                'action' : 'exit',
-                'message' : '해당 방이 존재하지 않습니다.\n서버가 재시작되었을 수 있습니다.'
-            });
-            return socket.disconnect();
-        }
 
         socket.join(`room_${url_query.room}`);
         socket.join(`user_${user.fullID}`);
