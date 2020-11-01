@@ -1,3 +1,11 @@
+/**
+ * Angle calculation provided by PatrickKR
+ *
+ * Copyright (c) 2020 PatrickKR
+ *
+ * Do not remove this header.
+ */
+
 const fs = require('fs');
 const path = require('path');
 
@@ -33,34 +41,50 @@ module.exports = (adofai, music, musicname, key_limit, fast_input_limit, control
     let bpm = adofai.settings.bpm;
     let offset = adofai.settings.offset;
     let first_spin_timing = ((60 / bpm) * 1000);
-    let last_tile_angle = 180;
     let note_position = 4;
-    let twirl = false;
     let before_bpm = bpm;
     let bpm_set = false;
     let lastms = 0;
+
+    /**
+     * PatrickKR Start
+     */
+    let last_tile_angle = 180;
+    let twirl = false;
     let last_note_ms = 0;
+
     const angle_map = {
-        "J": 150,
-        "T": 120,
-        "U": 90,
-        "G": 60,
-        "H": 30,
         "L": 0,
-        "N": 330,
-        "F": 300,
-        "D": 270,
-        "B": 240,
-        "M": 210,
-        "R": 180,
-        "E": 135,
+        "W": 15,
+        "H": 30,
         "Q": 45,
-        "Z": 315,
+        "G": 60,
+        "q": 75,
+        "U": 90,
+        "o": 105,
+        "T": 120,
+        "E": 135,
+        "J": 150,
+        "p": 165,
+        "R": 180,
+        "A": 195,
+        "M": 210,
         "C": 225,
+        "B": 240,
+        "Y": 255,
+        "D": 270,
+        "V": 285,
+        "F": 300,
+        "Z": 315,
+        "N": 330,
+        "x": 345,
         "!": undefined,
         "5": undefined,
         "7": undefined
     }
+    /**
+     * PatrickKR End
+     */
 
     for (let i in roads) {
         for (let key in angle_map) {
@@ -80,6 +104,9 @@ module.exports = (adofai, music, musicname, key_limit, fast_input_limit, control
                         }
                     }
                 }
+                /**
+                 * PatrickKR Start
+                 */
                 if (key == '!') {
                     last_tile_angle -= 180;
                     if (last_tile_angle < 0) {
@@ -104,6 +131,9 @@ module.exports = (adofai, music, musicname, key_limit, fast_input_limit, control
 
                 let check = last_note_ms - ms;
                 if(check < 0) check = check * -1
+                /**
+                 * PatrickKR End
+                 */
 
                 if (result <= 30 || result >= 330) note_position = 8 - note_position + 1;
                 else if(check <= fast_input_limit) note_position = 8 - note_position + 1;
