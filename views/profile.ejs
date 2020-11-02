@@ -8,7 +8,7 @@
     <script src="/js/bootstrap/bootstrap.min.js"></script>
     <link rel="stylesheet" href="/css/bootstrap/bootstrap.min.css">
     <script>
-        if(<%=session.isClient%>) {
+        if(<%=session.isClient || false%>) {
             require('electron').remote.getGlobal('globalVars').RichPresence = {
                 details: `<%=profile_user.nickname%>의 프로필을 보는 중`,
                 startTimestamp: Date.now(),
@@ -20,6 +20,8 @@
         window.onload = () => {
             $("[data-toggle=popover]").popover();
         }
+
+        $("[data-toggle=popover]").popover();
     </script>
     <link rel="stylesheet" href="/css/profile.css">
     <script>if (window.module) module = window.module;</script>
