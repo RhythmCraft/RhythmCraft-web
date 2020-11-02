@@ -8,6 +8,7 @@ const fileType = require('file-type');
 const bodyParser = require('body-parser');
 const jwt = require('jsonwebtoken');
 const adofai = require('../adofai_converter');
+const Url = require('url');
 
 const setting = require('../setting.json');
 const utils = require('../utils');
@@ -75,6 +76,12 @@ app.get('/removemusic', utils.isLogin, async (req, res, next) => {
 });
 
 app.get('/listenmusic', async (req, res, next) => {
+    const pathname = Url.parse(req.get('referrer') || '').pathname;
+    if(!req.get('referrer') || (!pathname.startsWith('/music') && !pathname.startsWith('/game'))) {
+        req.flash('Error', '음악 다이렉트 접속은 제한되어 있습니다.');
+        return res.redirect('/');
+    }
+
     const file = await File.findOne({ name : req.query.name , file_type : 'music' });
     if(!file) {
         req.flash('Error', '해당 파일이 존재하지 않습니다.');
@@ -89,6 +96,12 @@ app.get('/listenmusic', async (req, res, next) => {
 });
 
 app.get('/listenmusic/:music', async (req, res, next) => {
+    const pathname = Url.parse(req.get('referrer') || '').pathname;
+    if(!req.get('referrer') || (!pathname.startsWith('/music') && !pathname.startsWith('/game'))) {
+        req.flash('Error', '음악 다이렉트 접속은 제한되어 있습니다.');
+        return res.redirect('/');
+    }
+
     const file = await File.findOne({ name : req.params.music , file_type : 'music' });
     if(!file) {
         req.flash('Error', '해당 파일이 존재하지 않습니다.');
