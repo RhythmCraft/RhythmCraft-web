@@ -201,6 +201,26 @@ module.exports = (io, app) => {
                         note_speed: checkroom.note_speed * (checkroom.packet_multiplier != 1 ? checkroom.packet_multiplier : most_slow_note_speed),
                         packet_multiplier: checkroom.packet_multiplier != 1 ? checkroom.packet_multiplier : most_slow_note_speed
                     });
+                    checkroom = await Room.findOne({ roomcode : url_query.room });
+                    socket.emit('Chat', {
+                        nickname: '시스템',
+                        chattype: 'system',
+                        chat: '채보 이펙트로 인해 패킷 설정이 변경되었습니다.',
+                        verified: true
+                    });
+
+                    io.to(`room_${url_query.room}`).emit('msg', {
+                        action : 'roomInfo',
+                        name : checkroom.name,
+                        password : checkroom.password,
+                        note_speed : checkroom.note_speed,
+                        music : checkroom.name,
+                        note : checkroom.note,
+                        startpos : checkroom.startpos,
+                        public : checkroom.public,
+                        pitch: checkroom.pitch,
+                        packet_multiplier: user.admin ? checkroom.packet_multiplier : 1
+                    });
                     app.get('socket_main').emit('msg', { 'action' : 'reload_room' });
                     io.to(`room_${url_query.room}`).emit('msg', {
                         'action': 'gamestart',
