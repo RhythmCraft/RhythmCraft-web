@@ -184,10 +184,19 @@ module.exports = (io, app) => {
                 case 'gamestart':
                     if(!master) return;
                     const players = await RoomUser.find({ roomcode : url_query.room });
+                    let most_slow_note_speed = 1;
+                    for(let key in checkroom.note.jscode) {
+                        const this_note_speed = Number(checkroom.note.jscode[key]
+                            .split(' ').join('')
+                            .replace('note_speed=note_speed/', ''));
+                        if(!isNaN(this_note_speed) && this_note_speed > most_slow_note_speed)
+                            most_slow_note_speed = this_note_speed;
+                    }
                     await Room.updateOne({
                         roomcode : url_query.room,
                         playing : true,
-                        note_speed: checkroom.note_speed * checkroom.packet_multiplier
+                        note_speed: checkroom.note_speed * (checkroom.packet_multiplier != 1 ? checkroom.packet_multiplier : most_slow_note_speed),
+                        packet_multiplier: checkroom.packet_multiplier != 1 ? checkroom.packet_multiplier : most_slow_note_speed
                     });
                     app.get('socket_main').emit('msg', { 'action' : 'reload_room' });
                     io.to(`room_${url_query.room}`).emit('msg', {
