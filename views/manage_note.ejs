@@ -13,7 +13,7 @@
         }
     </style>
     <script>
-        if(<%=session.isClient%>) {
+        if(<%=session.isClient || false%>) {
             require('electron').remote.getGlobal('globalVars').RichPresence = {
                 details: '채보 목록 보는 중',
                 startTimestamp: Date.now(),

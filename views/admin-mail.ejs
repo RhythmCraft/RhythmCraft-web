@@ -10,7 +10,7 @@
     <script src="/js/bootstrap/bootstrap.min.js"></script>
     <link rel="stylesheet" href="/css/bootstrap/bootstrap.min.css">
     <script>
-        if(<%=session.isClient%>) {
+        if(<%=session.isClient || false%>) {
             require('electron').remote.getGlobal('globalVars').RichPresence = {
                 details: '관리자 페이지',
                 startTimestamp: Date.now(),
