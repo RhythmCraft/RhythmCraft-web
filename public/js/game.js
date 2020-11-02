@@ -207,14 +207,14 @@ window.onload = async () => {
                     require('electron').remote.getGlobal('globalVars').RichPresence = ready_rich_presence;
                 }
 
-                document.getElementById('InputName').value = data.name;
-                document.getElementById('InputPassword').value = data.password;
-                document.getElementById('InputNoteSpeed').value = data.note_speed;
-                document.getElementById('InputMusic').value = data.music;
-                document.getElementById('InputNote').value = data.note;
-                document.getElementById('InputStartpos').value = data.startpos;
-                document.getElementById('public').checked = data.public;
-                document.getElementById('InputPitch').value = data.pitch;
+                if(!(!data.name)) document.getElementById('InputName').value = data.name;
+                if(!(!data.password)) document.getElementById('InputPassword').value = data.password;
+                if(!(!data.note_speed)) document.getElementById('InputNoteSpeed').value = data.note_speed;
+                if(!(!data.music)) document.getElementById('InputMusic').value = data.music;
+                if(!(!data.note)) document.getElementById('InputNote').value = data.note;
+                if(!(!data.startpos)) document.getElementById('InputStartpos').value = data.startpos;
+                if(!(!data.public)) document.getElementById('public').checked = data.public;
+                if(!(!data.pitch)) document.getElementById('InputPitch').value = data.pitch;
                 if(document.getElementById('InputPacketMultiplier') != null)
                     document.getElementById('InputPacketMultiplier').value = data.packet_multiplier
                 break;
