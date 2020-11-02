@@ -345,7 +345,7 @@ module.exports = (io, app) => {
                         if(checkroom.room_for_note_test) {
                             socket.emit('msg', {
                                 "action": "redirect",
-                                "url": `/editor?name=${checkroom.note_name_for_note_test}&startpos=${(new Date().getTime() - starttimestamp) - (1000 / (checkroom.pitch / 100))}&pitch=${checkroom.pitch}&autoplay=${checkroom.autoplay}&unsafe=${checkroom.trusted}`
+                                "url": `/editor?name=${checkroom.note_name_for_note_test}&startpos=${((new Date().getTime() - starttimestamp) - (1000 / (checkroom.pitch / 100))) / (checkroom.pitch / 100)}&pitch=${checkroom.pitch}&autoplay=${checkroom.autoplay}&unsafe=${checkroom.trusted}`
                             });
                         }
                         if(checkroom.room_for_single_play) {
