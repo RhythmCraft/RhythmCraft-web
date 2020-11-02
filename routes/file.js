@@ -78,8 +78,14 @@ app.get('/removemusic', utils.isLogin, async (req, res, next) => {
 app.get('/listenmusic', async (req, res, next) => {
     const pathname = Url.parse(req.get('referrer') || '').pathname;
     if(!req.get('referrer') || (!pathname.startsWith('/music') && !pathname.startsWith('/game'))) {
-        req.flash('Error', '음악 다이렉트 접속은 제한되어 있습니다.');
-        return res.redirect('/');
+        if(req.get('sec-fetch-dest') != 'empty') {
+            req.flash('Error', '음악 다이렉트 접속은 제한되어 있습니다.');
+            return res.redirect('/');
+        }
+        else {
+            res.setHeader('Content-Disposition', 'attachment; filename="README.txt"');
+            return res.send('음악은 다운로드할 수 없습니다!');
+        }
     }
 
     const file = await File.findOne({ name : req.query.name , file_type : 'music' });
@@ -98,8 +104,15 @@ app.get('/listenmusic', async (req, res, next) => {
 app.get('/listenmusic/:music', async (req, res, next) => {
     const pathname = Url.parse(req.get('referrer') || '').pathname;
     if(!req.get('referrer') || (!pathname.startsWith('/music') && !pathname.startsWith('/game'))) {
-        req.flash('Error', '음악 다이렉트 접속은 제한되어 있습니다.');
-        return res.redirect('/');
+        if(req.get('sec-fetch-dest') != 'empty') {
+            req.flash('Error', '음악 다이렉트 접속은 제한되어 있습니다.');
+            return res.redirect('/');
+        }
+        else {
+            res.setHeader('Content-Disposition', 'attachment');
+            res.setHeader('filename', 'README.txt');
+            return res.send('음악은 다운로드할 수 없습니다!');
+        }
     }
 
     const file = await File.findOne({ name : req.params.music , file_type : 'music' });
