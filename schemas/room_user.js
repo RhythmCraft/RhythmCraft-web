@@ -20,6 +20,10 @@ const newSchema = new Schema({
     roomcode: {
         type: String,
         required: true
+    },
+    socket_id: {
+        type: String,
+        required: true
     }
 });
 

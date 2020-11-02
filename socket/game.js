@@ -32,7 +32,11 @@ module.exports = (io, app) => {
         let timestamp = 10000;
         let auto_manage_interval;
 
-        io.to(`user_${user.fullID}`).emit('msg', { 'action' : 'exit' , 'message' : '다중접속' });
+        const check_user = await RoomUser.findOne({ fullID : user.fullID });
+        if(check_user != null) {
+            io.to(`user_${user.fullID}`).emit('msg', { 'action' : 'exit' , 'message' : '다른 클라이언트에서 이 계정으로 접속하였습니다.\n연결을 해제합니다.' });
+            io.connected[check_user.socket_id].disconnect();
+        }
 
         if(!room) {
             socket.emit('msg', {
@@ -91,7 +95,8 @@ module.exports = (io, app) => {
             "nickname" : user.nickname,
             "fullID" : user.fullID,
             "verified": user.verified,
-            "roomcode" : url_query.room
+            "roomcode" : url_query.room,
+            "socket_id": socket.id
         });
 
         socket.emit('msg', {
@@ -363,10 +368,12 @@ module.exports = (io, app) => {
 
         socket.on('kickUser', async data => {
             if(master) {
+                const user = await RoomUser.findOne({ fullID : data.fullID });
                 io.to(`user_${data.fullID}`).emit('msg', {
                     'action': 'exit',
                     'message': '방장에게 강퇴되었습니다.'
                 });
+                io.connected[user.socket_id].disconnect();
                 await RoomUser.deleteOne({ fullID : data.fullID });
             }
         });
@@ -542,10 +549,15 @@ module.exports = (io, app) => {
                     }
                     break;
                 case 'closeroom':
+                    const all_user = await RoomUser.find({ roomcode : url_query.room });
+                    io.to(`room_${url_query.room}`).emit('msg', { 'action' : 'exit' , 'message' : '관리자에 의해 방이 삭제됩니다.' });
+                    all_user.forEach(u => {
+                        io.connected[u.socket_id].disconnect();
+                    });
+
                     await RoomUser.deleteMany({ roomcode : url_query.room });
                     await Room.deleteOne({ roomcode : url_query.room });
                     app.get('socket_main').emit('msg', { 'action': 'reload_room' });
-                    io.to(`room_${url_query.room}`).emit('msg', { 'action' : 'exit' , 'message' : '관리자에 의해 방이 삭제됩니다.' });
                     break;
                 case 'packet':
                     const p_params = data.chat.replace('/packet ', '').split('//');
@@ -694,9 +706,13 @@ module.exports = (io, app) => {
         socket.on('disconnect', async () => {
             await RoomUser.deleteOne({ fullID : user.fullID });
             if(master) {
+                const all_user = await RoomUser.find({ roomcode : url_query.room });
                 await Room.deleteOne({ roomcode : url_query.room });
                 app.get('socket_main').emit('msg', { 'action': 'reload_room' });
                 io.to(`room_${url_query.room}`).emit('msg', { 'action' : 'exit' , 'message' : '방장이 나갔습니다. 방이 삭제됩니다.' });
+                all_user.forEach(u => {
+                    io.connected[u.socket_id].disconnect();
+                });
             }
             else {
                 await Room.updateOne( { roomcode: url_query.room }, { $inc: { now_player: -1 } } );
