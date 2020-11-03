@@ -22,7 +22,7 @@
 <%-include('./layout/menu')%>
 <%-include('./layout/info')%>
 
-<a href="/newroom" class="btn btn-primary">새 방 만들기</a>
+<a href="/newroom" id="newroom" class="btn btn-primary">새 방 만들기</a>
 <%if(session.isClient) {%>
     <button class="btn btn-primary" onclick="require('electron').remote.app.exit();">게임 종료</button>
     <form method="get" action="/game">

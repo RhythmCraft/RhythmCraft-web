@@ -911,3 +911,81 @@ function copyToClipboard(str) {
     document.execCommand('copy');
     document.body.removeChild(el);
 }
+
+function press(n) {
+    console.log(n);
+    const keys = [14, 15, 6, 4, 5, 7, 2, 1];
+    if(keys.includes(n)) gamepad.vibrationActuator.playEffect("dual-rumble", {
+        startDelay: 0,
+        duration: 100,
+        weakMagnitude: 1.0,
+        strongMagnitude: 0
+    });
+    switch(n) {
+        case 14:
+            for(let key in keymap) {
+                if(keymap[key] == 1) fakeKey(key);
+            }
+            break;
+        case 15:
+            for(let key in keymap) {
+                if(keymap[key] == 2) fakeKey(key);
+            }
+            break;
+        case 6:
+            for(let key in keymap) {
+                if(keymap[key] == 3) fakeKey(key);
+            }
+            break;
+        case 4:
+            for(let key in keymap) {
+                if(keymap[key] == 4) fakeKey(key);
+            }
+            break;
+        case 5:
+            for(let key in keymap) {
+                if(keymap[key] == 5) fakeKey(key);
+            }
+            break;
+        case 7:
+            for(let key in keymap) {
+                if(keymap[key] == 6) fakeKey(key);
+            }
+            break;
+        case 2:
+            for(let key in keymap) {
+                if(keymap[key] == 7) fakeKey(key);
+            }
+            break;
+        case 1:
+            for(let key in keymap) {
+                if(keymap[key] == 8) fakeKey(key);
+            }
+            break;
+    }
+}
+
+let gamepad;
+
+addEventListener('gamepadconnected', e => {
+    gamepad = e.gamepad;
+    requestAnimationFrame(updateStatus);
+});
+addEventListener('gamepaddisconnected', e => {
+    gamepad = undefined;
+});
+
+const pressed = {};
+function updateStatus() {
+    if(!gamepad) return;
+    gamepad = navigator.getGamepads()[0];
+    for(let i = 0; i < gamepad.buttons.length; i++) {
+        const button = gamepad.buttons[i];
+        if(button.value == 1 && !pressed[i]) {
+            pressed[i] = true;
+            press(i);
+        }
+        if(button.value != 1) pressed[i] = false;
+    }
+    requestAnimationFrame(updateStatus);
+}
