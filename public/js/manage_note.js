@@ -13,6 +13,7 @@ window.onload = () => {
 
 document.onkeydown = e => {
     if(e.ctrlKey && e.code == 'KeyP') {
+        e.preventDefault();
         document.getElementById('lucky_play').value = 'true';
         document.getElementById('submit_search').click();
     }
