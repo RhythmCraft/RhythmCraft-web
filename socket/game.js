@@ -185,7 +185,7 @@ module.exports = (io, app) => {
                     if(!master) return;
                     const players = await RoomUser.find({ roomcode : url_query.room });
                     let most_slow_note_speed = 1;
-                    for(let key in checkroom.note.jscode) {
+                    if(checkroom.note != null) for(let key in checkroom.note.jscode) {
                         if(!checkroom.note.jscode[key].split(' ').join('').startsWith('note_speed=note_speed/'))
                             continue;
 
