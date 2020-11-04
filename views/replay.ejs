@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <script>if (typeof module === 'object') {window.module = module; module = undefined;}</script>
+    <script src="/js/bootstrap/jquery-3.2.1.slim.min.js"></script>
+    <script src="/js/bootstrap/popper.min.js"></script>
+    <script src="/js/bootstrap/bootstrap.min.js"></script>
+    <link rel="stylesheet" href="/css/bootstrap/bootstrap.min.css">
+    <script>
+        if(<%=session.isClient || false%>) {
+            require('electron').remote.getGlobal('globalVars').RichPresence = {
+                details: '리플레이 메뉴',
+                startTimestamp: Date.now(),
+                largeImageKey: 'main',
+                instance: true
+            }
+        }
+    </script>
+    <script>if (window.module) module = window.module;</script>
+    <title><%=servername%> - 리플레이</title>
+</head>
+
+<body>
+<h1>리플레이</h1>
+<%-include('./layout/menu')%>
+<%-include('./layout/info')%>
+
+<form action="/replay" method="post" enctype="multipart/form-data">
+    <div class="form-group">
+        <label for="InputFile">리플레이 파일 업로드</label>
+        <input type="file" name="file" id="InputFile" class="form-control-file" required>
+    </div>
+
+    <button type="submit" class="btn btn-primary">재생</button>
+</form>
+</body>
+</html>

@@ -83,6 +83,11 @@ const newSchema = new Schema({
         required: true,
         default: false
     },
+    room_for_replay: {
+        type: Boolean,
+        required: true,
+        default: false
+    },
     pitch: {
         type: Number,
         required: true,

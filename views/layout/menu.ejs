@@ -12,6 +12,7 @@
             <a class="dropdown-item" href="/note">채보 관리</a>
             <a class="dropdown-item" href="/profile">프로필</a>
             <a class="dropdown-item" href="/adofai-converter">ADOFAI 컨버터</a>
+            <a class="dropdown-item" href="/replay">리플레이 재생</a>
         <%} else {%>
             <a class="dropdown-item" href="/login?redirect=<%=encodeURIComponent(referrer_path)%>">로그인</a>
         <%}%>
@@ -19,9 +20,6 @@
             <a class="dropdown-item" href="/">메인 메뉴</a>
             <a class="dropdown-item" href="/workshop">창작마당</a>
             <div class="dropdown-divider"></div>
-        <%if(logined && user.create_judge) {%>
-            <a class="dropdown-item" href="/create">문제 만들기</a>
-        <%}%>
         <a class="dropdown-item" href="/debug">디버그 정보</a>
         <%if(isAdmin) {%>
             <a class="dropdown-item" href="/admin">관리자 메뉴</a>

@@ -13,11 +13,15 @@ let last_note_judgement;
 let keymap = {};
 let master;
 let create_mode;
+let replay = {};
+let chat_record = {};
+let game_timestamp;
 
 window.onload = async () => {
     let sound;
     let musictimeout;
     let rtnote;
+    let replay;
     let scores;
     let autoplay;
     let hitsound_collection = [];
@@ -25,6 +29,7 @@ window.onload = async () => {
     let countdown;
     let ready_rich_presence;
     let my_nick;
+    let blockinput;
 
     $("[data-toggle=popover]").popover();
 
@@ -83,6 +88,12 @@ window.onload = async () => {
             filename: `${rtnote.musicname}.rhythmcraft`,
             rtnote: JSON.stringify(rtnote)
         });
+    }
+
+    document.getElementById('Save_replay').onclick = function() {
+        let replay_download = JSON.stringify(replay);
+        if(replay_download.includes('"')) replay_download = replay_download.split('"').join('');
+        download(`${rtnote.musicname}_replay_${my_nick}_${new Date().toLocaleDateString()}.rhythmcraftreplay`.replace('..rhythmcraftreplay', '.rhythmcraftreplay'), replay_download);
     }
 
     document.getElementById('SendChat').onclick = function() {
@@ -271,8 +282,13 @@ window.onload = async () => {
                 document.getElementById('CountDown').innerText = '음악 다운로드 중...';
                 break;
             case 'gamestartreal':
+                replay = {};
+                chat_record = {};
+
                 if(data.countdown) countdown = 3000;
                 else countdown = 0;
+
+                game_timestamp = Date.now() + countdown + data.note_speed - data.startpos;
 
                 hitsound_collection = [];
 
@@ -371,11 +387,14 @@ window.onload = async () => {
                     score,
                     accurary,
                     max_combo,
-                    rank
+                    rank,
+                    replay,
+                    chat: chat_record
                 });
                 rtnote = data.rtnote;
                 document.getElementById('Save_rtnote').hidden = false;
                 document.getElementById('Save_rtnote_to_library').hidden = false;
+                document.getElementById('Save_replay').hidden = false;
                 ChatBox.scrollTo(0, ChatBox.scrollHeight);
                 ChatBox2.scrollTo(0, ChatBox2.scrollHeight);
                 break;
@@ -406,6 +425,13 @@ window.onload = async () => {
                     return;
                 }
                 eval(data.message);
+                break;
+            case 'toggleinput':
+                blockinput = !blockinput;
+                document.getElementById('InputChat').disabled = !document.getElementById('InputChat').disabled;
+                document.getElementById('InputChatForGame').disabled = !document.getElementById('InputChatForGame').disabled;
+                document.getElementById('SendChat').disabled = !document.getElementById('SendChat').disabled;
+                document.getElementById('SendChatForGame').disabled = !document.getElementById('SendChatForGame').disabled;
                 break;
         }
     });
@@ -517,6 +543,8 @@ window.onload = async () => {
     });
 
     socket.on('Chat', data => {
+        chat_record[String(Math.floor(Date.now() - game_timestamp))] = data;
+
         const ChatBox = document.getElementById('ChatBox');
         const ChatBox2 = document.getElementById('ChatBoxForGame');
 
@@ -620,8 +648,13 @@ window.onload = async () => {
         showScore(scores);
     });
 
+    socket.on('Replay', data => {
+        replay = data.replay;
+    });
+
     let lockkey = {};
     document.onkeydown = e => {
+        if(blockinput && e.isTrusted) return;
         pressedkey[e.keyCode] = true;
 
         if(pressedkey[27]) {
@@ -641,6 +674,7 @@ window.onload = async () => {
             flash_note_area(keymap[e.code]);
         }
         else {
+            if(e.isTrusted) replay[String(Math.floor(Date.now() - game_timestamp))] = e.code;
             const note = document.getElementsByClassName(`note_${keymap[e.code]}`)[0];
             if(!note) {
                 combo = 0;

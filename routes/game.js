@@ -3,6 +3,7 @@ const bodyParser = require('body-parser');
 const uniqueString = require('unique-string');
 const fs = require('fs');
 const path = require('path');
+const multer = require('multer');
 
 const utils = require('../utils');
 const setting = require('../setting.json');
@@ -17,6 +18,10 @@ const app = express.Router();
 // bodyParser
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended : false }));
+
+const upload = multer({
+    storage: multer.memoryStorage()
+});
 
 app.get('/game', utils.isLogin, async (req, res, next) => {
     const room = await Room.findOne({ roomcode : req.query.room });
@@ -114,6 +119,60 @@ app.post('/chat-report', utils.isLogin, async (req, res, next) => {
     await Chat.updateOne({ chat_id : req.body.chat_id }, { reported : true , reported_by : req.user.fullID });
     return res.send('신고가 접수되었습니다. 관리자 확인 후 신고가 처리됩니다.');
     // return res.send('wa sans ashinenguna gup na are ryop seph ni da nen hut so ri go sasil not implemented yet');
+});
+
+app.get('/replay', utils.isLogin, (req, res, next) => {
+    return res.render('replay');
+});
+
+app.post('/replay', utils.isLogin, upload.single('file'), async (req, res, next) => {
+    if(!req.file.originalname.endsWith('.rhythmcraftreplay')) {
+        req.flash('Error', '리플레이 파일이 아닙니다.');
+        return res.redirect('/replay');
+    }
+
+    let note_file = String(req.file.buffer);
+
+    let token_result = utils.verifyToken(note_file);
+    if (token_result.error) {
+        req.flash('Error', `리플레이 오류 : ${token_result.message}`);
+        return res.redirect('/replay');
+    }
+
+    if(!token_result.replay) {
+        req.flash('Error', '이 파일은 채보 파일입니다. 리플레이 파일을 업로드하세요.');
+        return res.redirect('/replay');
+    }
+
+    const music = await File.findOne({ name : !token_result ? note_file.music : token_result.music , public : true , file_type : 'music' });
+    if(!music) {
+        req.flash('Error', '음악이 잘못되었습니다.');
+        return res.redirect('/');
+    }
+
+    const roomcode = uniqueString();
+    await Room.deleteMany({ master : req.user.fullID });
+    await Room.create({
+        name: roomcode,
+        master: req.user.fullID,
+        password: '',
+        note_speed: 1000,
+        max_player: 1,
+        roomcode,
+        music: music.name,
+        music_name: music.originalname,
+        note: token_result || note_file,
+        startpos: req.query.startpos,
+        public: false,
+        note_name_for_note_test: token_result.name,
+        room_for_replay: true,
+        pitch: req.query.pitch,
+        autoplay: req.query.autoplay == 'true',
+        trusted: true,
+        note_name: req.query.note
+    });
+
+    return res.redirect(`/game?room=${roomcode}#start`);
 });
 
 module.exports = app;

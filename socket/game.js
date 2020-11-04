@@ -3,6 +3,7 @@ const querystring = require('querystring');
 const fs = require('fs');
 const path = require('path');
 const uniqueString = require('unique-string');
+const jwt = require('jsonwebtoken');
 
 const User = require('../schemas/user');
 const Room = require('../schemas/room');
@@ -178,6 +179,10 @@ module.exports = (io, app) => {
         if(master) socket.emit('msg', { 'action' : 'im_master' });
         else socket.emit('msg', { 'action' : 'im_not_master' });
 
+        if(room.room_for_replay) socket.emit('msg', {
+            action: 'toggleinput'
+        });
+
         socket.on('msg', async data => {
             let checkroom = await Room.findOne({ roomcode : url_query.room });
             switch(data.action) {
@@ -260,7 +265,7 @@ module.exports = (io, app) => {
                         await Room.updateOne( { roomcode: url_query.room }, { ready_player : 0 } );
 
                         if(checkroom.room_for_note_test) starttimestamp = new Date().getTime() - checkroom.startpos;
-                        else  starttimestamp = new Date().getTime() + 3000 - checkroom.startpos;
+                        else starttimestamp = new Date().getTime() + 3000 - checkroom.startpos;
 
                         rtnote = {};
                         rtnote.music = checkroom.music;
@@ -282,6 +287,7 @@ module.exports = (io, app) => {
                         else countdown = 3000;
                         if(checkroom.note != null) {
                             rtnote_timeout = [];
+                            rtnote['jscode'] = checkroom.note.jscode;
                             for(let i in checkroom.note.note) {
                                 checkroom['note']['note'][i].forEach(time => {
                                     if(time > checkroom.startpos) rtnote_timeout.push(setTimeout(() => {
@@ -289,6 +295,7 @@ module.exports = (io, app) => {
                                             note: Number(i.replace('note', '')),
                                             note_speed: checkroom.note_speed
                                         });
+                                        rtnote['note'][i].push(time);
                                     }, ((time / (checkroom.pitch / 100)) + countdown - (checkroom.startpos / (checkroom.pitch / 100)))));
                                 });
                             }
@@ -313,6 +320,15 @@ module.exports = (io, app) => {
                                             .split('/*closebracket*/').join('}')
                                             .split('/*bigcomma*/').join('"')
                                     });
+                                });
+                            }
+
+                            if(checkroom.note.chat != null) for(let i in checkroom.note.chat) {
+                                if(Number(i) > checkroom.startpos) rtnote_timeout.push(setTimeout(() => {
+                                    io.to(`room_${url_query.room}`).emit('Chat', checkroom['note']['chat'][i]);
+                                }, ((Number(i) / (checkroom.pitch / 100)) + countdown - (checkroom.startpos / (checkroom.pitch / 100))) + checkroom.note_speed));
+                                else setImmediate(() => {
+                                    io.to(`room_${url_query.room}`).emit('Chat', checkroom['note']['chat'][i]);
                                 });
                             }
                         }
@@ -352,21 +368,6 @@ module.exports = (io, app) => {
 
                         checkroom = await Room.findOne({ roomcode : url_query.room });
 
-                        rtnote = {};
-                        rtnote.music = checkroom.music;
-                        rtnote.musicname = checkroom.music_name;
-                        rtnote.author = user.fullID;
-                        rtnote.author_name = user.nickname;
-                        rtnote.note = {};
-                        rtnote.note.note1 = [];
-                        rtnote.note.note2 = [];
-                        rtnote.note.note3 = [];
-                        rtnote.note.note4 = [];
-                        rtnote.note.note5 = [];
-                        rtnote.note.note6 = [];
-                        rtnote.note.note7 = [];
-                        rtnote.note.note8 = [];
-
                         rtnote_timeout.forEach(timeout => {
                             clearTimeout(timeout);
                         });
@@ -388,6 +389,12 @@ module.exports = (io, app) => {
                             socket.emit('msg', {
                                 "action": "redirect",
                                 "url": `/workshop/note?name=${checkroom.note_name}`
+                            });
+                        }
+                        if(checkroom.room_for_replay) {
+                            socket.emit('msg', {
+                                "action": "redirect",
+                                "url": `/replay`
                             });
                         }
                         timestamp = 10000;
@@ -504,11 +511,29 @@ module.exports = (io, app) => {
                 verified: user.verified,
                 rank: data.rank
             });
+
+            const replay = rtnote;
+            const replay_data = rtnote.jscode || {};
+            for(let key in data.replay) {
+                replay_data[key] = `fakeKey('${data.replay[key].split('`').join('')}');`;
+            }
+            replay['replay'] = true;
+            replay['chat'] = data.chat;
+            delete replay.iss;
+            delete replay.iat;
+            const token = jwt.sign(replay, setting.TOKEN_SECRET, {
+                issuer: setting.SERVER_NAME
+            });
+            socket.emit('Replay', {
+                replay: token
+            });
         });
 
         socket.on('Chat', async data => {
             const checkuser = await User.findOne({ fullID : user.fullID });
             const checkroom = await Room.findOne({ roomcode : url_query.room });
+
+            if(checkroom.room_for_replay) return;
 
             let chattype;
             if(checkuser.admin) chattype = 'admin';
