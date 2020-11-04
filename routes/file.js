@@ -148,6 +148,10 @@ app.get('/note', utils.isLogin, async (req, res, next) => {
         { owner : req.user.fullID , file_type : 'note' , workshop_title : { $regex : regex } },
         { owner : req.user.fullID , file_type : 'note' , description : { $regex : regex } }
         ]);
+    if(files.length == 0 && (req.query.search != null || req.query.search != '')) {
+        req.flash('Error', '검색 결과가 없습니다.');
+        return res.redirect('/note');
+    }
     if(req.query.lucky_play == 'true') return res.redirect(`/testnote?note=${encodeURIComponent(files[0].name)}&startpos=0&singleplay=true`);
     else return res.render('manage_note', {
         files,
