@@ -199,7 +199,7 @@ module.exports = (io, app) => {
                         roomcode : url_query.room,
                         playing : true,
                         note_speed: checkroom.note_speed * (checkroom.packet_multiplier != 1 ? checkroom.packet_multiplier : most_slow_note_speed),
-                        packet_multiplier: checkroom.packet_multiplier != 1 ? checkroom.packet_multiplier : most_slow_note_speed
+                        packet_multiplier: most_slow_note_speed
                     });
                     const before_packet = checkroom.packet_multiplier;
                     checkroom = await Room.findOne({ roomcode : url_query.room });
@@ -217,7 +217,7 @@ module.exports = (io, app) => {
                         startpos : checkroom.startpos,
                         public : checkroom.public,
                         pitch: checkroom.pitch,
-                        packet_multiplier: user.admin ? checkroom.packet_multiplier : 1
+                        packet_multiplier: checkroom.packet_multiplier
                     });
                     app.get('socket_main').emit('msg', { 'action' : 'reload_room' });
                     io.to(`room_${url_query.room}`).emit('msg', {
