@@ -198,7 +198,7 @@ module.exports = (io, app) => {
                     await Room.updateOne({
                         roomcode : url_query.room,
                         playing : true,
-                        note_speed: checkroom.note_speed * (checkroom.packet_multiplier != 1 ? checkroom.packet_multiplier : most_slow_note_speed),
+                        note_speed: checkroom.note_speed * most_slow_note_speed,
                         packet_multiplier: most_slow_note_speed
                     });
                     const before_packet = checkroom.packet_multiplier;
