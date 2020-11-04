@@ -148,7 +148,8 @@ app.get('/note', utils.isLogin, async (req, res, next) => {
         { owner : req.user.fullID , file_type : 'note' , workshop_title : { $regex : regex } },
         { owner : req.user.fullID , file_type : 'note' , description : { $regex : regex } }
         ]);
-    return res.render('manage_note', {
+    if(req.query.lucky_play == 'true') return res.redirect(`/testnote?note=${encodeURIComponent(files[0].name)}&startpos=0&singleplay=true`);
+    else return res.render('manage_note', {
         files,
         allowed_tags: setting.SEARCH_TAGS
     });
