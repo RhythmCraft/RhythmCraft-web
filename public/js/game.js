@@ -152,6 +152,7 @@ window.onload = async () => {
     socket.on('msg', data => {
         const ChatBox = document.getElementById('ChatBox');
         const ChatBox2 = document.getElementById('ChatBoxForGame');
+        const pg = document.getElementById('progressbar');
 
         switch(data.action) {
             case 'exit':
@@ -224,7 +225,6 @@ window.onload = async () => {
                 document.getElementById('lobby').hidden = true;
                 document.getElementById('game').hidden = false;
 
-                const pg = document.getElementById('progressbar');
                 pg.style.transition = `width linear 0s 0s`;
                 pg.style.width = '0%';
 
@@ -245,8 +245,6 @@ window.onload = async () => {
                     onload: () => {
                         socket.emit('msg', { 'action' : 'gameready' });
                         document.getElementById('CountDown').innerText = '다른 유저를 기다리는 중...';
-                        pg.style.transition = `width linear ${sound._duration}s 3s`;
-                        pg.style.width = '100%';
                     },
                     onend: () => {
                         socket.emit('msg', { 'action' : 'gameend' });
@@ -284,11 +282,15 @@ window.onload = async () => {
                 if(master && create_mode) hitsound_collection.push(setTimeout(() => {
                     sound.seek(data.startpos / 1000);
                     sound.play();
+                    pg.style.transition = `width linear ${sound._duration}s 0s`;
+                    pg.style.width = '100%';
                 }, countdown));
                 else {
                     musictimeout = hitsound_collection.push(setTimeout(() => {
                         sound.seek(data.startpos / 1000);
                         sound.play();
+                        pg.style.transition = `width linear ${sound._duration}s 0s`;
+                        pg.style.width = '100%';
                     }, data.note_speed + countdown));
                 }
 
@@ -517,7 +519,6 @@ window.onload = async () => {
     socket.on('Chat', data => {
         const ChatBox = document.getElementById('ChatBox');
         const ChatBox2 = document.getElementById('ChatBoxForGame');
-        const ChatBoxForGame = document.getElementById('ChatBoxForGame');
 
         const newchat = document.createElement('div');
         const newchat2 = document.createElement('div');
