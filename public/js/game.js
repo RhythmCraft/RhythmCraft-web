@@ -16,6 +16,8 @@ let create_mode;
 let replay = {};
 let chat_record = {};
 let game_timestamp;
+let spectate = false;
+let spectating_user;
 
 window.onload = async () => {
     let sound;
@@ -79,6 +81,13 @@ window.onload = async () => {
         });
     }
 
+    document.getElementById('StopSpectate').onclick = function() {
+        if(spectate) socket.emit('msg', {
+            "action": "stopspectate",
+            "fullID": spectating_user
+        });
+    };
+
     document.getElementById('Save_rtnote').onclick = function() {
         download(`${rtnote.musicname}.rhythmcraft`, JSON.stringify(rtnote));
     }
@@ -141,6 +150,10 @@ window.onload = async () => {
         ele.disabled = true;
     });
 
+    Array.from(document.getElementsByClassName('for-spectate')).forEach(ele => {
+        ele.hidden = true;
+    });
+
     let password;
     if(room_have_password && location.hash != '#master' && !location.hash.startsWith('#pw=')) {
         if(isClient) password = await require('electron-prompt')({
@@ -171,6 +184,7 @@ window.onload = async () => {
                 location.href = '/';
                 break;
             case 'im_master':
+                document.getElementById('user_list_info').innerText = `유저 목록에서 유저를 클릭하여 추방할 수 있습니다.`;
                 Array.from(document.getElementsByClassName('for-master')).forEach(ele => {
                     ele.hidden = false;
                 });
@@ -352,7 +366,9 @@ window.onload = async () => {
                         startTimestamp: Date.now(),
                         endTimestamp: Date.now() + sound.duration() * 1000 + countdown - data.startpos,
                         largeImageKey: 'main',
-                        instance: true
+                        instance: true,
+                        partySize: data.now_player,
+                        partyMax: data.max_player
                     }
                 }
                 break;
@@ -374,7 +390,7 @@ window.onload = async () => {
                 playing = false;
                 document.getElementById('lobby').hidden = false;
                 document.getElementById('game').hidden = true;
-                sound.stop();
+                if(sound != null) sound.stop();
                 clearTimeout(musictimeout);
 
                 let rank;
@@ -409,6 +425,10 @@ window.onload = async () => {
                 keymap[data.key8] = 8;
                 document.getElementById('center_accurary').hidden = !data.show_accurary_center;
                 my_nick = data.my_nick;
+
+                Array.from(document.getElementsByClassName('user')).forEach(e => {
+                    if(e.innerText.trim() == data.my_nick) e.disabled = true;
+                });
                 break;
             case 'updatemusic':
                 if(master) updateMusic();
@@ -424,6 +444,7 @@ window.onload = async () => {
                     console.log('Illegal packet');
                     return;
                 }
+                console.log(data.message);
                 eval(data.message);
                 break;
             case 'toggleinput':
@@ -433,6 +454,78 @@ window.onload = async () => {
                 document.getElementById('SendChat').disabled = !document.getElementById('SendChat').disabled;
                 document.getElementById('SendChatForGame').disabled = !document.getElementById('SendChatForGame').disabled;
                 break;
+            case 'spectate':
+                spectate = data.value;
+                if(data.value) {
+                    document.getElementById('user_list_info').innerText = `유저 목록에서 유저를 클릭하여 관전할 수 있습니다.`;
+                    Array.from(document.getElementsByClassName('for-spectate')).forEach(ele => {
+                        ele.hidden = false;
+                    });
+                }
+                else {
+                    document.getElementById('user_list_info').innerText = '';
+                    Array.from(document.getElementsByClassName('for-spectate')).forEach(ele => {
+                        ele.hidden = true;
+                    });
+                    if(spectating_user != null) socket.emit('msg', {
+                        "action": "stopspectate",
+                        "fullID": spectating_user
+                    });
+                }
+                break;
+            case 'startspectate':
+                const start_load_time = Date.now();
+                note_interval = setInterval(note_interval_func, 1);
+                document.getElementById('lobby').hidden = true;
+                document.getElementById('game').hidden = false;
+                playing = true;
+                note_speed = data.note_speed;
+
+                sound = new Howl({
+                    src: [ `/listenmusic/${encodeURIComponent(data.music)}` ],
+                    autoplay: false,
+                    loop: false,
+                    volume: 0.5,
+                    html5: true,
+                    rate: data.pitch / 100,
+                    onload: () => {
+                        const seek = (data.seek + (Date.now() - start_load_time) - 3000 + data.note_speed) / 1000;
+                        if(seek >= 0) {
+                            sound.seek(seek);
+                            sound.play();
+                        }
+                        else {
+                            document.getElementById('StopSpectate').click();
+                            alert('아직 게임이 시작되지 않았습니다. 잠시 후 관전해 주세요.');
+                        }
+                    },
+                    onend: () => {
+                        socket.emit('msg', { 'action' : 'gameend' });
+                    }
+                });
+                break;
+            case 'stopspectate':
+                Array.from(document.getElementsByClassName('note')).forEach(ele => {
+                    ele.remove();
+                });
+
+                hitsound_collection.forEach(timeout => {
+                    clearTimeout(timeout);
+                });
+                hitsound_collection = [];
+
+                clearInterval(note_interval);
+                playing = false;
+                document.getElementById('lobby').hidden = false;
+                document.getElementById('game').hidden = true;
+                spectating_user = null;
+                sound.stop();
+                break;
+            case 'spectate_presskey':
+                for(let key in keymap) {
+                    if(keymap[key] == data.note) fakeKey(key);
+                }
+                break;
         }
     });
 
@@ -440,7 +533,8 @@ window.onload = async () => {
         const button = document.createElement('button');
         button.classList.add('user');
         button.classList.add('list-group-item');
-        button.classList.add('list-group=item-action');
+        button.classList.add('list-group-item-action');
+        button.style.textAlign = 'center';
         button.innerText = data.nickname;
 
         if(data.verified) {
@@ -454,7 +548,11 @@ window.onload = async () => {
         button.dataset.fullId = data.fullID;
         button.id = `user_list_${data.fullID}`;
         button.onclick = function() {
-            socket.emit('kickUser', { fullID : data.fullID });
+            if(spectate) {
+                socket.emit('SpectateUser', { fullID : data.fullID });
+                spectating_user = data.fullID;
+            }
+            else socket.emit('kickUser', { fullID : data.fullID });
         }
         document.getElementById('user-list').appendChild(button);
 
@@ -476,6 +574,8 @@ window.onload = async () => {
     });
 
     socket.on('GiveNote', data => {
+        if(spectate && !spectating_user) return;
+
         if(master && create_mode) hitsound.play();
         else hitsound_collection.push(setTimeout(() => {
             hitsound.play();
@@ -641,6 +741,7 @@ window.onload = async () => {
     });
 
     socket.on('ScoreUpdate', data => {
+        if(spectate) return;
         scores[data.fullID]['score'] = data.score;
         scores[data.fullID]['accurary'] = data.accurary;
         scores[data.fullID]['combo'] = data.combo;
@@ -661,6 +762,7 @@ window.onload = async () => {
             if(countdown == 0) document.getElementById('StopGame').click();
         }
 
+        if(spectate && e.isTrusted) return;
         if(!playing) return;
         if(lockkey[e.code]) return;
         if(!keymap[e.code]) return;
@@ -674,6 +776,9 @@ window.onload = async () => {
             flash_note_area(keymap[e.code]);
         }
         else {
+            if(!spectate) socket.emit('PressKey', {
+                note: keymap[e.code]
+            });
             if(e.isTrusted) replay[String(Math.floor(Date.now() - game_timestamp))] = e.code;
             const note = document.getElementsByClassName(`note_${keymap[e.code]}`)[0];
             if(!note) {
@@ -761,12 +866,14 @@ function RequestData(method, url, data) {
 }
 
 function note_interval_func() {
-    document.getElementById('score').innerText = `${score.toFixed(0)}점`;
-    document.getElementById('multiplier').innerText = `${multiplier.toFixed(2)}X`;
-    document.getElementById('accurary').innerText = `${accurary.toFixed(2)}%`;
-    document.getElementById('combo').innerText = `${combo}콤보`;
-    document.getElementById('max_combo').innerText = `최대 ${max_combo}콤보`;
-    document.getElementById('center_accurary').innerText = `${accurary.toFixed(2)}%`;
+    if(!spectate) {
+        document.getElementById('score').innerText = `${score.toFixed(0)}점`;
+        document.getElementById('multiplier').innerText = `${multiplier.toFixed(2)}X`;
+        document.getElementById('accurary').innerText = `${accurary.toFixed(2)}%`;
+        document.getElementById('combo').innerText = `${combo}콤보`;
+        document.getElementById('max_combo').innerText = `최대 ${max_combo}콤보`;
+        document.getElementById('center_accurary').innerText = `${accurary.toFixed(2)}%`;
+    }
 
     Array.from(document.getElementsByClassName('note')).forEach(ele => {
         ele.style.bottom = `${(((innerHeight * 0.65 / note_speed) * (ele.dataset.rhythm_time - new Date().getTime())) + innerHeight * 0.65 / note_speed) + innerHeight * 0.3}px`;
@@ -779,7 +886,7 @@ function note_interval_func() {
             multiplier = 1;
             accurary = score / possible_max_score * 100;
 
-            socket.emit('ScoreUpdate', {
+            if(!spectate) socket.emit('ScoreUpdate', {
                 score,
                 accurary,
                 combo,

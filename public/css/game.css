@@ -5,11 +5,12 @@
     width: 5.5vw;
     height: 49px;
 }
-#StopGame {
+#StopGame, #StopSpectate {
     position: absolute;
     top: 210px;
     right: 0px;
     float: right;
+    z-index: 1;
 }
 #user-list {
     width: 300px;
@@ -168,9 +169,6 @@
 }
 .system-chat {
     background-color: lightgray;
-}
-#StopGame {
-    z-index: 1;
 }
 #Live_LeaderBoard {
     position: absolute;

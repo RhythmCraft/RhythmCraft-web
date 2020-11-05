@@ -59,6 +59,7 @@
     <br><br>
     <button id="StartGame" class="for-master btn btn-primary">게임 시작</button>
     <br><br>
+    <h3 id="user_list_info"></h3>
     <div id="user-list" class="list-group"></div>
 
     <br><button id="Save_rtnote_to_library" class="btn btn-primary" hidden>이전 게임 채보 저장</button>
@@ -75,6 +76,7 @@
 
 <div id="game" hidden>
     <button id="StopGame" class="for-master btn btn-primary">게임 종료</button>
+    <button id="StopSpectate" class="for-spectate btn btn-primary">이 유저 관전 중지</button>
     <div id="score">0점</div>
     <div id="multiplier">1.00X</div>
     <div id="accurary">0%</div>
@@ -97,7 +99,7 @@
     <button id="SendChatForGame" class="btn btn-primary">전송</button>
     <div id="Live_LeaderBoard"></div>
 
-    <h1 id="CountDown">3</h1>
+    <h1 id="CountDown" hidden>3</h1>
     <h1 id="center_accurary" hidden>100%</h1>
 
     <div class="progress">

@@ -122,6 +122,9 @@ const newSchema = new Schema({
         type: Number,
         required: true,
         default: 1
+    },
+    starttimestamp: {
+        type: Number
     }
 });
 

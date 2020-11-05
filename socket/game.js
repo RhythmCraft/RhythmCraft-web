@@ -52,10 +52,14 @@ module.exports = (io, app) => {
 
         if(room.playing) {
             socket.emit('msg', {
-                'action' : 'exit',
-                'message' : '게임이 플레이 중 입니다.'
+                'action': 'spectate',
+                'value': true
             });
-            return socket.disconnect();
+            // socket.emit('msg', {
+            //     'action' : 'exit',
+            //     'message' : '게임이 플레이 중 입니다.'
+            // });
+            // return socket.disconnect();
         }
 
         if(!master && room.password != null && room.password != '' && room.password != socket_url_query.password) {
@@ -224,7 +228,6 @@ module.exports = (io, app) => {
                         pitch: checkroom.pitch,
                         packet_multiplier: checkroom.packet_multiplier
                     });
-                    app.get('socket_main').emit('msg', { 'action' : 'reload_room' });
                     io.to(`room_${url_query.room}`).emit('msg', {
                         'action': 'gamestart',
                         'music': checkroom.music,
@@ -260,9 +263,15 @@ module.exports = (io, app) => {
                             'note_speed': checkroom.note_speed,
                             'musicname': checkroom.music_name,
                             'startpos': checkroom.startpos,
-                            'countdown': !checkroom.room_for_note_test
+                            'countdown': !checkroom.room_for_note_test,
+                            'now_player': checkroom.now_player,
+                            'max_player': checkroom.max_player,
+                            'password': checkroom.password
                         });
-                        await Room.updateOne( { roomcode: url_query.room }, { ready_player : 0 } );
+                        await Room.updateOne( { roomcode: url_query.room }, {
+                            ready_player : 0,
+                            starttimestamp: new Date().getTime() + 3000 - checkroom.startpos
+                        });
 
                         if(checkroom.room_for_note_test) starttimestamp = new Date().getTime() - checkroom.startpos;
                         else starttimestamp = new Date().getTime() + 3000 - checkroom.startpos;
@@ -352,6 +361,7 @@ module.exports = (io, app) => {
                         await Room.updateOne({ roomcode : checkroom.roomcode }, {
                             note_speed: checkroom.note_speed / checkroom.packet_multiplier
                         });
+                        app.get('socket_main').emit('msg', { 'action': 'reload_room' });
                     }
                     break;
                 case 'gameend':
@@ -364,6 +374,10 @@ module.exports = (io, app) => {
                         if (master) io.to(`room_${url_query.room}`).emit('msg', {
                             'action': 'gameend',
                             rtnote
+                        });
+                        io.to(`room_${url_query.room}`).emit('msg', {
+                            'action': 'spectate',
+                            'value': false
                         });
 
                         checkroom = await Room.findOne({ roomcode : url_query.room });
@@ -400,6 +414,12 @@ module.exports = (io, app) => {
                         timestamp = 10000;
                     }
                     break;
+                case 'stopspectate':
+                    socket.leave(`spectate_${data.fullID}`);
+                    socket.emit('msg', {
+                        "action": "stopspectate"
+                    });
+                    break;
             }
         });
 
@@ -413,6 +433,39 @@ module.exports = (io, app) => {
                 io.connected[user.socket_id].disconnect();
                 await RoomUser.deleteOne({ fullID : data.fullID });
             }
+        });
+
+        socket.on('SpectateUser', async data => {
+            const checkroom = await Room.findOne({ roomcode : url_query.room });
+
+            socket.join(`spectate_${data.fullID}`);
+            console.log(Date.now() - checkroom.starttimestamp);
+            socket.emit('msg', {
+                'action': 'startspectate',
+                'music': checkroom.music,
+                'seek': Date.now() - checkroom.starttimestamp,
+                'note_speed': checkroom.note_speed
+            });
+
+            if(checkroom.trusted) for(let i in checkroom.note.jscode) {
+                if(Number(i) <= checkroom.startpos) setImmediate(() => {
+                    socket.emit('msg', {
+                        'action': 'eval',
+                        'message': checkroom['note']['jscode'][i]
+                            .split('/*grave*/').join('`')
+                            .split('/*openbracket*/').join('{')
+                            .split('/*closebracket*/').join('}')
+                            .split('/*bigcomma*/').join('"')
+                    });
+                });
+            }
+        });
+
+        socket.on('PressKey', data => {
+            io.to(`spectate_${user.fullID}`).emit('msg', {
+                action: 'spectate_presskey',
+                note: data.note
+            });
         });
 
         socket.on('ChangeRoomSetting', async data => {
