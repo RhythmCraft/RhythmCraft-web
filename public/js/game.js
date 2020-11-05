@@ -410,7 +410,8 @@ window.onload = async () => {
                 rtnote = data.rtnote;
                 document.getElementById('Save_rtnote').hidden = false;
                 document.getElementById('Save_rtnote_to_library').hidden = false;
-                document.getElementById('Save_replay').hidden = false;
+                if(master && create_mode) document.getElementById('Save_replay').hidden = true;
+                else document.getElementById('Save_replay').hidden = false;
                 ChatBox.scrollTo(0, ChatBox.scrollHeight);
                 ChatBox2.scrollTo(0, ChatBox2.scrollHeight);
                 break;
