@@ -425,6 +425,10 @@ module.exports = (io, app) => {
 
         socket.on('kickUser', async data => {
             if(master) {
+                if(data.fullID == user.fullID) return socket.emit('msg', {
+                    'action': 'alert',
+                    'message': '자신을 킥할 수 없습니다.'
+                });
                 const user = await RoomUser.findOne({ fullID : data.fullID });
                 io.to(`user_${data.fullID}`).emit('msg', {
                     'action': 'exit',
@@ -436,6 +440,10 @@ module.exports = (io, app) => {
         });
 
         socket.on('SpectateUser', async data => {
+            if(data.fullID == user.fullID) return socket.emit('msg', {
+                'action': 'alert',
+                'message': '자신을 관전할 수 없습니다.'
+            });
             const checkroom = await Room.findOne({ roomcode : url_query.room });
 
             socket.join(`spectate_${data.fullID}`);
