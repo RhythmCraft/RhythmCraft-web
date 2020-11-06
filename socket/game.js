@@ -425,11 +425,11 @@ module.exports = (io, app) => {
 
         socket.on('kickUser', async data => {
             if(master) {
+                const user = await RoomUser.findOne({ fullID : data.fullID });
                 if(data.fullID == user.fullID) return socket.emit('msg', {
                     'action': 'alert',
                     'message': '자신을 킥할 수 없습니다.'
                 });
-                const user = await RoomUser.findOne({ fullID : data.fullID });
                 io.to(`user_${data.fullID}`).emit('msg', {
                     'action': 'exit',
                     'message': '방장에게 강퇴되었습니다.'
