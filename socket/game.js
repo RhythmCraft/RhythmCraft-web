@@ -478,6 +478,9 @@ module.exports = (io, app) => {
 
         socket.on('ChangeRoomSetting', async data => {
             if(!master) return socket.emit('msg', { 'action' : 'alert' , 'message' : '권한이 없습니다.' });
+            if(room.room_for_note_test || room.room_for_single_play || roomroom_for_workshop || room.room_for_replay)
+                return socket.emit('msg', { 'action' : 'alert' , 'message' : '권한이 없습니다.' });
+
             if(!data.name || !data.note_speed || !data.music || data.startpos < 0 || data.pitch < 50 || data.pitch > 400) return socket.emit('msg', { 'action' : 'alert' , 'message' : '설정 구성이 잘못되었습니다.' });
 
             let note;
