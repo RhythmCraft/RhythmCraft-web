@@ -113,6 +113,11 @@ app.get('/newitem', utils.isAdmin, (req, res, next) => {
 });
 
 app.post('/newitem', utils.isAdmin, async (req, res, next) => {
+    if(req.body.price < 1) {
+        req.flash('Error', '돈의 액수는 0보다 커야 합니다!');
+        return res.redirect('/newitem');
+    }
+
     const productid = uniqueString();
     await Item.create({
         uploader: req.user.fullID,
@@ -144,6 +149,11 @@ app.post('/edititem/:item', utils.isAdmin, async (req, res, next) => {
         req.flash('Error', '해당 아이템이 존재하지 않습니다.');
         return res.redirect('/shop');
     }
+    if(req.body.price < 1) {
+        req.flash('Error', '돈의 액수는 0보다 커야 합니다!');
+        return res.redirect(`/edititem/${req.params.item}`);
+    }
+
     await Item.updateOne({ product_id : req.params.item }, {
         title: req.body.title,
         description: req.body.description,
