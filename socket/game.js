@@ -33,6 +33,7 @@ module.exports = (io, app) => {
         let note_name;
         let timestamp = 10000;
         let auto_manage_interval;
+        let spectate;
 
         const check_user = await RoomUser.findOne({ fullID : user.fullID });
         if(check_user != null) {
@@ -56,6 +57,7 @@ module.exports = (io, app) => {
                 'action': 'spectate',
                 'value': true
             });
+            spectate = true;
             // socket.emit('msg', {
             //     'action' : 'exit',
             //     'message' : '게임이 플레이 중 입니다.'
@@ -383,6 +385,16 @@ module.exports = (io, app) => {
                         let checkroom = await Room.findOne({ roomcode : url_query.room });
                         if(!checkroom.playing) return;
 
+                        if(Date.now() - checkroom.starttimestamp > 60000 && !spectate) {
+                            await User.updateOne({ fullID : user.fullID }, { $inc : { money : 10 } });
+                            socket.emit('Chat', {
+                                nickname: '시스템',
+                                chattype: 'system',
+                                chat: '게임을 1분 이상 플레이하여 10원을 획득하였습니다.',
+                                verified: true
+                            });
+                        }
+
                         await Room.updateOne({ roomcode: url_query.room, playing: false });
                         app.get('socket_main').emit('msg', { 'action': 'reload_room' });
                         if (master) io.to(`room_${url_query.room}`).emit('msg', {
@@ -393,6 +405,7 @@ module.exports = (io, app) => {
                             'action': 'spectate',
                             'value': false
                         });
+                        spectate = false;
 
                         checkroom = await Room.findOne({ roomcode : url_query.room });
 
@@ -492,7 +505,7 @@ module.exports = (io, app) => {
 
         socket.on('ChangeRoomSetting', async data => {
             if(!master) return socket.emit('msg', { 'action' : 'alert' , 'message' : '권한이 없습니다.' });
-            if(room.room_for_note_test || room.room_for_single_play || roomroom_for_workshop || room.room_for_replay)
+            if(room.room_for_note_test || room.room_for_single_play || room.room_for_workshop || room.room_for_replay)
                 return socket.emit('msg', { 'action' : 'alert' , 'message' : '권한이 없습니다.' });
 
             if(!data.name || !data.note_speed || !data.music || data.startpos < 0 || data.pitch < 50 || data.pitch > 400) return socket.emit('msg', { 'action' : 'alert' , 'message' : '설정 구성이 잘못되었습니다.' });
