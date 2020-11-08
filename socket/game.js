@@ -117,7 +117,7 @@ module.exports = (io, app) => {
             "verified": user.verified,
             "roomcode" : url_query.room,
             "socket_id": socket.id,
-            "badge": badge.image_name
+            "badge": badge != null ? badge.image_name : null
         });
 
         socket.emit('msg', {

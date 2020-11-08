@@ -283,6 +283,7 @@ window.onload = async () => {
                     scores[player.fullID] = {};
                     scores[player.fullID]['nickname'] = player.nickname;
                     scores[player.fullID]['verified'] = player.verified;
+                    scores[player.fullID]['badge'] = player.badge;
                     scores[player.fullID]['score'] = 0;
                     scores[player.fullID]['accurary'] = 0;
                     scores[player.fullID]['combo'] = 0;
@@ -1019,6 +1020,12 @@ function showScore(scores) {
             verified.outerHTML = ` <svg width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-check-circle-fill text-secondary" fill="currentColor" xmlns="http://www.w3.org/2000/svg" data-container="body" data-toggle="popover" data-placement="top" data-content="인증된 유저" data-trigger="hover">
         <path fill-rule="evenodd" d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zm-3.97-3.03a.75.75 0 0 0-1.08.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-.01-1.05z"/>
     </svg>`;
+        }
+        if(scores[key].badge != null) {
+            const badge = document.createElement('img');
+            badge.src = `/item/badge/${scores[key].badge}`;
+            badge.classList.add('user_badge');
+            nickname.appendChild(badge);
         }
         player.appendChild(nickname);
 
