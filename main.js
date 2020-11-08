@@ -21,6 +21,7 @@ const File = require('./schemas/file');
 const Comment = require('./schemas/comment');
 const Chat = require('./schemas/chat');
 const Item = require('./schemas/item');
+const Inventory = require('./schemas/inventory');
 
 // 웹소켓
 const webSocket = require('./socket');
@@ -55,7 +56,8 @@ passport.deserializeUser((obj, done) => {
             const user = JSON.parse(JSON.stringify(u));
             for(let key in user.equip) {
                 const item = await Item.findOne({ product_id : user.equip[key] });
-                if(!item) {
+                const check_have = await Inventory.findOne({ owner : user.fullID , product_id : user.equip[key] });
+                if(!item || !check_have) {
                     const equip = user.equip;
                     equip[key] = null;
                     await User.updateOne({ fullID : user.fullID }, { equip });
