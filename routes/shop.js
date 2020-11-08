@@ -194,12 +194,12 @@ app.get('/buyitem/:item', utils.isLogin, async (req, res, next) => {
         req.flash('Error', '판매 중지된 상품입니다.');
         return res.redirect('/shop');
     }
-    if(req.user.money < item.price) {
-        req.flash('Error', '돈이 부족합니다.');
-        return res.redirect(`/shop/${req.params.item}`);
-    }
     if(!item.multi_buy && check_item != null) {
         req.flash('Error', '해당 아이템을 이미 소유하고 있습니다.');
+        return res.redirect(`/shop/${req.params.item}`);
+    }
+    if(req.user.money < item.price) {
+        req.flash('Error', '돈이 부족합니다.');
         return res.redirect(`/shop/${req.params.item}`);
     }
 
