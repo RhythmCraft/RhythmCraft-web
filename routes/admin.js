@@ -1,4 +1,5 @@
 const express = require('express');
+const fs = require('fs');
 
 const User = require('../schemas/user');
 const Comment = require('../schemas/comment');
@@ -30,8 +31,11 @@ app.get('/admin/:page', utils.isAdmin, async (req, res, next) => {
                     return res.redirect('/admin/user');
                 }
 
+                const game_skins = fs.readdirSync('./public/skin/game').map(n => n.replace('.css', ''));
+
                 res.render('admin-user-edit', {
-                    edituser: user
+                    edituser: user,
+                    game_skins
                 });
             }
             return;

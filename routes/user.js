@@ -4,6 +4,7 @@ const fs = require('fs');
 
 const User = require('../schemas/user');
 const File = require('../schemas/file');
+const Item = require('../schemas/item');
 
 const utils = require('../utils');
 const setting = require('../setting.json');
@@ -80,12 +81,16 @@ app.get('/profile', async (req, res, next) => {
     if(!profile_image) profile_image = '/img/no_avatar.png';
     else profile_image = `/avatar/${profile_image.name}`;
 
+    let badge;
+    if(profile_user.equip.image_badge != null) badge = await Item.findOne({ product_id : profile_user.equip.image_badge });
+
     const notes = await File.find({ owner : req.query.id || req.user.fullID , file_type : 'note' , public : true });
 
     return res.render('profile', {
         profile_user,
         profile_image,
-        notes
+        notes,
+        badge: badge != null ? badge.image_name : null
     });
 });
 

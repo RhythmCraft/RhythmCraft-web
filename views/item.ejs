@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <script>if (typeof module === 'object') {window.module = module; module = undefined;}</script>
+    <script src="/js/bootstrap/jquery-3.2.1.slim.min.js"></script>
+    <script src="/js/bootstrap/popper.min.js"></script>
+    <script src="/js/bootstrap/bootstrap.min.js"></script>
+    <link rel="stylesheet" href="/css/bootstrap/bootstrap.min.css">
+    <script>
+        if(<%=session.isClient || false%>) {
+            require('electron').remote.getGlobal('globalVars').RichPresence = {
+                details: '아이템 보는 중',
+                startTimestamp: Date.now(),
+                largeImageKey: 'main',
+                instance: true
+            }
+        }
+    </script>
+    <script src="/js/item.js"></script>
+    <script>if (window.module) module = window.module;</script>
+    <title><%=servername%> - 아이템</title>
+</head>
+
+<body>
+<h1>아이템</h1>
+<%-include('./layout/menu')%>
+<%-include('./layout/info')%>
+
+<%if(user.admin) {%>
+    <a class="btn btn-primary" href="/edititem/<%=item.product_id%>">아이템 정보 수정</a>
+    <a id="RemoveItem" class="btn btn-danger" href="/removeitem/<%=item.product_id%>">아이템 삭제</a>
+    <%if(item.stop_sell) {%>
+    <a class="btn btn-success" href="/stopitem/<%=item.product_id%>">아이템 판매 재개</a>
+    <%} else {%>
+    <a class="btn btn-danger" href="/stopitem/<%=item.product_id%>">아이템 판매 중지</a>
+    <%}%>
+<br><br>
+<%}%>
+<button id="buy" class="btn btn-success" data-price="<%=item.price%>" data-my-money="<%=user.money%>" data-item="<%=item.product_id%>">아이템 구매</button>
+<br><br>
+
+<h3>이름 : <%=item.title%></h3>
+<h4>가격 : <%=item.price%>원</h4>
+<%if(item.multi_buy) {%>
+    <h4>중복 구매 가능</h4>
+<%} else {%>
+    <h4>중복 구매 불가</h4>
+<%}%>
+<br>
+<h5>설명</h5>
+<h5><%=item.description%></h5>
+</body>
+</html>

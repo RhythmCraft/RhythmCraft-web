@@ -20,6 +20,7 @@ const RoomUser = require('./schemas/room_user');
 const File = require('./schemas/file');
 const Comment = require('./schemas/comment');
 const Chat = require('./schemas/chat');
+const Item = require('./schemas/item');
 
 // 웹소켓
 const webSocket = require('./socket');
@@ -50,7 +51,20 @@ passport.serializeUser((user, done) => {
 });
 passport.deserializeUser((obj, done) => {
     User.findOne({ snsID: obj.snsID , provider: obj.provider })
-        .then(user => done(null, user))
+        .then(async u => {
+            const user = JSON.parse(JSON.stringify(u));
+            for(let key in user.equip) {
+                const item = await Item.findOne({ product_id : user.equip[key] });
+                if(!item) {
+                    const equip = user.equip;
+                    equip[key] = null;
+                    await User.updateOne({ fullID : user.fullID }, { equip });
+                    user.equip = equip;
+                }
+                else user[`equip_${key}`] = item.image_name;
+            }
+            done(null, user);
+        })
         .catch(err => done(err));
 });
 

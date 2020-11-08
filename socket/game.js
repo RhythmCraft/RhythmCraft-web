@@ -10,6 +10,7 @@ const Room = require('../schemas/room');
 const RoomUser = require('../schemas/room_user');
 const File = require('../schemas/file');
 const Chat = require('../schemas/chat');
+const Item = require('../schemas/item');
 
 const setting = require('../setting.json');
 const utils = require('../utils');
@@ -86,10 +87,22 @@ module.exports = (io, app) => {
 
         const already_user = await RoomUser.find({ roomcode : url_query.room });
         already_user.forEach(user => {
-            socket.emit('userJoin', user);
+            socket.emit('userJoin', {
+                nickname: user.nickname,
+                fullID: user.fullID,
+                verified: user.verified,
+                badge: user.badge
+            });
         });
 
-        io.to(`room_${url_query.room}`).emit('userJoin', { "nickname" : user.nickname , "fullID" : user.fullID , "verified" : user.verified });
+        let badge;
+        if(user.equip.image_badge != null) badge = await Item.findOne({ product_id : user.equip.image_badge });
+        io.to(`room_${url_query.room}`).emit('userJoin', {
+            nickname: user.nickname,
+            fullID: user.fullID,
+            verified: user.verified,
+            badge: badge != null ? badge.image_name : null
+        });
         io.to(`room_${url_query.room}`).emit('Chat', {
             nickname: `시스템`,
             chattype: 'system',
@@ -101,7 +114,8 @@ module.exports = (io, app) => {
             "fullID" : user.fullID,
             "verified": user.verified,
             "roomcode" : url_query.room,
-            "socket_id": socket.id
+            "socket_id": socket.id,
+            "badge": badge.image_name
         });
 
         socket.emit('msg', {
@@ -786,13 +800,15 @@ module.exports = (io, app) => {
                     chat_id
                 });
             }
-
+            let badge;
+            if(checkuser.equip.image_badge != null) badge = await Item.findOne({ product_id : checkuser.equip.image_badge });
             io.to(`room_${url_query.room}`).emit('Chat', {
                 nickname: checkuser.nickname,
                 chattype,
                 chat: data.chat,
                 verified: checkuser.verified,
-                chat_id
+                chat_id,
+                badge: badge != null ? badge.image_name : null
             });
         });
 

@@ -27,7 +27,19 @@ app.post('/admin_editaccount', utils.isAdmin, async (req, res, next) => {
         block_login: new Date(req.body.block_login).getTime(),
         block_login_reason: req.body.block_login_reason,
         block_chat: new Date(req.body.block_chat).getTime(),
-        block_chat_reason: req.body.block_chat_reason
+        block_chat_reason: req.body.block_chat_reason,
+        rhythm_key_1: req.body.InputKey1,
+        rhythm_key_2: req.body.InputKey2,
+        rhythm_key_3: req.body.InputKey3,
+        rhythm_key_4: req.body.InputKey4,
+        rhythm_key_5: req.body.InputKey5,
+        rhythm_key_6: req.body.InputKey6,
+        rhythm_key_7: req.body.InputKey7,
+        rhythm_key_8: req.body.InputKey8,
+        show_accurary_center: req.body.show_accurary_center == 'true',
+        game_skin: req.body.game_skin,
+        custom_game_skin: req.body.custom_game_skin,
+        money: req.body.money
     });
 
     res.redirect(`/admin/user?id=${req.body.fullID}`);

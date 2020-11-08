@@ -158,6 +158,9 @@
     width: 25%;
     height: 400px;
 }
+.chat {
+    margin-bottom: 8px;
+}
 .chat-nickname, .chat-text {
     margin-left: 10px;
 }
@@ -194,4 +197,9 @@
 }
 .report-button {
     margin-bottom: 2px;
+}
+.user_badge {
+    width: 20px;
+    height: 20px;
+    margin-left: 4px;
 }

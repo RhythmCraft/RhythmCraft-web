@@ -17,7 +17,9 @@
                 instance: true
             }
         }
+        game_skin_value = "<%=user.game_skin%>";
     </script>
+    <script src="/js/admin-user-edit.js"></script>
     <script>if (window.module) module = window.module;</script>
     <title>유저 관리 - 데이터 수정</title>
 </head>
@@ -30,11 +32,11 @@
 <form action="/admin_editaccount" method="post">
     <input type="hidden" name="before_fullID" value="<%=edituser.fullID%>">
 
-    <p>닉네임 : <input type="text" name="nickname" id="input" placeholder="닉네임을 입력해 주세요." value="<%=edituser.nickname%>" required></p>
-    <p>이메일(선택 입력) : <input type="email" name="email" id="input" placeholder="이메일을 입력해 주세요." value="<%=edituser.email%>"></p>
-    <p>snsID(수정하면 계정에 큰 영향을 미칩니다) : <input type="text" name="snsID" id="input" placeholder="snsID를 입력해 주세요." value="<%=edituser.snsID%>" required></p>
-    <p>fullID(수정하면 계정에 큰 영향을 미칩니다) : <input type="text" name="fullID" id="input" placeholder="fullID를 입력해 주세요." value="<%=edituser.fullID%>" required></p>
-    <p>provider(수정하면 계정에 큰 영향을 미칩니다) : <input type="text" name="provider" id="input" placeholder="provider를 입력해 주세요." value="<%=edituser.provider%>" required></p>
+    <p>닉네임 : <input type="text" name="nickname" id="nickinput" class="input_box" placeholder="닉네임을 입력해 주세요." value="<%=edituser.nickname%>" required></p>
+    <p>이메일(선택 입력) : <input type="email" name="email" id="emailinput" class="input_box" placeholder="이메일을 입력해 주세요." value="<%=edituser.email%>"></p>
+    <p>snsID(수정하면 계정에 큰 영향을 미칩니다) : <input type="text" name="snsID" id="snsidinput" class="input_box" placeholder="snsID를 입력해 주세요." value="<%=edituser.snsID%>" required></p>
+    <p>fullID(수정하면 계정에 큰 영향을 미칩니다) : <input type="text" name="fullID" id="fullidinput" class="input_box" placeholder="fullID를 입력해 주세요." value="<%=edituser.fullID%>" required></p>
+    <p>provider(수정하면 계정에 큰 영향을 미칩니다) : <input type="text" name="provider" id="providerinput" class="input_box" placeholder="provider를 입력해 주세요." value="<%=edituser.provider%>" required></p>
     <%if(edituser.nick_set) {%>
         <p><label for="nick_set">nick_set(닉네임 최초 설정 여부) : <input type="checkbox" name="nick_set" id="nick_set" value="true" checked></label></p>
     <%} else {%>
@@ -55,6 +57,38 @@
     <%} else {%>
         <p><label for="verified">인증됨 : <input type="checkbox" name="verified" id="verified" value="true"></label></p>
     <%}%>
+    <%if(edituser.show_accurary_center) {%>
+        <p><label for="show_accurary_center">게임 중 정확도 중앙에 표시 : <input type="checkbox" name="show_accurary_center" id="show_accurary_center" value="true" checked></label></p>
+    <%} else {%>
+        <p><label for="show_accurary_center">게임 중 정확도 중앙에 표시 : <input type="checkbox" name="show_accurary_center" id="show_accurary_center" value="true"></label></p>
+    <%}%>
+    게임 키 1 : <input type="text" id="InputKey1" class="setkey" name="InputKey1" value="<%=user.rhythm_key_1%>" placeholder="1번 키">
+    <br>게임 키 2 : <input type="text" id="InputKey2" class="setkey" name="InputKey2" value="<%=user.rhythm_key_2%>" placeholder="2번 키">
+    <br>게임 키 3 : <input type="text" id="InputKey3" class="setkey" name="InputKey3" value="<%=user.rhythm_key_3%>" placeholder="3번 키">
+    <br>게임 키 4 : <input type="text" id="InputKey4" class="setkey" name="InputKey4" value="<%=user.rhythm_key_4%>" placeholder="4번 키">
+    <br>게임 키 5 : <input type="text" id="InputKey5" class="setkey" name="InputKey5" value="<%=user.rhythm_key_5%>" placeholder="5번 키">
+    <br>게임 키 6 : <input type="text" id="InputKey6" class="setkey" name="InputKey6" value="<%=user.rhythm_key_6%>" placeholder="6번 키">
+    <br>게임 키 7 : <input type="text" id="InputKey7" class="setkey" name="InputKey7" value="<%=user.rhythm_key_7%>" placeholder="7번 키">
+    <br>게임 키 8 : <input type="text" id="InputKey8" class="setkey" name="InputKey8" value="<%=user.rhythm_key_8%>" placeholder="8번 키">
+    <br><br>
+    <div class="form-group">
+        <label for="InputGameSkin">게임 스킨</label>
+        <select name="game_skin" class="form-control" id="InputGameSkin" required>
+            <option value="no_skin">없음</option>
+            <option value="custom_skin">커스텀</option>
+            <%game_skins.forEach(skin => {%>
+            <option value="<%=skin%>"><%=skin%></option>
+            <%});%>
+        </select>
+    </div>
+
+    <div class="form-group" id="input_custom_skin" hidden>
+        <label for="CustomGameSkin">커스텀 게임 스킨</label>
+        <textarea id="CustomGameSkin" name="custom_game_skin" class="form-control" placeholder="커스텀 게임 스킨 CSS를 입력하세요."><%=edituser.custom_game_skin%></textarea>
+    </div>
+
+    <p>돈 : <input type="number" name="money" class="input_box" placeholder="돈을 입력해 주세요." value="<%=edituser.money%>" required></p>
+
     <div class="form-group">
         <label for="InputAccountBan">계정 벤(설정 날짜까지 로그인 불가능)</label>
         <%const ban_d = new Date(edituser.block_login);%>

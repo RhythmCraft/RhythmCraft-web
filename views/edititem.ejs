@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <script>if (typeof module === 'object') {window.module = module; module = undefined;}</script>
+    <script src="/js/bootstrap/jquery-3.2.1.slim.min.js"></script>
+    <script src="/js/bootstrap/popper.min.js"></script>
+    <script src="/js/bootstrap/bootstrap.min.js"></script>
+    <link rel="stylesheet" href="/css/bootstrap/bootstrap.min.css">
+    <script>
+        if(<%=session.isClient || false%>) {
+            require('electron').remote.getGlobal('globalVars').RichPresence = {
+                details: '아이템 정보 수정',
+                startTimestamp: Date.now(),
+                largeImageKey: 'main',
+                instance: true
+            }
+        }
+        window.onload = () => {
+            document.getElementById('InputName').focus();
+        }
+    </script>
+    <script>if (window.module) module = window.module;</script>
+    <title><%=servername%> - 아이템 수정</title>
+</head>
+
+<body>
+<h1>아이템 수정</h1>
+<%-include('./layout/menu')%>
+<%-include('./layout/info')%>
+
+<form action="/edititem/<%=item.product_id%>" method="post">
+    <div class="form-group">
+        <label for="InputName">아이템 이름</label>
+        <input type="text" id="InputName" class="form-control" name="title" placeholder="아이템 이름을 입력하세요." value="<%=item.title%>" required>
+    </div>
+    <div class="form-group">
+        <label for="InputDescription">아이템 설명</label>
+        <textarea id="InputDescription" class="form-control" name="description" placeholder="아이템 설명을 입력하세요." required><%=item.description%></textarea>
+    </div>
+    <div class="form-group">
+        <label for="InputPrice">아이템 가격</label>
+        <input type="number" id="InputPrice" class="form-control" name="price" placeholder="아이템 가격을 입력하세요." value="<%=item.price%>" required>
+    </div>
+    <div class="form-group">
+        <label for="InputType">아이템 타입</label>
+        <input type="text" id="InputType" class="form-control" name="type" placeholder="아이템 타입을 입력하세요." value="<%=item.type%>" required>
+    </div>
+    <div class="form-group">
+        <label for="InputImageName">아이템 에셋 이미지명(필수 아님)</label>
+        <input type="text" id="InputImageName" class="form-control" name="image_name" placeholder="아이템 에셋 이미지명을 입력하세요." value="<%=item.image_name%>">
+    </div>
+    <%if(item.multi_buy) {%>
+        <input type="checkbox" name="multi_buy" id="InputMultibuy" value="true" checked> <label for="InputMultibuy">중복 구매 가능</label>
+    <%} else {%>
+        <input type="checkbox" name="multi_buy" id="InputMultibuy" value="true"> <label for="InputMultibuy">중복 구매 가능</label>
+    <%}%>
+
+    <br><button type="submit" class="btn btn-primary">수정</button>
+</form>
+</body>
+</html>

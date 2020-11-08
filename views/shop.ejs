@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <script>if (typeof module === 'object') {window.module = module; module = undefined;}</script>
+    <script src="/js/bootstrap/jquery-3.2.1.slim.min.js"></script>
+    <script src="/js/bootstrap/popper.min.js"></script>
+    <script src="/js/bootstrap/bootstrap.min.js"></script>
+    <link rel="stylesheet" href="/css/bootstrap/bootstrap.min.css">
+    <script>
+        if(<%=session.isClient || false%>) {
+            require('electron').remote.getGlobal('globalVars').RichPresence = {
+                details: '상점',
+                startTimestamp: Date.now(),
+                largeImageKey: 'main',
+                instance: true
+            }
+        }
+    </script>
+    <script src="/js/shop.js"></script>
+    <link rel="stylesheet" href="/css/shop.css">
+    <script>if (window.module) module = window.module;</script>
+    <title><%=servername%> - 상점</title>
+</head>
+
+<body>
+<h1>상점</h1>
+<%-include('./layout/menu')%>
+<%-include('./layout/info')%>
+<h3>내가 가진 돈 : <%=user.money%>원</h3>
+
+<%if(user.admin) {%>
+    <a href="/newitem" class="btn btn-primary">새 상품 생성</a>
+<%}%>
+<a href="/inventory" class="btn btn-primary">인벤토리</a>
+<a href="/shop_history" class="btn btn-primary">구매내역</a>
+
+<form action="/shop" method="get">
+    <div class="form-group">
+        <label for="InputSearch">검색어 입력</label>
+        <input type="text" id="InputSearch" class="form-control" value="<%=query.search%>" name="search" placeholder="검색어를 입력하세요.">
+    </div>
+
+    <button type="submit" class="btn btn-primary">검색</button>
+</form>
+<br>
+
+<%if(items.length == 0) {%>
+<h3>아이템이 없습니다!</h3>
+<%} else items.forEach(item => {%>
+    <div class="item" data-productid="<%=item.product_id%>">
+        <h3><%=item.title%></h3>
+        <h4><%=item.price%>원</h4>
+        <h5><%=item.description%></h5>
+    </div>
+<%});%>
+</body>
+</html>

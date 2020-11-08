@@ -12,6 +12,7 @@ const File = require('../schemas/file');
 const Comment = require('../schemas/comment');
 const Like = require('../schemas/like');
 const RemoveCommentVote = require('../schemas/remove_comment_vote');
+const Item = require('../schemas/item');
 
 // app 정의
 const app = express.Router();
@@ -86,6 +87,8 @@ app.get('/workshop/note', async (req, res, next) => {
     }
 
     const creator = await User.findOne({ fullID : note.owner });
+    let badge;
+    if(creator.equip.image_badge != null) badge = await Item.findOne({ product_id : creator.equip.image_badge });
     const comments = await Comment.find({ note_name : note.name }).sort('-pin -like');
 
     for(let i in comments) {
@@ -119,7 +122,8 @@ app.get('/workshop/note', async (req, res, next) => {
         User,
         File,
         comments,
-        comment_delete_required_count: setting.COMMENT_DELETE_REQUIRED_COUNT
+        comment_delete_required_count: setting.COMMENT_DELETE_REQUIRED_COUNT,
+        badge: badge != null ? badge.image_name : null
     });
 });
 

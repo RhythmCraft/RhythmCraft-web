@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <script>if (typeof module === 'object') {window.module = module; module = undefined;}</script>
+    <script src="/js/bootstrap/jquery-3.2.1.slim.min.js"></script>
+    <script src="/js/bootstrap/popper.min.js"></script>
+    <script src="/js/bootstrap/bootstrap.min.js"></script>
+    <link rel="stylesheet" href="/css/bootstrap/bootstrap.min.css">
+    <script>
+        if(<%=session.isClient || false%>) {
+            require('electron').remote.getGlobal('globalVars').RichPresence = {
+                details: '인벤토리',
+                startTimestamp: Date.now(),
+                largeImageKey: 'main',
+                instance: true
+            }
+        }
+    </script>
+    <link rel="stylesheet" href="/css/inventory.css">
+    <script>if (window.module) module = window.module;</script>
+    <title><%=servername%> - 인벤토리</title>
+</head>
+
+<body>
+<h1>인벤토리</h1>
+<%-include('./layout/menu')%>
+<%-include('./layout/info')%>
+
+<%if(inventory.length == 0) {%>
+    <h3>구매한 아이템이 없습니다! <a href="/shop">상점</a>에서 아이템을 구매해 보세요.</h3>
+<%} else inventory.forEach(item => {%>
+<div class="item" data-productid="<%=item.product_id%>">
+    <h3><%=item.title%></h3>
+    <h5><%=item.description%></h5>
+    <%if(user.equip[item.type] == item.product_id) {%>
+        <a class="btn btn-primary" href="/unuseitem/<%=item.type%>">이 아이템 착용 해제</a>
+    <%} else {%>
+        <a class="btn btn-primary" href="/useitem/<%=item.product_id%>">이 아이템 착용</a>
+    <%}%>
+</div>
+<%});%>
+</body>
+</html>

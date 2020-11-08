@@ -24,6 +24,9 @@ const newSchema = new Schema({
     socket_id: {
         type: String,
         required: true
+    },
+    badge: {
+        type: String
     }
 });
 

@@ -125,6 +125,16 @@ const userSchema = new Schema({
     },
     custom_game_skin: {
         type: String
+    },
+    money: {
+        type: Number,
+        required: true,
+        default: 0
+    },
+    equip: {
+        type: JSON,
+        required: true,
+        default: {}
     }
 });
 
