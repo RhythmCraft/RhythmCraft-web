@@ -16,6 +16,9 @@
                 instance: true
             }
         }
+        window.onload = () => {
+            document.getElementById('InputSearch').focus();
+        }
     </script>
     <link rel="stylesheet" href="/css/inventory.css">
     <script>if (window.module) module = window.module;</script>
@@ -27,9 +30,20 @@
 <%-include('./layout/menu')%>
 <%-include('./layout/info')%>
 
+<form action="/inventory" method="get">
+    <div class="form-group">
+        <label for="InputSearch">검색어 입력</label>
+        <input type="text" id="InputSearch" class="form-control" name="search" placeholder="검색어를 입력하세요." value="<%=query.search%>">
+    </div>
+
+    <button type="submit" class="btn btn-primary">검색</button>
+</form>
+<hr>
+
 <%if(inventory.length == 0) {%>
     <h3>구매한 아이템이 없습니다! <a href="/shop">상점</a>에서 아이템을 구매해 보세요.</h3>
 <%} else inventory.forEach(item => {%>
+<%if(!item.dontshow) {%>
 <div class="item" data-productid="<%=item.product_id%>">
     <h3><%=item.title%></h3>
     <h5><%=item.description%></h5>
@@ -39,6 +53,7 @@
         <a class="btn btn-primary" href="/useitem/<%=item.product_id%>">이 아이템 착용</a>
     <%}%>
 </div>
+<%}%>
 <%});%>
 </body>
 </html>

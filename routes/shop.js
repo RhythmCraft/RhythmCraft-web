@@ -52,6 +52,8 @@ app.get('/inventory', utils.isLogin, async (req, res, next) => {
         inventory[i]['title'] = item.title;
         inventory[i]['description'] = item.description;
         inventory[i]['type'] = item.type;
+
+        inventory[i]['dontshow'] = (req.query.search != null && !item.title.includes(req.query.search) && !item.description.includes(req.query.search));
     }
     return res.render('inventory', {
         inventory
