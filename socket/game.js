@@ -348,7 +348,7 @@ module.exports = (io, app) => {
                                 });
                             }
 
-                            if(checkroom.note.chat != null) for(let i in checkroom.note.chat) {
+                            if(checkroom.note.chat != null && checkroom.trusted) for(let i in checkroom.note.chat) {
                                 if(Number(i) > checkroom.startpos) rtnote_timeout.push(setTimeout(() => {
                                     io.to(`room_${url_query.room}`).emit('Chat', checkroom['note']['chat'][i]);
                                 }, ((Number(i) / (checkroom.pitch / 100)) + countdown - (checkroom.startpos / (checkroom.pitch / 100))) + checkroom.note_speed));
