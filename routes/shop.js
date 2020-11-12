@@ -8,6 +8,7 @@ const setting = require('../setting.json');
 const User = require('../schemas/user');
 const Item = require('../schemas/item');
 const Inventory = require('../schemas/inventory');
+const Promotion = require('../schemas/promotion');
 
 // app 정의
 const app = express.Router();
@@ -222,6 +223,55 @@ app.get('/buyitem/:item', utils.isLogin, async (req, res, next) => {
     });
     req.flash('Info', '아이템 구매 처리가 완료되었습니다.');
     return res.redirect(`/shop/${req.params.item}`);
+});
+
+app.get('/promotion', utils.isLogin, (req, res, next) => {
+    return res.render('promotion');
+});
+
+app.post('/promotion', utils.isLogin, async (req, res, next) => {
+    if(!/^[A-Z0-9]{5}(-[A-Z0-9]{5}){4}$/.test(req.body.code)) {
+        req.flash('Error', '유효하지 않은 프로모션 코드 형식입니다.');
+        return res.redirect('/promotion');
+    }
+
+    const promotion = await Promotion.findOne({ code : req.body.code });
+    if(!promotion) {
+        req.flash('Error', '존재하지 않는 프로모션 키입니다.');
+        return res.redirect('/promotion');
+    }
+    if(promotion.expires <= Date.now()) {
+        req.flash('Error', '유효기간이 지나 사용 처리할 수 없습니다. 1분 안에 이 키가 서버에서 삭제됩니다.');
+        return res.redirect('/promotion');
+    }
+
+    switch(promotion.type) {
+        case 'money':
+            await User.updateOne({ fullID : req.user.fullID }, { $inc : { money : promotion.promotion_money } });
+            req.flash('Info', `프로모션 코드를 성공적으로 사용하였습니다!<br>돈 ${promotion.promotion_money}원이 계정에 추가되었습니다.`);
+            break;
+        case 'item':
+            const item = await Item.findOne({ product_id : promotion.promotion_item });
+            const check_item = await Inventory.findOne({ owner : req.user.fullID , product_id : req.params.item });
+            if(!item) {
+                req.flash('Error', '해당 프로모션 코드로 얻을 아이템을 찾을 수 없습니다. 관리자에게 문의하세요.');
+                return res.redirect('/promotion');
+            }
+            if(!item.multi_buy && check_item != null) {
+                req.flash('Error', '해당 아이템을 이미 소유하고 있어 프로모션 코드를 사용할 수 없습니다.<br>친구에게 키를 선물하는 것은 어떨까요? :)');
+                return res.redirect('/promotion');
+            }
+
+            await Inventory.create({
+                owner: req.user.fullID,
+                product_id: promotion.promotion_item
+            });
+            req.flash('Info', `프로모션 코드를 성공적으로 사용하였습니다!<br>아이템 ${item.title}이(가) 계정에 추가되었습니다.`);
+            break;
+    }
+
+    await Promotion.deleteOne({ code : req.body.code });
+    return res.redirect('/promotion');
 });
 
 module.exports = app;

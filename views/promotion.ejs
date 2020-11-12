@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <script>if (typeof module === 'object') {window.module = module; module = undefined;}</script>
+    <script src="/js/bootstrap/jquery-3.2.1.slim.min.js"></script>
+    <script src="/js/bootstrap/popper.min.js"></script>
+    <script src="/js/bootstrap/bootstrap.min.js"></script>
+    <link rel="stylesheet" href="/css/bootstrap/bootstrap.min.css">
+    <script>
+        if(<%=session.isClient || false%>) {
+            require('electron').remote.getGlobal('globalVars').RichPresence = {
+                details: '프로모션 코드 입력',
+                startTimestamp: Date.now(),
+                largeImageKey: 'main',
+                instance: true
+            }
+        }
+    </script>
+    <script src="/js/promotion.js"></script>
+    <script>if (window.module) module = window.module;</script>
+    <title><%=servername%> - 프로모션 코드</title>
+</head>
+
+<body>
+<h1>프로모션 코드</h1>
+<%-include('./layout/menu')%>
+<%-include('./layout/info')%>
+<div id="info"></div>
+
+<h3>프로모션 코드가 계정 <%=user.nickname%><%=user.email != null ? `(${user.email})` : ''%>에 활성화됩니다. 이 계정이 아니라면 <a href="/logout">로그아웃</a> 후 다른 계정으로 로그인하세요.</h3>
+
+<form action="/promotion" method="post" id="form">
+    <div class="form-group">
+        <label for="InputPromotion">25자리의 프로모션 코드를 입력하세요.</label>
+        <input type="text" id="InputPromotion" class="form-control" name="code" maxlength="29" placeholder="예시 : XXXXX-XXXXX-XXXXX-XXXXX-XXXXX" required>
+    </div>
+
+    <button type="submit" class="btn btn-primary">사용하기</button>
+</form>
+</body>
+</html>

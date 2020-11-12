@@ -4,6 +4,8 @@ const nodemailer = require('nodemailer');
 
 const User = require('../schemas/user');
 const Chat = require('../schemas/chat');
+const Promotion = require('../schemas/promotion');
+const Item = require('../schemas/item');
 
 const utils = require('../utils');
 const setting = require('../setting.json');
@@ -88,6 +90,78 @@ app.get('/remove-report', utils.isAdmin, async (req, res, next) => {
     await Chat.updateOne({ chat_id : req.query.chat , reported : true } , { reported : false , reported_by : 'no_user' });
     req.flash('Info', '요청이 처리되었습니다. 신고 관리 목록에서 제거하였습니다.');
     return res.redirect('/admin/chat-report');
+});
+
+app.post('/admin_create_promotion', utils.isAdmin, async (req, res, next) => {
+    const allowed_type = [ 'money' , 'item' ];
+    if(!allowed_type.includes(req.body.type)) {
+        req.flash('Error', '프로모션 코드 타입이 잘못되었습니다!');
+        return res.redirect('/admin/create-promotion');
+    }
+    if(req.body.type == 'money' && !req.body.promotion_money) {
+        req.flash('Error', '프로모션 코드 타입이 돈일 경우 돈을 입력해야 합니다!');
+        return res.redirect('/admin/create-promotion');
+    }
+    if(req.body.type == 'item' && !req.body.promotion_item) {
+        req.flash('Error', '프로모션 코드 타입이 아이템일 경우 아이템 코드를 입력해야 합니다!');
+        return res.redirect('/admin/create-promotion');
+    }
+    if(req.body.multi_code == 'true' && !req.body.count) {
+        req.flash('Error', '코드 여러개 생성시 코드 생성 갯수를 입력해야 합니다!');
+        return res.redirect('/admin/create-promotion');
+    }
+    if(req.body.multi_code == 'true' && isNaN(req.body.count)) {
+        req.flash('Error', '코드 생성 갯수는 유효한 숫자만 입력해야 합니다!');
+        return res.redirect('/admin/create-promotion');
+    }
+    if(req.body.multi_code == 'true' && req.body.count < 2) {
+        req.flash('Error', '코드 여러개 생성시 코드 생성 갯수는 2 이상이어야 합니다!');
+        return res.redirect('/admin/create-promotion');
+    }
+    if(req.body.type == 'money' && req.body.promotion_money < 1) {
+        req.flash('Error', '지급할 돈은 0원보다 커야 합니다!');
+        return res.redirect('/admin/create-promotion');
+    }
+    if(req.body.type == 'item') {
+        const checkitem = await Item.findOne({ product_id : req.body.promotion_item });
+        if(!checkitem) {
+            req.flash('Error', '해당 아이템 코드로 아이템을 찾을 수 없습니다!');
+            return res.redirect('/admin/create-promotion');
+        }
+    }
+
+    if(req.body.multi_code == 'true') {
+        let csv = `${setting.SERVER_NAME} Promotion Code\n`;
+        for(let i = 1; i <= req.body.count; i++) {
+            const promotion_code = await utils.createPromotion();
+
+            await Promotion.create({
+                code: promotion_code,
+                expires: new Date(req.body.expires).getTime(),
+                type: req.body.type,
+                promotion_money: req.body.promotion_money,
+                promotion_item: req.body.promotion_item
+            });
+
+            csv += `${promotion_code}\n`;
+        }
+
+        res.setHeader('Content-Disposition', 'attachment; filename="promotion.csv"');
+        return res.send(csv);
+    }
+    else {
+        const promotion_code = await utils.createPromotion();
+        await Promotion.create({
+            code: promotion_code,
+            expires: new Date(req.body.expires).getTime(),
+            type: req.body.type,
+            promotion_money: req.body.promotion_money,
+            promotion_item: req.body.promotion_item
+        });
+
+        req.flash('Info', `프로모션 코드가 생성되었습니다!<br>코드 : ${promotion_code}`);
+        return res.redirect('/admin/create-promotion');
+    }
 });
 
 module.exports = app;

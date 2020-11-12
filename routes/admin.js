@@ -92,6 +92,9 @@ app.get('/admin/:page', utils.isAdmin, async (req, res, next) => {
                 chats
             });
             return;
+        case 'create-promotion':
+            res.render('admin_promotion');
+            return;
         default:
             res.redirect('/admin');
             return;

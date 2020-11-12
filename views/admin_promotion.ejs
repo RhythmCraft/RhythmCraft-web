@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <script>if (typeof module === 'object') {window.module = module; module = undefined;}</script>
+    <script src="/js/bootstrap/jquery-3.2.1.slim.min.js"></script>
+    <script src="/js/bootstrap/popper.min.js"></script>
+    <script src="/js/bootstrap/bootstrap.min.js"></script>
+    <link rel="stylesheet" href="/css/bootstrap/bootstrap.min.css">
+    <script>
+        if(<%=session.isClient || false%>) {
+            require('electron').remote.getGlobal('globalVars').RichPresence = {
+                details: '관리자 페이지',
+                startTimestamp: Date.now(),
+                largeImageKey: 'main',
+                instance: true
+            }
+        }
+    </script>
+    <script src="/js/admin_promotion.js"></script>
+    <script>if (window.module) module = window.module;</script>
+    <title><%=servername%> - 프로모션 코드 관리</title>
+</head>
+
+<body>
+<h1>프로모션 코드 생성</h1>
+<%-include('./layout/menu')%>
+<%-include('./layout/info')%>
+
+<form action="/admin_create_promotion" method="post">
+    <div class="form-group">
+        <label for="InputType">프로모션 코드 타입을 선택하세요.</label>
+        <select id="InputType" class="form-control" name="type" required>
+            <option value="money">돈</option>
+            <option value="item">아이템</option>
+        </select>
+    </div>
+    <div id="type_input_money" class="form-group type_inputs">
+        <label for="InputMoney">지급할 돈의 액수</label>
+        <input type="number" id="InputMoney" class="form-control" name="promotion_money" placeholder="지급할 돈의 액수를 입력하세요.">
+    </div>
+    <div id="type_input_item" class="form-group type_inputs" hidden>
+        <label for="InputItem">지급할 아이템 코드(상점에서 아이템 페이지에 들어가면 URL에서 확인 가능합니다)</label>
+        <input type="text" id="InputItem" class="form-control" name="promotion_item" placeholder="지급할 아이템의 코드를 입력하세요.">
+    </div>
+    <div class="form-group">
+        <input type="checkbox" id="InputMultiCode" name="multi_code" value="true">
+        <label for="InputMultiCode">코드 여러개 생성(csv 파일로 저장됩니다)</label>
+    </div>
+    <div id="InputCount" class="form-group" hidden>
+        <label for="InputCount">생성할 코드의 갯수</label>
+        <input type="number" id="InputCount" class="form-control" min="2" name="count" placeholder="생성할 코드의 갯수를 입력하세요.">
+    </div>
+    <div class="form-group">
+        <label for="InputExpires">만료 기한 설정(최대 1분까지 코드 무효화가 연기될 수 있습니다)</label>
+        <input type="datetime-local" id="InputExpires" class="form-control" name="expires" required>
+    </div>
+
+    <button type="submit" class="btn btn-primary">생성</button>
+</form>
+</body>
+</html>

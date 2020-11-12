@@ -22,6 +22,7 @@ const Comment = require('./schemas/comment');
 const Chat = require('./schemas/chat');
 const Item = require('./schemas/item');
 const Inventory = require('./schemas/inventory');
+const Promotion = require('./schemas/promotion');
 
 // 웹소켓
 const webSocket = require('./socket');
@@ -245,4 +246,5 @@ async function CreateOfficialRoom() {
 
 setInterval(async () => {
     await Chat.deleteMany({ createdAt : { $lt : Date.now() - 259200000 } , reported : false });
+    await Promotion.deleteMany({ expires : { $lt : Date.now() } });
 }, 60000);

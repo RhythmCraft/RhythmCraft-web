@@ -19,7 +19,10 @@
         <div class="dropdown-divider"></div>
             <a class="dropdown-item" href="/">메인 메뉴</a>
             <a class="dropdown-item" href="/workshop">창작마당</a>
-            <a class="dropdown-item" href="/shop">상점</a>
+            <%if(logined) {%>
+                <a class="dropdown-item" href="/shop">상점</a>
+                <a class="dropdown-item" href="/promotion">프로모션 코드 사용</a>
+            <%}%>
             <div class="dropdown-divider"></div>
         <a class="dropdown-item" href="/debug">디버그 정보</a>
         <%if(isAdmin) {%>

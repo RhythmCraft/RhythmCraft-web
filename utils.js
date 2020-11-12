@@ -1,5 +1,8 @@
 const jwt = require('jsonwebtoken');
 const Url = require('url');
+const uniqueString = require('unique-string');
+
+const Promotion = require('./schemas/promotion');
 
 const setting = require('./setting.json');
 
@@ -58,4 +61,17 @@ module.exports.verifyToken = token => {
 
 module.exports.getRandomNote = key_limit => {
     return key_limit[getRandomInt(0, key_limit.length - 1)];
-};
+}
+
+const createPromotion = async () => {
+    let promotion_code = uniqueString().substring(0, 25).replace(/(.{5})/g,"$1-").toUpperCase();
+    if(promotion_code.endsWith('-')) promotion_code = promotion_code.slice(0, -1);
+
+    const check = await Promotion.findOne({
+        code: promotion_code
+    });
+    if(!check) return promotion_code;
+    else return createPromotion();
+}
+
+module.exports.createPromotion = createPromotion;
