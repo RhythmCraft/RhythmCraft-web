@@ -252,7 +252,7 @@ app.post('/promotion', utils.isLogin, async (req, res, next) => {
             break;
         case 'item':
             const item = await Item.findOne({ product_id : promotion.promotion_item });
-            const check_item = await Inventory.findOne({ owner : req.user.fullID , product_id : req.params.item });
+            const check_item = await Inventory.findOne({ owner : req.user.fullID , product_id : promotion.promotion_item });
             if(!item) {
                 req.flash('Error', '해당 프로모션 코드로 얻을 아이템을 찾을 수 없습니다. 관리자에게 문의하세요.');
                 return res.redirect('/promotion');
