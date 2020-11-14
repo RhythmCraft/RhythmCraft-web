@@ -478,6 +478,17 @@ app.post('/adofai-converter', utils.isLogin, upload.fields([{ name : 'music' }, 
         return res.redirect('/adofai-converter');
     }
 
+    const adofai = JSON.parse(String(req.files.adofai[0].buffer).trim()
+        .replaceAll(', ,', ',')
+        .replaceAll('}\n', '},\n')
+        .replaceAll('},\n\t]', '}\n\t]')
+        .replaceAll(', },', ' },')
+        .replaceAll(', }', ' }'));
+    if(!adofai.pathData || !adofai.settings || !adofai.actions) {
+        req.flash('Error', 'ADOFAI 채보 파일이 잘못되었습니다.');
+        return res.redirect('/adofai-converter');
+    }
+
     let music;
     if(req.body.music_select != null) music = await File.findOne({ name : req.body.music_select });
 
@@ -499,6 +510,7 @@ app.post('/adofai-converter', utils.isLogin, upload.fields([{ name : 'music' }, 
         originalname: req.files.adofai[0].originalname.replace('.adofai', '.signedrhythmcraft'),
         owner: req.user.fullID,
         file_type: 'note',
+        workshop_title: `${adofai.settings.artist || 'Unknown'} - ${adofai.settings.song || 'Unknown'}`,
         description: '레벨에 대해 말해보세요!'
     });
 
