@@ -6,9 +6,6 @@
  * Do not remove this header.
  */
 
-const fs = require('fs');
-const path = require('path');
-
 const utils = require('./utils');
 
 String.prototype.replaceAll = function(org, dest) {
