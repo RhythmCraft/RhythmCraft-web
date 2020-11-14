@@ -10,7 +10,7 @@
     <script>
         if(<%=session.isClient || false%>) {
             require('electron').remote.getGlobal('globalVars').RichPresence = {
-                details: '채보 변환 페이지',
+                details: 'ADOFAI 채보 변환 페이지',
                 startTimestamp: Date.now(),
                 largeImageKey: 'main',
                 instance: true
@@ -42,7 +42,7 @@
     </div>
 
     <br><label for="InputADOFAI"><p class="btn btn-primary">클릭하여 ADOFAI 파일 업로드</p></label>
-    <input type="file" name="adofai" id="InputADOFAI" class="inputfile" data-type="adofai" hidden required>
+    <input type="file" name="adofai" accept=".adofai" id="InputADOFAI" class="inputfile" data-type="adofai" hidden required>
 
     <p>키 제한</p>
     <input id="key_limit_1" type="checkbox" name="key_limit" value="1" checked>
