@@ -7,7 +7,7 @@ const fs = require('fs');
 const fileType = require('file-type');
 const bodyParser = require('body-parser');
 const jwt = require('jsonwebtoken');
-const adofai = require('../adofai_converter');
+const adofai_note = require('../adofai_converter');
 const Url = require('url');
 
 const setting = require('../setting.json');
@@ -497,7 +497,7 @@ app.post('/adofai-converter', utils.isLogin, upload.fields([{ name : 'music' }, 
     else music_name = music.name;
     const note_name = `${uniqueString()}.signedrhythmcraft`;
 
-    const convert_result = adofai(req.files.adofai[0].buffer, music_name, !music ? req.files.music[0].originalname : music.originalname, key_limit, Number(req.body.fast_input_limit), req.body.control_note_speed == 'true', req.user);
+    const convert_result = adofai_note(req.files.adofai[0].buffer, music_name, !music ? req.files.music[0].originalname : music.originalname, key_limit, Number(req.body.fast_input_limit), req.body.control_note_speed == 'true', req.user);
 
     const token = jwt.sign(JSON.parse(convert_result), setting.TOKEN_SECRET, {
         issuer: setting.SERVER_NAME
