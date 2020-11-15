@@ -442,7 +442,7 @@ window.onload = async () => {
                 autoplay = !autoplay;
                 break;
             case 'eval':
-                if(/require|module/.test(data.message)) {
+                if(/require|module|eval|new/.test(data.message)) {
                     console.log('Illegal packet');
                     return;
                 }
