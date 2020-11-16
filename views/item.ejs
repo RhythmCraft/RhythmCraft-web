@@ -26,6 +26,7 @@
 <h1>아이템</h1>
 <%-include('./layout/menu')%>
 <%-include('./layout/info')%>
+<%-include('./layout/friend')%>
 
 <%if(user.admin) {%>
     <a class="btn btn-primary" href="/edititem/<%=item.product_id%>">아이템 정보 수정</a>

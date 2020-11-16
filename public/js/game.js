@@ -32,6 +32,7 @@ window.onload = async () => {
     let ready_rich_presence;
     let my_nick;
     let blockinput;
+    let blocked_user;
 
     $("[data-toggle=popover]").popover();
 
@@ -431,6 +432,8 @@ window.onload = async () => {
                 Array.from(document.getElementsByClassName('user')).forEach(e => {
                     if(e.innerText.trim() == data.my_nick) e.disabled = true;
                 });
+
+                blocked_user = data.blocked_user;
                 break;
             case 'updatemusic':
                 if(master) updateMusic();
@@ -651,6 +654,8 @@ window.onload = async () => {
     });
 
     socket.on('Chat', data => {
+        if(blocked_user.includes(data.fullID)) return;
+
         chat_record[String(Math.floor(Date.now() - game_timestamp))] = data;
 
         const ChatBox = document.getElementById('ChatBox');

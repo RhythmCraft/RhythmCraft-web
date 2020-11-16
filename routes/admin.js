@@ -95,7 +95,11 @@ app.get('/admin/:page', utils.isAdmin, async (req, res, next) => {
         case 'create-promotion':
             res.render('admin_promotion');
             return;
+        case 'notification':
+            res.render('admin-notification');
+            return;
         default:
+            req.flash('Error', '해당 관리 페이지가 존재하지 않습니다.');
             res.redirect('/admin');
             return;
     }

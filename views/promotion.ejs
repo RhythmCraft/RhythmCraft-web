@@ -26,6 +26,7 @@
 <h1>프로모션 코드</h1>
 <%-include('./layout/menu')%>
 <%-include('./layout/info')%>
+<%-include('./layout/friend')%>
 <div id="info"></div>
 
 <h3>프로모션 코드가 계정 <%=user.nickname%><%=user.email != null ? `(${user.email})` : ''%>에 활성화됩니다. 이 계정이 아니라면 <a href="/logout">로그아웃</a> 후 다른 계정으로 로그인하세요.</h3>

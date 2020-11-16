@@ -97,6 +97,21 @@ module.exports = (io, app) => {
             });
         });
 
+        socket.emit('msg', {
+            'action': 'keymapinfo',
+            'key1': user.rhythm_key_1,
+            'key2': user.rhythm_key_2,
+            'key3': user.rhythm_key_3,
+            'key4': user.rhythm_key_4,
+            'key5': user.rhythm_key_5,
+            'key6': user.rhythm_key_6,
+            'key7': user.rhythm_key_7,
+            'key8': user.rhythm_key_8,
+            'show_accurary_center': user.show_accurary_center,
+            'my_nick': user.nickname,
+            'blocked_user': user.blocked_user || []
+        });
+
         let badge;
         if(user.equip.image_badge != null) badge = await Item.findOne({ product_id : user.equip.image_badge });
         io.to(`room_${url_query.room}`).emit('userJoin', {
@@ -133,20 +148,6 @@ module.exports = (io, app) => {
             'now_player': room.now_player,
             'max_player': room.max_player,
             'packet_multiplier': room.packet_multiplier
-        });
-
-        socket.emit('msg', {
-            'action': 'keymapinfo',
-            'key1': user.rhythm_key_1,
-            'key2': user.rhythm_key_2,
-            'key3': user.rhythm_key_3,
-            'key4': user.rhythm_key_4,
-            'key5': user.rhythm_key_5,
-            'key6': user.rhythm_key_6,
-            'key7': user.rhythm_key_7,
-            'key8': user.rhythm_key_8,
-            'show_accurary_center': user.show_accurary_center,
-            'my_nick': user.nickname
         });
 
         if(room.public) socket.emit('Chat', {
@@ -821,7 +822,8 @@ module.exports = (io, app) => {
                 chat: data.chat,
                 verified: checkuser.verified,
                 chat_id,
-                badge: badge != null ? badge.image_name : null
+                badge: badge != null ? badge.image_name : null,
+                fullID: checkuser.fullID
             });
         });
 

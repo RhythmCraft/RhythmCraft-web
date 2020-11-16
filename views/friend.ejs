@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <script>if (typeof module === 'object') {window.module = module; module = undefined;}</script>
+    <script src="/js/bootstrap/jquery-3.2.1.slim.min.js"></script>
+    <script src="/js/bootstrap/popper.min.js"></script>
+    <script src="/js/bootstrap/bootstrap.min.js"></script>
+    <link rel="stylesheet" href="/css/bootstrap/bootstrap.min.css">
+    <script>
+        if(<%=session.isClient || false%>) {
+            require('electron').remote.getGlobal('globalVars').RichPresence = {
+                details: '친구 목록 보는 중',
+                startTimestamp: Date.now(),
+                largeImageKey: 'main',
+                instance: true
+            }
+        }
+    </script>
+    <link rel="stylesheet" href="/css/friend.css">
+    <script>if (window.module) module = window.module;</script>
+    <title><%=servername%> - 친구 목록</title>
+</head>
+
+<body>
+<h1>친구 목록</h1>
+<%-include('./layout/menu')%>
+<%-include('./layout/info')%>
+<%-include('./layout/friend')%>
+
+<h3>친구 추가</h3>
+<form action="/friend_request" method="post">
+    <div class="form-group">
+        <label for="InputNickname">추가할 유저의 닉네임</label>
+        <input type="text" id="InputNickname" class="form-control" name="nickname" placeholder="친구 추가할 유저의 닉네임을 정확히 입력하세요." required>
+    </div>
+
+    <button type="submit" class="btn btn-primary">친구 추가</button>
+</form>
+
+<hr>
+
+<h3>받은 친구 요청</h3>
+<%friend_request_user.forEach(f => {%>
+    <h4><%=f.nickname%></h4>
+    <a href="/accept_friend_request/<%=f.fullID%>" class="btn btn-success">수락</a>
+    <a href="/deny_friend_request/<%=f.fullID%>" class="btn btn-danger">거절</a>
+    <button class="btn btn-warning post-button" data-url="/block_user" data-nickname="<%=f.nickname%>">차단</button>
+<%});%>
+
+<hr>
+
+<h3>친구 목록</h3>
+<%friends.forEach(f => {%>
+<div class="friend">
+    <h4><%=f.nickname%></h4>
+    <h4 id="<%=f.fullID%>_status"><%=f.status%></h4>
+    <a href="/remove_friend/<%=f.fullID%>" class="btn btn-danger remove_friend">친구 목록에서 삭제</a>
+</div>
+<%});%>
+</body>
+</html>

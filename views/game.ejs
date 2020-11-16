@@ -9,7 +9,6 @@
     <script src="/js/bootstrap/bootstrap.min.js"></script>
     <link rel="stylesheet" href="/css/bootstrap/bootstrap.min.css">
     <script src="/js/game.js"></script>
-    <script src="/js/howler.js"></script>
     <link rel="stylesheet" href="/css/game.css">
     <title><%=servername%> - 게임</title>
     <script>
@@ -28,6 +27,7 @@
 </head>
 
 <body>
+<%-include('./layout/friend')%>
 <div id="lobby">
     <a href="/" class="btn btn-primary">나가기</a>
     <br><button id="room_setting_toggle" class="btn btn-primary">방 설정 열기 / 닫기</button>

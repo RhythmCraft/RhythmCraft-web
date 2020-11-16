@@ -164,4 +164,19 @@ app.post('/admin_create_promotion', utils.isAdmin, async (req, res, next) => {
     }
 });
 
+app.post('/send-notification', utils.isAdmin, (req, res, next) => {
+    req.app.get('socket_friend').to(req.body.target).emit('toast', {
+        image: req.body.image,
+        title: req.body.title,
+        text: req.body.text,
+        options: {
+            autohide: req.body.autohide == 'true',
+            delay: Number(req.body.delay)
+        },
+        allow_html: req.body.allow_html == 'true'
+    });
+
+    return res.send('ok');
+});
+
 module.exports = app;

@@ -135,6 +135,29 @@ const userSchema = new Schema({
         type: JSON,
         required: true,
         default: {}
+    },
+    friends: {
+        type: Array,
+        required: true,
+        default: []
+    },
+    friend_request: {
+        type: Array,
+        required: true,
+        default: []
+    },
+    blocked_user: {
+        type: Array,
+        required: true,
+        default: []
+    },
+    online: {
+        type: Boolean,
+        required: true,
+        default: false
+    },
+    status: {
+        type: String
     }
 });
 

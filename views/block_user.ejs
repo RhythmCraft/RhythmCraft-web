@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <script>if (typeof module === 'object') {window.module = module; module = undefined;}</script>
+    <script src="/js/bootstrap/jquery-3.2.1.slim.min.js"></script>
+    <script src="/js/bootstrap/popper.min.js"></script>
+    <script src="/js/bootstrap/bootstrap.min.js"></script>
+    <link rel="stylesheet" href="/css/bootstrap/bootstrap.min.css">
+    <script>
+        if(<%=session.isClient || false%>) {
+            require('electron').remote.getGlobal('globalVars').RichPresence = {
+                details: '유저 차단 페이지',
+                startTimestamp: Date.now(),
+                largeImageKey: 'main',
+                instance: true
+            }
+        }
+        window.onload = () => {
+            document.getElementById('InputNickname').focus();
+        }
+    </script>
+    <script>if (window.module) module = window.module;</script>
+    <title><%=servername%> - 유저 차단</title>
+</head>
+
+<body>
+<h1>유저 차단</h1>
+<%-include('./layout/menu')%>
+<%-include('./layout/info')%>
+<%-include('./layout/friend')%>
+
+<h3>차단하기</h3>
+<h4>차단시 해당 유저가 친구 추가를 요청할 수 없고, 채팅도 보이지 않게 됩니다.</h4>
+<form action="/block_user" method="post">
+    <div class="form-group">
+        <label for="InputNickname">차단할 유저의 닉네임</label>
+        <input type="text" id="InputNickname" class="form-control" name="nickname" placeholder="차단할 유저의 닉네임을 정확히 입력하세요." required>
+    </div>
+
+    <button type="submit" class="btn btn-danger">유저 차단</button>
+</form>
+
+<hr>
+
+<h3>차단된 유저</h3>
+<%blocked.forEach(u => {%>
+    <h4><%=u.nickname%></h4>
+    <button class="btn btn-primary post-button" data-url="/unblock_user" data-nickname="<%=u.nickname%>">차단 해제</button>
+<%});%>
+</body>
+</html>

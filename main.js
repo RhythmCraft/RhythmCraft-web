@@ -153,7 +153,7 @@ app.use((req, res, next) => {
     next();
 });
 
-// 미리 템플릿 엔진 변수 넣기
+// 미리 템플릿 엔진 변수 넣기, 세션 셋팅
 app.use((req, res, next) => {
     res.locals.user = req.user;
     res.locals.logined = req.isAuthenticated();
@@ -168,6 +168,10 @@ app.use((req, res, next) => {
     res.locals.query = req.query;
     res.locals.referrer = req.get('referrer');
     res.locals.referrer_path = req.get('referrer') != null ? Url.parse(req.get('referrer')).path : req.url;
+
+    req.session.isLogin = req.isAuthenticated();
+    req.session.rejoined_time = Date.now() - (req.session.last_join || 0);
+    req.session.last_join = Date.now();
     next();
 });
 

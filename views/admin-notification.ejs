@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <script>if (typeof module === 'object') {window.module = module; module = undefined;}</script>
+    <script src="/js/bootstrap/jquery-3.2.1.slim.min.js"></script>
+    <script src="/js/bootstrap/popper.min.js"></script>
+    <script src="/js/bootstrap/bootstrap.min.js"></script>
+    <link rel="stylesheet" href="/css/bootstrap/bootstrap.min.css">
+    <script>
+        if(<%=session.isClient || false%>) {
+            require('electron').remote.getGlobal('globalVars').RichPresence = {
+                details: '관리자 페이지',
+                startTimestamp: Date.now(),
+                largeImageKey: 'main',
+                instance: true
+            }
+        }
+    </script>
+    <script src="/js/admin-notification.js"></script>
+    <script>if (window.module) module = window.module;</script>
+    <title><%=servername%> - 알림 전송</title>
+</head>
+
+<body>
+<h1>알림 전송</h1>
+<%-include('./layout/menu')%>
+<%-include('./layout/info')%>
+<%-include('./layout/friend')%>
+
+<form id="form" enctype="application/x-www-form-urlencoded">
+    <div class="form-group">
+        <label for="InputTarget">전송 타겟</label>
+        <input type="text" id="InputTarget" class="form-control" name="target" value="everyone" placeholder="전송 타겟을 입력하세요.">
+    </div>
+    <div class="form-group">
+        <label for="InputImage">이미지 URL</label>
+        <input type="text" id="InputImage" class="form-control" name="image" value="/favicon.ico" placeholder="이미지 URL을 입력하세요.">
+    </div>
+    <div class="form-group">
+        <label for="InputTitle">알림 제목</label>
+        <input type="text" id="InputTitle" class="form-control" name="title" value="알림" placeholder="알림 제목을 입력하세요." required>
+    </div>
+    <div class="form-group">
+        <label for="InputText">알림 내용</label>
+        <input type="text" id="InputText" class="form-control" name="text" value="알림입니다." placeholder="알림 내용을 입력하세요." required>
+    </div>
+    <div class="form-group">
+        <input type="checkbox" id="AutoHide" name="autohide" value="true">
+        <label for="AutoHide">자동으로 알림창 숨기기</label>
+    </div>
+    <div class="form-group">
+        <label for="InputDelay">알림창 유지 시간(자동으로 알림창 숨기기 체크할시에만 적용)</label>
+        <input type="number" id="InputDelay" class="form-control" name="delay" value="2000" placeholder="알림창 유지 시간을 입력하세요.">
+    </div>
+    <div class="form-group">
+        <input type="checkbox" id="AllowHTML" name="allow_html" value="true">
+        <label for="AllowHTML">내용에 HTML 허용</label>
+    </div>
+
+    <button id="submit" type="submit" class="btn btn-primary">전송</button>
+</form>
+</body>
+</html>
