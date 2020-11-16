@@ -167,6 +167,7 @@ app.get('/workshop/note/removecomment', utils.isLogin, async (req, res, next) =>
 
     if(note.owner == req.user.fullID || comment.writer == req.user.fullID) {
         await Comment.deleteOne({ id : req.query.comment });
+        await RemoveCommentVote.deleteMany({ comment_id : req.query.comment });
 
         req.flash('Info', '댓글을 삭제했습니다.');
         return res.redirect(`/workshop/note?name=${comment.note_name}`);
@@ -177,6 +178,7 @@ app.get('/workshop/note/removecomment', utils.isLogin, async (req, res, next) =>
 
         if(delete_count + 1 >= setting.COMMENT_DELETE_REQUIRED_COUNT && !check) {
             await Comment.deleteOne({ id : req.query.comment });
+            await RemoveCommentVote.deleteMany({ comment_id : req.query.comment });
 
             req.flash('Info', '댓글을 삭제했습니다.');
             return res.redirect(`/workshop/note?name=${comment.note_name}`);
