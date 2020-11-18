@@ -483,7 +483,8 @@ app.post('/adofai-converter', utils.isLogin, upload.fields([{ name : 'music' }, 
         .replaceAll('}\n', '},\n')
         .replaceAll('},\n\t]', '}\n\t]')
         .replaceAll(', },', ' },')
-        .replaceAll(', }', ' }'));
+        .replaceAll(', }', ' }')
+        .replaceAll('\n', ''));
     if(!adofai.pathData || !adofai.settings || !adofai.actions) {
         req.flash('Error', 'ADOFAI 채보 파일이 잘못되었습니다.');
         return res.redirect('/adofai-converter');

@@ -18,7 +18,8 @@ module.exports = (adofai, music, musicname, key_limit, fast_input_limit, control
         .replaceAll('}\n', '},\n')
         .replaceAll('},\n\t]', '}\n\t]')
         .replaceAll(', },', ' },')
-        .replaceAll(', }', ' }'));
+        .replaceAll(', }', ' }')
+        .replaceAll('\n', ''));
     const rtnote = {};
     rtnote.music = music;
     rtnote.musicname = musicname;
