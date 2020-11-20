@@ -66,9 +66,10 @@ window.onload = () => {
     });
 
     socket.on('updateStatus', data => {
-        if(!location.pathname.startsWith('/friend')) return;
+        if(!location.pathname.startsWith('/friend') && !location.pathname.startsWith('/game')) return;
         if(!document.getElementById(`${data.fullID}_status`)) return;
         document.getElementById(`${data.fullID}_status`).innerText = data.status;
+        document.getElementById(`invite_${data.fullID}`).disabled = !data.online;
     });
 
     Array.from(document.getElementsByClassName('post-button')).forEach(e => {

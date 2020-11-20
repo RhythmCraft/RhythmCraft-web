@@ -31,6 +31,9 @@ module.exports = io => {
             case '/game':
                 status = '게임 플레이';
                 break;
+            case '/game/':
+                status = '게임 플레이';
+                break;
             case '/newroom':
                 status = '방 생성 중';
                 break;
@@ -43,7 +46,8 @@ module.exports = io => {
             await User.updateOne({ fullID : user.fullID }, { status , online : true });
             io.to(`friend_${user.fullID}`).emit('updateStatus', {
                 fullID: user.fullID,
-                status: status
+                status: status,
+                online: true
             });
 
             if(session.rejoined_time > 10000 && url.pathname == '/') {
@@ -75,6 +79,11 @@ module.exports = io => {
 
         socket.on('disconnect', async () => {
             if(user != null) await User.updateOne({ fullID : user.fullID }, { status : '오프라인' , online : false });
+            io.to(`friend_${user.fullID}`).emit('updateStatus', {
+                fullID: user.fullID,
+                status: '오프라인',
+                online: false
+            });
         });
     });
 }

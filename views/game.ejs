@@ -55,6 +55,22 @@
         <button id="change_room_setting" class="for-master-other-disable btn btn-primary">적용</button>
     </div>
     <br><br>
+    <button id="friend_toggle" class="btn btn-primary">친구 초대 열기 / 닫기</button>
+    <br>
+    <div id="friend" hidden>
+    <%friends.forEach(f => {%>
+    <div class="friend">
+        <h4><%=f.nickname%></h4>
+        <h4 id="<%=f.fullID%>_status"><%=f.status%></h4>
+        <%if(f.online) {%>
+            <button id="invite_<%=f.fullID%>" class="btn btn-primary invite" data-user="<%=f.fullID%>">이 유저 초대</button>
+        <%} else {%>
+            <button id="invite_<%=f.fullID%>" class="btn btn-primary invite" data-user="<%=f.fullID%>" disabled>이 유저 초대</button>
+        <%}%>
+    </div>
+    <%});%>
+    </div>
+    <br><br>
     <button id="CopyURL" class="btn btn-primary">방 URL 복사</button>
     <br><br>
     <button id="StartGame" class="for-master btn btn-primary">게임 시작</button>

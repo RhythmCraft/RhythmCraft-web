@@ -23,7 +23,7 @@ module.exports = (io, app) => {
         const url = Url.parse(socket.request.headers.referer);
         const url_query = querystring.parse(url.query);
         const socket_url = Url.parse(socket.request.url);
-        const socket_url_query = querystring.parse(socket_url.query);
+        const socket_url_query = socket.handshake.query;
         const room = await Room.findOne({ roomcode : url_query.room });
         let rtnote = {};
         let starttimestamp;
@@ -64,7 +64,7 @@ module.exports = (io, app) => {
             // });
             // return socket.disconnect();
         }
-
+        console.log(socket_url_query)
         if(!master && room.password != null && room.password != '' && room.password != socket_url_query.password) {
             socket.emit('msg', {
                 'action' : 'exit',
@@ -850,6 +850,46 @@ module.exports = (io, app) => {
                 accurary: data.accurary,
                 combo: data.combo,
                 max_combo: data.max_combo
+            });
+        });
+
+        socket.on('Invite', async data => {
+            if(!user.friends.includes(data.user)) return socket.emit('msg', {
+                action: 'alert',
+                message: '해당 유저는 친구가 아닙니다.'
+            });
+
+            const check_roomuser = await RoomUser.findOne({ fullID : data.user , roomcode : url_query.room });
+            if(check_roomuser != null) return socket.emit('msg', {
+                action: 'alert',
+                message: '해당 유저가 이미 같은 게임에 있습니다.'
+            });
+
+            const invite_user = await User.findOne({ fullID : data.user });
+            if(!invite_user) return socket.emit('msg', {
+                action: 'alert',
+                message: '해당 유저가 존재하지 않습니다.'
+            });
+            if(!invite_user.online) return socket.emit('msg', {
+                action: 'alert',
+                message: '해당 유저가 오프라인입니다.'
+            });
+
+            const checkroom = await Room.findOne({ roomcode : url_query.room });
+
+            let avatar = await File.findOne({ owner : user.fullID, file_type : 'avatar' });
+            if (!avatar) avatar = '/img/no_avatar.png';
+            else avatar = `/avatar/${avatar.name}`;
+
+            app.get('socket_friend').to(`user_${data.user}`).emit('toast', {
+                image: avatar,
+                title: '게임 초대',
+                text: `${utils.escapeHTML(user.nickname)}님이 "${utils.escapeHTML(checkroom.name)}" 게임에 초대하였습니다.<br>아래 버튼으로 참가하세요.<br>`
+                + `<a href="/game?room=${checkroom.roomcode}#pwu=${encodeURIComponent(checkroom.password || 'nopassword')}" class="btn btn-primary">참가</a>`,
+                options: {
+                    delay: 10000
+                },
+                allow_html: true
             });
         });
 

@@ -58,6 +58,9 @@ window.onload = async () => {
     document.getElementById('room_setting_toggle').onclick = function() {
         document.getElementById('room_setting').hidden = !document.getElementById('room_setting').hidden;
     }
+    document.getElementById('friend_toggle').onclick = function() {
+        document.getElementById('friend').hidden = !document.getElementById('friend').hidden;
+    }
     document.getElementById('change_room_setting').onclick = function() {
         if(master) {
             const InputName = document.getElementById('InputName');
@@ -155,8 +158,16 @@ window.onload = async () => {
         ele.hidden = true;
     });
 
+    Array.from(document.getElementsByClassName('invite')).forEach(ele => {
+        ele.onclick = () => {
+            socket.emit('Invite', {
+                user: ele.dataset.user
+            });
+        }
+    });
+
     let password;
-    if(room_have_password && location.hash != '#master' && !location.hash.startsWith('#pw=')) {
+    if(room_have_password && location.hash != '#master' && !location.hash.startsWith('#pw=') && !location.hash.startsWith('#pwu=')) {
         if(isClient) password = await require('electron-prompt')({
             title: '비밀번호 입력',
             label: '아래에 비밀번호를 입력하세요.',
@@ -169,9 +180,12 @@ window.onload = async () => {
     }
 
     if(location.hash.startsWith('#pw=') && isClient) password = Buffer.from(location.hash.replace('#pw=', ''), 'base64').toString();
+    if(location.hash.startsWith('#pwu=')) password = decodeURIComponent(location.hash.replace('#pwu=', ''));
+    console.log(password)
 
-    socket = io.connect(`${socket_address}/game?password=${password}`, {
-        path: '/socket'
+    socket = io.connect(`${socket_address}/game`, {
+        path: '/socket',
+        query: `password=${password}`
     });
 
     socket.on('msg', data => {

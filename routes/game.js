@@ -8,6 +8,7 @@ const multer = require('multer');
 const utils = require('../utils');
 const setting = require('../setting.json');
 
+const User = require('../schemas/user');
 const Room = require('../schemas/room');
 const File = require('../schemas/file');
 const Chat = require('../schemas/chat');
@@ -33,10 +34,17 @@ app.get('/game', utils.isLogin, async (req, res, next) => {
     const files = await File.find({ owner : req.user.fullID , public : true , file_type : 'music' });
     const notes = await File.find({ owner : req.user.fullID , file_type : 'note' });
 
+    const friends = [];
+    for(let f of req.user.friends) {
+        const user = await User.findOne({ fullID : f });
+        friends.push(user);
+    }
+
     return res.render('game', {
         room_have_password: room.password != null && room.password != '',
         files,
-        notes
+        notes,
+        friends
     });
 });
 
