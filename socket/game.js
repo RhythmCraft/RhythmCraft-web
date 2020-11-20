@@ -64,7 +64,6 @@ module.exports = (io, app) => {
             // });
             // return socket.disconnect();
         }
-        console.log(socket_url_query)
         if(!master && room.password != null && room.password != '' && room.password != socket_url_query.password) {
             socket.emit('msg', {
                 'action' : 'exit',
