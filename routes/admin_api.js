@@ -179,4 +179,39 @@ app.post('/send-notification', utils.isAdmin, (req, res, next) => {
     return res.send('ok');
 });
 
+app.post('/promotion-api', async (req, res, next) => {
+    if(req.body.apikey != setting.API_SECRET) return res.json({ error : true , message : 'API 키가 틀렸습니다.' });
+
+    const allowed_type = [ 'money' , 'item' ];
+    if(!allowed_type.includes(req.body.type)) {
+        return res.json({ error : true , message : '프로모션 코드 타입이 잘못되었습니다!' });
+    }
+    if(req.body.type == 'money' && !req.body.promotion_money) {
+        return res.json({ error : true , message : '프로모션 코드 타입이 돈일 경우 돈을 입력해야 합니다!' });
+    }
+    if(req.body.type == 'item' && !req.body.promotion_item) {
+        return res.json({ error : true , message : '프로모션 코드 타입이 아이템일 경우 아이템 코드를 입력해야 합니다!' });
+    }
+    if(req.body.type == 'money' && req.body.promotion_money < 1) {
+        return res.json({ error : true , message : '지급할 돈은 0원보다 커야 합니다!' });
+    }
+    if(req.body.type == 'item') {
+        const checkitem = await Item.findOne({ product_id : req.body.promotion_item });
+        if(!checkitem) {
+            return res.json({ error : true , message : '해당 아이템 코드로 아이템을 찾을 수 없습니다!' });
+        }
+    }
+
+    const promotion_code = await utils.createPromotion();
+    await Promotion.create({
+        code: promotion_code,
+        expires: req.body.expires,
+        type: req.body.type,
+        promotion_money: req.body.promotion_money,
+        promotion_item: req.body.promotion_item
+    });
+
+    return res.json({ error : false , code : promotion_code });
+});
+
 module.exports = app;
