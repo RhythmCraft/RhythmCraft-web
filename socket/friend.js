@@ -78,12 +78,15 @@ module.exports = io => {
         // });
 
         socket.on('disconnect', async () => {
-            if(user != null) await User.updateOne({ fullID : user.fullID }, { status : '오프라인' , online : false });
-            io.to(`friend_${user.fullID}`).emit('updateStatus', {
-                fullID: user.fullID,
-                status: '오프라인',
-                online: false
-            });
+            if(user != null) {
+                await User.updateOne({ fullID : user.fullID }, { status : '오프라인' , online : false });
+
+                io.to(`friend_${user.fullID}`).emit('updateStatus', {
+                    fullID: user.fullID,
+                    status: '오프라인',
+                    online: false
+                });
+            }
         });
     });
 }
