@@ -52,7 +52,7 @@
     <div class="item" data-productid="<%=item.product_id%>">
         <h3><%=item.title%></h3>
         <h4><%=item.price%>원</h4>
-        <h5><%=item.description%></h5>
+        <h5><%-item.description.replace('\n', '<br>')%></h5>
     </div>
 <%});%>
 </body>

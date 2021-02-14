@@ -50,6 +50,6 @@
 <%}%>
 <br>
 <h5>설명</h5>
-<h5><%=item.description%></h5>
+<h5><%-item.description.replace('\n', '<br>')%></h5>
 </body>
 </html>
