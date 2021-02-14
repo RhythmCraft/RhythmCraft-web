@@ -77,7 +77,7 @@ app.get('/useitem/:item', utils.isLogin, async (req, res, next) => {
         return res.redirect('/inventory');
     }
 
-    const equip = req.user.equip;
+    const equip = req.user.equip || {};
     equip[item.type] = item.product_id;
     await User.updateOne({ fullID : req.user.fullID }, { equip });
 
@@ -86,7 +86,7 @@ app.get('/useitem/:item', utils.isLogin, async (req, res, next) => {
 });
 
 app.get('/unuseitem/:type', utils.isLogin, async (req, res, next) => {
-    const equip = req.user.equip;
+    const equip = req.user.equip || {};
     equip[req.params.type] = null;
     await User.updateOne({ fullID : req.user.fullID }, { equip });
 
