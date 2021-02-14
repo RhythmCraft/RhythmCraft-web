@@ -304,7 +304,7 @@ app.get('/signnotetext', utils.isAdmin, async (req, res, next) => {
     return res.redirect(req.get('referrer'));
 });
 
-app.get('/unsignnote', utils.isAdmin, async (req, res, next) => {
+app.get('/unsignnote', utils.isLogin, async (req, res, next) => {
     const testnote = await File.findOne({ owner : req.user.fullID , file_type : 'note' , name : req.query.name });
     if(!testnote) {
         req.flash('Error', '해당 채보가 존재하지 않습니다.');
