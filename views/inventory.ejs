@@ -48,7 +48,7 @@
 <div class="item" data-productid="<%=item.product_id%>">
     <h3><%=item.title%></h3>
     <h5><%=item.description%></h5>
-    <%if(user.equip[item.type] == item.product_id) {%>
+    <%if(user.equip != null && user.equip[item.type] == item.product_id) {%>
         <a class="btn btn-primary" href="/unuseitem/<%=item.type%>">이 아이템 착용 해제</a>
     <%} else {%>
         <a class="btn btn-primary" href="/useitem/<%=item.product_id%>">이 아이템 착용</a>
