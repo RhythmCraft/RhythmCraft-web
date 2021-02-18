@@ -606,6 +606,7 @@ module.exports = (io, app) => {
             const replay = rtnote;
             const replay_data = rtnote.jscode || {};
             for(let key in data.replay) {
+                if(!data.replay[key]) continue;
                 replay_data[key] = `fakeKey('${data.replay[key].split('`').join('')}');`;
             }
             replay['replay'] = true;
