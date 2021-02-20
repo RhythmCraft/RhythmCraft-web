@@ -479,7 +479,6 @@ module.exports = (io, app) => {
             });
 
             socket.join(`spectate_${data.fullID}`);
-            console.log(Date.now() - checkroom.starttimestamp);
             socket.emit('msg', {
                 'action': 'startspectate',
                 'music': checkroom.music,
