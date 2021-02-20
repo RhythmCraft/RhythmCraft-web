@@ -821,9 +821,9 @@ window.onload = async () => {
             if(e.isTrusted) replay[String(Math.floor(Date.now() - game_timestamp))] = e.code;
             const note = document.getElementsByClassName(`note_${keymap[e.code]}`)[0];
             if(!note) {
-                combo = 0;
-                multiplier = 1;
-                flash_note_area(keymap[e.code], 'red');
+                // combo = 0;
+                // multiplier = 1;
+                // flash_note_area(keymap[e.code], 'red');
                 return;
             }
             const distance = note.dataset.rhythm_time - new Date().getTime() + (note_speed / 20);
