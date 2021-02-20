@@ -500,6 +500,8 @@ window.onload = async () => {
                 playing = true;
                 note_speed = data.note_speed;
 
+                console.log(data)
+
                 sound = new Howl({
                     src: [ `/listenmusic/${encodeURIComponent(data.music)}` ],
                     autoplay: false,
@@ -508,7 +510,7 @@ window.onload = async () => {
                     html5: true,
                     rate: data.pitch / 100,
                     onload: () => {
-                        const seek = (data.seek + (Date.now() - start_load_time) - 3000 + data.note_speed) / 1000;
+                        const seek = (data.seek + (Date.now() - start_load_time) - data.note_speed) / 1000;
                         if(seek >= 0) {
                             sound.seek(seek);
                             sound.play();

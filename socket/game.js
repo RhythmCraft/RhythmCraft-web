@@ -473,6 +473,11 @@ module.exports = (io, app) => {
             });
             const checkroom = await Room.findOne({ roomcode : url_query.room });
 
+            if(!checkroom.note && data.fullID == checkroom.master) return socket.emit('msg', {
+                'action': 'alert',
+                'message': '자유 모드에서는 방장을 관전할 수 없습니다.'
+            });
+
             socket.join(`spectate_${data.fullID}`);
             console.log(Date.now() - checkroom.starttimestamp);
             socket.emit('msg', {
