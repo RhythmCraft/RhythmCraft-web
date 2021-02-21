@@ -156,45 +156,45 @@ module.exports = (io, app) => {
             verified: true
         });
 
-        if(room.auto_manage_room && !room.auto_manage_room_timeout_setted) {
-            auto_manage_interval = setInterval(async () => {
-                const before_timestamp = timestamp;
-                timestamp -= 1000;
-                if(before_timestamp < 0) return;
-                if(before_timestamp == 0) {
-                    const players = await RoomUser.find({ roomcode : url_query.room });
-                    await Room.updateOne({ roomcode : url_query.room , playing : true });
-                    app.get('socket_main').emit('msg', { 'action' : 'reload_room' });
-                    const checkroom = await Room.findOne({ roomcode : url_query.room });
-                    return io.to(`room_${url_query.room}`).emit('msg', {
-                        'action': 'gamestart',
-                        'music': checkroom.music,
-                        'create_mode': !checkroom.note,
-                        'players': players,
-                        'pitch': checkroom.pitch
-                    });
-                }
-                if(before_timestamp == 30000) return io.to(`room_${url_query.room}`).emit('Chat', {
-                    nickname: '시스템',
-                    chattype: 'system',
-                    chat: '30초 후 게임이 시작됩니다.',
-                    verified: true
-                });
-                if(before_timestamp == 20000) return io.to(`room_${url_query.room}`).emit('Chat', {
-                    nickname: '시스템',
-                    chattype: 'system',
-                    chat: '20초 후 게임이 시작됩니다.',
-                    verified: true
-                });
-                if(before_timestamp <= 10000 && timestamp % 1000 == 0) return io.to(`room_${url_query.room}`).emit('Chat', {
-                    nickname: '시스템',
-                    chattype: 'system',
-                    chat: `${timestamp / 1000}초 후 게임이 시작됩니다.`,
-                    verified: true
-                });
-            }, 1000);
-            await Room.updateOne({ roomcode : url_query.room }, { auto_manage_room_timeout_setted : true });
-        }
+        // if(room.auto_manage_room && !room.auto_manage_room_timeout_setted) {
+        //     auto_manage_interval = setInterval(async () => {
+        //         const before_timestamp = timestamp;
+        //         timestamp -= 1000;
+        //         if(before_timestamp < 0) return;
+        //         if(before_timestamp == 0) {
+        //             const players = await RoomUser.find({ roomcode : url_query.room });
+        //             await Room.updateOne({ roomcode : url_query.room , playing : true });
+        //             app.get('socket_main').emit('msg', { 'action' : 'reload_room' });
+        //             const checkroom = await Room.findOne({ roomcode : url_query.room });
+        //             return io.to(`room_${url_query.room}`).emit('msg', {
+        //                 'action': 'gamestart',
+        //                 'music': checkroom.music,
+        //                 'create_mode': !checkroom.note,
+        //                 'players': players,
+        //                 'pitch': checkroom.pitch
+        //             });
+        //         }
+        //         if(before_timestamp == 30000) return io.to(`room_${url_query.room}`).emit('Chat', {
+        //             nickname: '시스템',
+        //             chattype: 'system',
+        //             chat: '30초 후 게임이 시작됩니다.',
+        //             verified: true
+        //         });
+        //         if(before_timestamp == 20000) return io.to(`room_${url_query.room}`).emit('Chat', {
+        //             nickname: '시스템',
+        //             chattype: 'system',
+        //             chat: '20초 후 게임이 시작됩니다.',
+        //             verified: true
+        //         });
+        //         if(before_timestamp <= 10000 && timestamp % 1000 == 0) return io.to(`room_${url_query.room}`).emit('Chat', {
+        //             nickname: '시스템',
+        //             chattype: 'system',
+        //             chat: `${timestamp / 1000}초 후 게임이 시작됩니다.`,
+        //             verified: true
+        //         });
+        //     }, 1000);
+        //     await Room.updateOne({ roomcode : url_query.room }, { auto_manage_room_timeout_setted : true });
+        // }
 
         if(master) socket.emit('msg', { 'action' : 'im_master' });
         else socket.emit('msg', { 'action' : 'im_not_master' });
