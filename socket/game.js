@@ -920,12 +920,12 @@ module.exports = (io, app) => {
                     verified: true
                 });
 
-                if(checkroom.now_player == 0) {
-                    await Room.deleteOne({ roomcode : url_query.room });
-                    app.get('socket_main').emit('msg', { 'action': 'reload_room' });
-                    await CreateOfficialRoom();
-                    app.get('socket_main').emit('msg', { 'action': 'reload_room' });
-                }
+                // if(checkroom.now_player == 0) {
+                //     await Room.deleteOne({ roomcode : url_query.room });
+                //     app.get('socket_main').emit('msg', { 'action': 'reload_room' });
+                //     await CreateOfficialRoom();
+                //     app.get('socket_main').emit('msg', { 'action': 'reload_room' });
+                // }
             }
         });
     });
