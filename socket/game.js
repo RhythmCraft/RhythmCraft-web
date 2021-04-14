@@ -199,6 +199,8 @@ module.exports = (io, app) => {
         if(master) socket.emit('msg', { 'action' : 'im_master' });
         else socket.emit('msg', { 'action' : 'im_not_master' });
 
+        if(user.admin) socket.emit('msg', { 'action' : 'im_admin' });
+
         if(room.room_for_replay) socket.emit('msg', {
             action: 'toggleinput'
         });
@@ -445,6 +447,11 @@ module.exports = (io, app) => {
                     socket.leave(`spectate_${data.fullID}`);
                     socket.emit('msg', {
                         "action": "stopspectate"
+                    });
+                    break;
+                case 'ping':
+                    socket.emit('msg', {
+                        "action": "pong"
                     });
                     break;
             }

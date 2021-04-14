@@ -12,12 +12,20 @@ let playing = false;
 let last_note_judgement;
 let keymap = {};
 let master;
+let admin = false;
 let create_mode;
 let replay = {};
 let chat_record = {};
 let game_timestamp;
 let spectate = false;
 let spectating_user;
+let last_ping;
+let ping_end = true;
+let ping_callback;
+let chatsound;
+let hitsound;
+let blocked_user;
+let my_nick;
 
 window.onload = async () => {
     let sound;
@@ -30,23 +38,21 @@ window.onload = async () => {
     let pressedkey = [];
     let countdown;
     let ready_rich_presence;
-    let my_nick;
     let blockinput;
-    let blocked_user;
 
     $("[data-toggle=popover]").popover();
 
     document.getElementById('InputMusic').innerHTML = Request('get', '/select_music');
     document.getElementById('InputNote').innerHTML = Request('get', '/select_note');
 
-    const hitsound = new Howl({
+    hitsound = new Howl({
         src: ['/game/sound/hitsound.mp3'],
         autoplay: false,
         volume: 0.5,
         html5: true
     });
 
-    const chatsound = new Howl({
+    chatsound = new Howl({
         src: ['/game/sound/chat.mp3'],
         autoplay: false,
         volume: 0.5,
@@ -225,6 +231,10 @@ window.onload = async () => {
                 console.log('im not master');
                 console.log(location.hash);
                 location.hash = '';
+                break;
+            case 'im_admin':
+                admin = true;
+                break;
                 break;
             case 'alert':
                 alert(data.message);
@@ -547,6 +557,10 @@ window.onload = async () => {
                     if(keymap[key] == data.note) fakeKey(key);
                 }
                 break;
+            case 'pong':
+                ping_end = true;
+                if(ping_callback != null) ping_callback(Date.now() - last_ping);
+                break;
         }
     });
 
@@ -670,113 +684,7 @@ window.onload = async () => {
     });
 
     socket.on('Chat', data => {
-        if(blocked_user.includes(data.fullID)) return;
-
-        chat_record[String(Math.floor(Date.now() - game_timestamp))] = data;
-
-        const ChatBox = document.getElementById('ChatBox');
-        const ChatBox2 = document.getElementById('ChatBoxForGame');
-
-        const newchat = document.createElement('div');
-        const newchat2 = document.createElement('div');
-        newchat.classList.add('chat');
-        newchat2.classList.add('chat');
-        newchat.classList.add(`${data.chattype}-chat`);
-        newchat2.classList.add(`${data.chattype}-chat`);
-
-        const nickname = document.createElement('strong');
-        const nickname2 = document.createElement('strong');
-        nickname.innerText = data.nickname;
-        nickname2.innerText = data.nickname;
-        nickname.classList.add(`chat-nickname`);
-        nickname2.classList.add(`chat-nickname`);
-        if(data.verified) {
-            const verified = document.createElement('svg');
-            const verified2 = document.createElement('svg');
-            nickname.appendChild(verified);
-            nickname2.appendChild(verified2);
-            verified.outerHTML = ` <svg width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-check-circle-fill text-secondary" fill="currentColor" xmlns="http://www.w3.org/2000/svg" data-container="body" data-toggle="popover" data-placement="top" data-content="인증된 유저" data-trigger="hover">
-        <path fill-rule="evenodd" d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zm-3.97-3.03a.75.75 0 0 0-1.08.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-.01-1.05z"/>
-    </svg>`;
-            verified2.outerHTML = ` <svg width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-check-circle-fill text-secondary" fill="currentColor" xmlns="http://www.w3.org/2000/svg" data-container="body" data-toggle="popover" data-placement="top" data-content="인증된 유저" data-trigger="hover">
-        <path fill-rule="evenodd" d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zm-3.97-3.03a.75.75 0 0 0-1.08.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-.01-1.05z"/>
-    </svg>`;
-        }
-        if(data.badge != null) {
-            const badge = document.createElement('img');
-            const badge2 = document.createElement('img');
-            badge.src = `/item/badge/${data.badge}`;
-            badge2.src = `/item/badge/${data.badge}`;
-            badge.classList.add('user_badge');
-            badge2.classList.add('user_badge');
-            nickname.appendChild(badge);
-            nickname2.appendChild(badge2);
-        }
-        nickname.classList.add(`${data.chattype}-chat-nickname`);
-        nickname2.classList.add(`${data.chattype}-chat-nickname`);
-        newchat.appendChild(nickname);
-        newchat2.appendChild(nickname2);
-
-        const chat = document.createElement('p');
-        const chat2 = document.createElement('p');
-        if(data.chattype == 'admin' || data.chattype == 'system') {
-            chat.innerHTML = data.chat;
-            chat2.innerHTML = data.chat;
-        }
-        else {
-            chat.innerText = data.chat;
-            chat2.innerText = data.chat;
-        }
-        chat.classList.add(`chat-text`);
-        chat2.classList.add(`chat-text`);
-        chat.classList.add(`${data.chattype}-chat-text`);
-        chat2.classList.add(`${data.chattype}-chat-text`);
-        newchat.appendChild(chat);
-        newchat2.appendChild(chat2);
-
-        if(document.getElementById('public').checked && data.chattype != 'system') {
-            const do_report = () => {
-                if(confirm('정말 신고하시겠습니까? 허위 신고시 신고자의 계정이 정지됩니다.')) {
-                    const result = RequestData('POST', `/chat-report`, {
-                        chat_id: data.chat_id
-                    });
-                    alert(result);
-                }
-            }
-            const report = document.createElement('button');
-            const report2 = document.createElement('button');
-            report.innerHTML = '신고';
-            report2.innerHTML = '신고';
-            report.classList.add('btn');
-            report2.classList.add('btn');
-            report.classList.add('btn-primary');
-            report2.classList.add('btn-primary');
-            report.classList.add('btn-sm');
-            report2.classList.add('btn-sm');
-            report.classList.add('report-button');
-            report2.classList.add('report-button');
-            if(data.nickname == my_nick) {
-                report.disabled = true;
-                report2.disabled = true;
-            }
-            else {
-                report.onclick = do_report;
-                report2.onclick = do_report;
-            }
-
-            newchat.appendChild(report);
-            newchat2.appendChild(report2);
-        }
-
-        ChatBox.appendChild(newchat);
-        ChatBox2.appendChild(newchat2);
-
-        ChatBox.scrollTo(0, ChatBox.scrollHeight);
-        ChatBox2.scrollTo(0, ChatBox2.scrollHeight);
-
-        $("[data-toggle=popover]").popover();
-
-        chatsound.play();
+        showChat(data);
     });
 
     socket.on('ScoreUpdate', data => {
@@ -965,30 +873,18 @@ function flash_note_area(note, color) {
 }
 
 function SendChat() {
-    if(playing) {
-        const input = document.getElementById('InputChatForGame');
-        if (!input.value) return;
+    const input = playing
+        ? document.getElementById('InputChatForGame')
+        : document.getElementById('InputChat');
 
-        socket.emit('Chat', {
-            'chat': input.value
-        });
+    if(!input.value) return;
 
-        input.value = '';
+    if(!localChatHandler(input.value)) socket.emit('Chat', {
+        'chat': input.value
+    });
 
-        document.getElementById('InputChatForGame').focus();
-    }
-    else {
-        const input = document.getElementById('InputChat');
-        if (!input.value) return;
-
-        socket.emit('Chat', {
-            'chat': input.value
-        });
-
-        input.value = '';
-
-        document.getElementById('InputChat').focus();
-    }
+    input.value = '';
+    input.focus();
 }
 
 function fakeKey(key) {
@@ -1175,4 +1071,149 @@ function updateStatus() {
         if(button.value != 1) pressed[i] = false;
     }
     requestAnimationFrame(updateStatus);
+}
+
+function ping(callback) {
+    if(!ping_end) throw new Error('Ping not finished yet');
+
+    socket.emit('msg', {
+        "action": "ping"
+    });
+    last_ping = Date.now();
+    ping_end = false;
+
+    ping_callback = callback;
+}
+
+function showChat(data) {
+    if(blocked_user.includes(data.fullID)) return;
+
+    chat_record[String(Math.floor(Date.now() - game_timestamp))] = data;
+
+    const ChatBox = document.getElementById('ChatBox');
+    const ChatBox2 = document.getElementById('ChatBoxForGame');
+
+    const newchat = document.createElement('div');
+    const newchat2 = document.createElement('div');
+    newchat.classList.add('chat');
+    newchat2.classList.add('chat');
+    newchat.classList.add(`${data.chattype}-chat`);
+    newchat2.classList.add(`${data.chattype}-chat`);
+
+    const nickname = document.createElement('strong');
+    const nickname2 = document.createElement('strong');
+    nickname.innerText = data.nickname;
+    nickname2.innerText = data.nickname;
+    nickname.classList.add(`chat-nickname`);
+    nickname2.classList.add(`chat-nickname`);
+    if(data.verified) {
+        const verified = document.createElement('svg');
+        const verified2 = document.createElement('svg');
+        nickname.appendChild(verified);
+        nickname2.appendChild(verified2);
+        verified.outerHTML = ` <svg width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-check-circle-fill text-secondary" fill="currentColor" xmlns="http://www.w3.org/2000/svg" data-container="body" data-toggle="popover" data-placement="top" data-content="인증된 유저" data-trigger="hover">
+        <path fill-rule="evenodd" d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zm-3.97-3.03a.75.75 0 0 0-1.08.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-.01-1.05z"/>
+    </svg>`;
+        verified2.outerHTML = ` <svg width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-check-circle-fill text-secondary" fill="currentColor" xmlns="http://www.w3.org/2000/svg" data-container="body" data-toggle="popover" data-placement="top" data-content="인증된 유저" data-trigger="hover">
+        <path fill-rule="evenodd" d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zm-3.97-3.03a.75.75 0 0 0-1.08.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-.01-1.05z"/>
+    </svg>`;
+    }
+    if(data.badge != null) {
+        const badge = document.createElement('img');
+        const badge2 = document.createElement('img');
+        badge.src = `/item/badge/${data.badge}`;
+        badge2.src = `/item/badge/${data.badge}`;
+        badge.classList.add('user_badge');
+        badge2.classList.add('user_badge');
+        nickname.appendChild(badge);
+        nickname2.appendChild(badge2);
+    }
+    nickname.classList.add(`${data.chattype}-chat-nickname`);
+    nickname2.classList.add(`${data.chattype}-chat-nickname`);
+    newchat.appendChild(nickname);
+    newchat2.appendChild(nickname2);
+
+    const chat = document.createElement('p');
+    const chat2 = document.createElement('p');
+    if(data.chattype == 'admin' || data.chattype == 'system') {
+        chat.innerHTML = data.chat;
+        chat2.innerHTML = data.chat;
+    }
+    else {
+        chat.innerText = data.chat;
+        chat2.innerText = data.chat;
+    }
+    chat.classList.add(`chat-text`);
+    chat2.classList.add(`chat-text`);
+    chat.classList.add(`${data.chattype}-chat-text`);
+    chat2.classList.add(`${data.chattype}-chat-text`);
+    newchat.appendChild(chat);
+    newchat2.appendChild(chat2);
+
+    if(document.getElementById('public').checked && data.chattype != 'system') {
+        const do_report = () => {
+            if(confirm('정말 신고하시겠습니까? 허위 신고시 신고자의 계정이 정지됩니다.')) {
+                const result = RequestData('POST', `/chat-report`, {
+                    chat_id: data.chat_id
+                });
+                alert(result);
+            }
+        }
+        const report = document.createElement('button');
+        const report2 = document.createElement('button');
+        report.innerHTML = '신고';
+        report2.innerHTML = '신고';
+        report.classList.add('btn');
+        report2.classList.add('btn');
+        report.classList.add('btn-primary');
+        report2.classList.add('btn-primary');
+        report.classList.add('btn-sm');
+        report2.classList.add('btn-sm');
+        report.classList.add('report-button');
+        report2.classList.add('report-button');
+        if(data.nickname == my_nick) {
+            report.disabled = true;
+            report2.disabled = true;
+        }
+        else {
+            report.onclick = do_report;
+            report2.onclick = do_report;
+        }
+
+        newchat.appendChild(report);
+        newchat2.appendChild(report2);
+    }
+
+    ChatBox.appendChild(newchat);
+    ChatBox2.appendChild(newchat2);
+
+    ChatBox.scrollTo(0, ChatBox.scrollHeight);
+    ChatBox2.scrollTo(0, ChatBox2.scrollHeight);
+
+    $("[data-toggle=popover]").popover();
+
+    chatsound.play();
+}
+
+function localChatHandler(chat) {
+    if(chat.startsWith('/')) {
+        const params = chat.slice(1).split(' ');
+        switch(params[0]) {
+            case 'ping':
+                if(!admin) return false;
+
+                ping(ping => {
+                    showChat({
+                        'nickname': '시스템',
+                        'chattype': 'system',
+                        'chat': `${ping}ms`,
+                        'verified': true
+                    });
+                });
+
+                return true;
+        }
+    }
+
+    return false;
 }
