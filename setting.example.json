@@ -6,6 +6,7 @@
   "SSL_CERT": "SSL_CERT",
   "SSL_KEY": "SSL_KEY",
   "SESSION_SECRET": "SECRET",
+  "PROXY_MODE": false,
 
   "INDEX": [ "index.htm" , "index.html" ],
 
