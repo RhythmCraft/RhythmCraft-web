@@ -164,7 +164,7 @@ app.use((req, res, next) => {
     res.locals.Warn = req.flash('Warn');
     res.locals.session = req.session;
     res.locals.isClient = req.session.isClient || false;
-    res.locals.socket = setting.PROXY_MODE ? `https://${req.hostname}:${setting.PORT}` : `${req.protocol}://${req.hostname}:${setting.PORT}`;
+    res.locals.socket = `${setting.ENFORCE_SOCKET_SECURE ? 'https' : req.protocol}://${req.hostname}${setting.ENFORCE_SOCKET_STANDARD_PORT ? '' : `:${setting.PORT}`}`;
     res.locals.query = req.query;
     res.locals.referrer = req.get('referrer');
     res.locals.referrer_path = req.get('referrer') != null ? Url.parse(req.get('referrer')).path : req.url;
