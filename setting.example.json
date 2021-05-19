@@ -7,7 +7,7 @@
   "SSL_KEY": "SSL_KEY",
   "SESSION_SECRET": "SECRET",
   "ENFORCE_SOCKET_SECURE": false,
-  "ENFORCE_SOCKET_DEFAULT_PORT": false,
+  "ENFORCE_SOCKET_STANDARD_PORT": false,
 
   "INDEX": [ "index.htm" , "index.html" ],
 
